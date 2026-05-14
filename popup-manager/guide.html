@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방문 가이드 — K-POP SQUARE 홍대</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black:  #0a0a0a;
+  --white:  #f5f5f3;
+  --gray:   #888;
+  --line:   rgba(255,255,255,0.1);
+  --accent: #e8e0d0;
+  --dim:    #1a1a1a;
+  --card:   #111;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Noto Sans KR', sans-serif;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* ── 헤더 ── */
+header {
+  padding: 24px 24px 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #2a2a2a;
+  border-radius: 50%;
+  color: var(--gray);
+  text-decoration: none;
+  font-size: 16px;
+  transition: border-color 0.2s, color 0.2s;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.back-btn:active { border-color: #555; color: var(--white); }
+
+.header-info {
+  flex: 1;
+}
+.page-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--gray);
+}
+.page-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 2px;
+  color: var(--white);
+  line-height: 1.1;
+}
+
+/* ── 섹션 ── */
+.section {
+  margin: 32px 24px 0;
+}
+
+.section-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--gray);
+  margin-bottom: 14px;
+}
+
+/* ── 운영시간 카드 ── */
+.hours-card {
+  background: var(--card);
+  border: 1px solid #1e1e1e;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.hours-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #1c1c1c;
+}
+.hours-row:last-child { border-bottom: none; }
+
+.hours-day {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--white);
+}
+.hours-day.weekend { color: #e07070; }
+
+.hours-time {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 1px;
+  color: var(--accent);
+}
+
+.hours-note {
+  padding: 12px 20px;
+  background: #0d0d0d;
+  font-size: 11px;
+  color: var(--gray);
+  line-height: 1.6;
+  border-top: 1px solid #1c1c1c;
+}
+
+/* ── 위치 카드 ── */
+.location-card {
+  background: var(--card);
+  border: 1px solid #1e1e1e;
+  border-radius: 4px;
+  padding: 20px;
+}
+
+.location-address {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--white);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.location-sub {
+  font-size: 12px;
+  color: var(--gray);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.map-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px;
+  background: transparent;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.2s;
+}
+.map-btn:active { border-color: #555; }
+.map-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+/* ── 지하철 태그들 ── */
+.transit-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.transit-tag {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 2px;
+  font-weight: 500;
+}
+.transit-tag.line2  { background: #1a3a1a; color: #4caf50; }
+.transit-tag.linea  { background: #2a1f0e; color: #e8a020; }
+
+/* ── 팁 리스트 ── */
+.tip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tip-item {
+  background: var(--card);
+  border: 1px solid #1e1e1e;
+  border-radius: 4px;
+  padding: 16px 20px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.tip-icon {
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.tip-content {}
+.tip-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+.tip-desc {
+  font-size: 12px;
+  color: var(--gray);
+  line-height: 1.6;
+}
+
+/* ── 입장 절차 스텝 ── */
+.steps {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.step-item {
+  display: flex;
+  gap: 16px;
+  position: relative;
+}
+
+.step-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.step-num {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #333;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px;
+  color: var(--accent);
+  background: var(--black);
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.step-line {
+  width: 1px;
+  flex: 1;
+  background: #222;
+  margin: 4px 0;
+  min-height: 20px;
+}
+
+.step-item:last-child .step-line { display: none; }
+
+.step-content {
+  padding-bottom: 20px;
+  flex: 1;
+}
+.step-item:last-child .step-content { padding-bottom: 0; }
+
+.step-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--white);
+  margin-bottom: 4px;
+  padding-top: 4px;
+}
+.step-desc {
+  font-size: 12px;
+  color: var(--gray);
+  line-height: 1.6;
+}
+
+/* ── 주의사항 ── */
+.notice-list {
+  background: var(--card);
+  border: 1px solid #1e1e1e;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.notice-item {
+  padding: 14px 20px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border-bottom: 1px solid #1c1c1c;
+  font-size: 13px;
+  color: var(--gray);
+  line-height: 1.5;
+}
+.notice-item:last-child { border-bottom: none; }
+.notice-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #444;
+  margin-top: 7px;
+  flex-shrink: 0;
+}
+
+/* ── 구분선 ── */
+.divider {
+  height: 1px;
+  background: var(--line);
+  margin: 32px 24px 0;
+}
+
+/* ── 푸터 ── */
+footer {
+  margin: 40px 24px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: #333;
+}
+.footer-loc {
+  font-size: 11px;
+  color: #333;
+  letter-spacing: 1px;
+}
+
+/* ── 애니메이션 ── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+header        { animation: fadeUp 0.4s ease both; }
+.section:nth-child(1) { animation: fadeUp 0.4s 0.05s ease both; }
+.section:nth-child(2) { animation: fadeUp 0.4s 0.1s ease both; }
+.section:nth-child(3) { animation: fadeUp 0.4s 0.15s ease both; }
+.section:nth-child(4) { animation: fadeUp 0.4s 0.2s ease both; }
+.section:nth-child(5) { animation: fadeUp 0.4s 0.25s ease both; }
+.divider      { animation: fadeUp 0.3s 0.3s ease both; }
+footer        { animation: fadeUp 0.3s 0.35s ease both; }
+</style>
+<!-- Facebook Pixel -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,"script",
+"https://connect.facebook.net/en_US/fbevents.js");
+fbq("init", "2914661692095333");
+fbq("track", "PageView");
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=2914661692095333&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Facebook Pixel -->
+</head>
+<body>
+
+<header>
+  <a class="back-btn" href="./index.html" aria-label="뒤로가기">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+  </a>
+  <div class="header-info">
+    <div class="page-label">K-POP SQUARE HONGDAE</div>
+    <div class="page-title">VISIT GUIDE</div>
+  </div>
+</header>
+
+<!-- 운영시간 -->
+<div class="section">
+  <div class="section-label">OPENING HOURS</div>
+  <div class="hours-card">
+    <div class="hours-row">
+      <span class="hours-day">월요일 — 금요일</span>
+      <span class="hours-time">10:00 — 21:00</span>
+    </div>
+    <div class="hours-row">
+      <span class="hours-day weekend">토요일</span>
+      <span class="hours-time">10:00 — 22:00</span>
+    </div>
+    <div class="hours-row">
+      <span class="hours-day weekend">일요일</span>
+      <span class="hours-time">10:00 — 21:00</span>
+    </div>
+    <div class="hours-note">
+      ※ 공휴일은 일요일 운영 시간을 따릅니다 &nbsp;·&nbsp; 마지막 입장은 운영 종료 30분 전입니다
+    </div>
+  </div>
+</div>
+
+<!-- 위치 -->
+<div class="section">
+  <div class="section-label">LOCATION & ACCESS</div>
+  <div class="location-card">
+    <div class="location-address">서울특별시 마포구 양화로 153<br>케이팝스퀘어 홍대 (K-POP SQUARE HONGDAE)</div>
+    <div class="location-sub">
+      지하 1층 · 지상 6층 규모의 복합문화공간
+    </div>
+    <div class="transit-tags">
+      <span class="transit-tag line2">🚇 2호선 홍대입구역 9번출구 도보 5분</span>
+      <span class="transit-tag linea">🚇 공항철도 홍대입구역 3번출구 도보 5분</span>
+    </div>
+    <div style="margin-top:16px;">
+      <a class="map-btn" href="https://naver.me/FjmsjscI" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        네이버 지도로 길찾기
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- 입장 절차 -->
+<div class="section">
+  <div class="section-label">ENTRY PROCESS</div>
+  <div class="steps">
+    <div class="step-item">
+      <div class="step-left">
+        <div class="step-num">1</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-title">대기 줄 합류</div>
+        <div class="step-desc">매장 입구에 마련된 대기 라인에 합류하세요. 피크 타임(오후 2~6시)에는 대기가 발생할 수 있습니다.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-left">
+        <div class="step-num">2</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-title">입장 허가 확인</div>
+        <div class="step-desc">스태프 안내에 따라 순서대로 입장합니다. 단체(5인 이상)는 사전 예약이 필요할 수 있습니다.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-left">
+        <div class="step-num">3</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-title">쇼핑 & 포토존 이용</div>
+        <div class="step-desc">층별로 다양한 굿즈와 포토존이 마련되어 있습니다. 재고 확인은 이 앱의 📦 재고 확인 기능을 이용하세요.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-left">
+        <div class="step-num">4</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-title">계산 & 포장</div>
+        <div class="step-desc">구매 상품은 전용 쇼핑백에 포장됩니다. 현금 및 카드 결제 가능, 일부 이벤트 굿즈는 1인 수량 제한이 있습니다.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 이용 꿀팁 -->
+<div class="section">
+  <div class="section-label">VISIT TIPS</div>
+  <div class="tip-list">
+    <div class="tip-item">
+      <div class="tip-icon">⏰</div>
+      <div class="tip-content">
+        <div class="tip-title">오전 방문을 추천해요</div>
+        <div class="tip-desc">오전 10~12시 사이는 가장 한산한 시간대입니다. 여유롭게 쇼핑하고 싶다면 오전 방문을 추천합니다.</div>
+      </div>
+    </div>
+    <div class="tip-item">
+      <div class="tip-icon">📦</div>
+      <div class="tip-content">
+        <div class="tip-title">방문 전 재고 확인은 필수</div>
+        <div class="tip-desc">원하는 굿즈가 있다면 이 앱의 실시간 재고 확인 기능으로 미리 확인하세요. 인기 품목은 오픈 직후 품절되는 경우가 많습니다.</div>
+      </div>
+    </div>
+    <div class="tip-item">
+      <div class="tip-icon">🎒</div>
+      <div class="tip-content">
+        <div class="tip-title">큰 가방은 보관함에</div>
+        <div class="tip-desc">매장 내 쾌적한 이용을 위해 대형 짐은 매장 입구 보관함을 이용해 주세요. 보관함은 무료입니다.</div>
+      </div>
+    </div>
+    <div class="tip-item">
+      <div class="tip-icon">📱</div>
+      <div class="tip-content">
+        <div class="tip-title">메모장으로 구매 목록 미리 작성</div>
+        <div class="tip-desc">이 앱의 🗒️ 쇼핑 메모장에 원하는 굿즈를 미리 기록하면 매장에서 더 효율적으로 쇼핑할 수 있어요.</div>
+      </div>
+    </div>
+    <div class="tip-item">
+      <div class="tip-icon">🔄</div>
+      <div class="tip-content">
+        <div class="tip-title">굿즈 교환은 공식 채널로</div>
+        <div class="tip-desc">팬들 간 굿즈 교환·나눔은 이 앱의 🔄 교환·나눔 채널을 이용하세요. 매장 내 직거래는 제한됩니다.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 주의사항 -->
+<div class="section">
+  <div class="section-label">NOTES & CAUTIONS</div>
+  <div class="notice-list">
+    <div class="notice-item">
+      <div class="notice-dot"></div>
+      매장 내 음식물 반입 및 취식은 금지되어 있습니다.
+    </div>
+    <div class="notice-item">
+      <div class="notice-dot"></div>
+      전시 상품 및 인테리어 소품에 임의로 손을 대지 말아 주세요.
+    </div>
+    <div class="notice-item">
+      <div class="notice-dot"></div>
+      포토존 촬영 시 삼각대·셀카봉 등 보조 장비 사용은 혼잡한 상황에서 제한될 수 있습니다.
+    </div>
+    <div class="notice-item">
+      <div class="notice-dot"></div>
+      구매 후 반품·교환은 영수증 지참 시 7일 이내 가능합니다. (일부 이벤트 상품 제외)
+    </div>
+    <div class="notice-item">
+      <div class="notice-dot"></div>
+      한정 수량 굿즈는 1인 최대 2개 구매 제한이 적용될 수 있습니다.
+    </div>
+    <div class="notice-item">
+      <div class="notice-dot"></div>
+      이 앱의 재고 정보는 실시간 데이터를 반영하나, 현장 상황에 따라 차이가 있을 수 있습니다.
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<footer>
+  <div class="footer-brand">K-POP SQUARE</div>
+  <div class="footer-loc">서울 마포구 홍대</div>
+</footer>
+
+</body>
+</html>

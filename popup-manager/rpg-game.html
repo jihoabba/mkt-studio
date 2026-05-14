@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Popup Store Preview RPG</title>
+  <style>
+    :root {
+      --bg: #0f1417;
+      --panel: #1e2a2d;
+      --text: #e6f0ef;
+      --accent: #ffcf57;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: monospace;
+      touch-action: none;
+    }
+    #game-wrap {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #223136 0%, #0d1214 80%);
+    }
+    #game-container {
+      width: min(100vw, 56.25vh);
+      height: min(177.78vw, 100vh);
+      max-width: 100vw;
+      max-height: 100vh;
+      image-rendering: pixelated;
+      border: 2px solid #33464d;
+      box-shadow: 0 0 0 2px #0a0f11, 0 10px 24px rgba(0,0,0,0.45);
+      position: relative;
+      overflow: hidden;
+      background: #0a0f10;
+    }
+    canvas { image-rendering: pixelated; }
+    .hud {
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      top: 8px;
+      z-index: 3;
+      pointer-events: none;
+      color: #c9dbd7;
+      text-shadow: 1px 1px 0 #1b2325;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+</head>
+<body>
+  <div id="game-wrap">
+    <div id="game-container">
+      <div class="hud"><span>POPUP STORE PREVIEW</span><span>ARROWS / D-PAD + A</span></div>
+    </div>
+  </div>
+
+  <script>
+    // =========================
+    // 1) Reusable template/config
+    // =========================
+    const STORE_TEMPLATE = {
+      palette: {
+        floorA: 0xc8d0bf,
+        floorB: 0xbec6b4,
+        wall: 0x51666f,
+        wallTrim: 0x2f3f45,
+        shelf: 0x866445,
+        shelfTop: 0xbaa082,
+        counter: 0x5b6d53,
+        counterTop: 0x91aa7b,
+        photoBooth: 0x765a8f,
+        mediaScreen: 0x2e3d47,
+        mediaGlow: 0x78dde4,
+        decor: 0xa06f8f,
+        playerHair: 0x2d2a2f,
+        playerBody: 0x3b6ca8,
+        playerAccent: 0xffd36e,
+        uiBg: 0x172126,
+        uiBorder: 0xcedcd8,
+        uiText: 0xeaf5f2,
+        zoneProduct: 0x7dc08e,
+        zonePhoto: 0xc78bd9,
+        zoneMedia: 0x6dc6db
+      },
+      map: {
+        tile: 16,
+        width: 20,
+        height: 28,
+        zones: [
+          {
+            id: 'product',
+            label: 'PRODUCT ZONE',
+            color: 'zoneProduct',
+            bounds: { x: 2, y: 3, w: 7, h: 8 },
+            text: 'GOODS GUIDE\n- Limited album sets are displayed by theme.\n- Queue at cashier counter to purchase.\n- Pick up one preview lightstick at the demo rack.'
+          },
+          {
+            id: 'photo',
+            label: 'PHOTO ZONE',
+            color: 'zonePhoto',
+            bounds: { x: 11, y: 3, w: 7, h: 8 },
+            text: 'PHOTO ZONE GUIDE\n- Try 3 themed photo frames.\n- Stand on marker and press shutter.\n- Share code appears on the print strip.'
+          },
+          {
+            id: 'media',
+            label: 'MEDIA ZONE',
+            color: 'zoneMedia',
+            bounds: { x: 4, y: 16, w: 12, h: 8 },
+            text: 'MEDIA ZONE GUIDE\n- Watch teaser loop on the wall screen.\n- Headphones available at side table.\n- Next trailer rotation every 2 minutes.'
+          }
+        ],
+        objectPresets: {
+          shelf: { type: 'rect', w: 2, h: 1, solid: true, interactive: true, text: 'These shelves hold signature goods and mini albums.' },
+          cashier: { type: 'rect', w: 4, h: 1, solid: true, interactive: true, text: 'Cashier: card & mobile pay only. Keep your pickup QR ready.' },
+          booth: { type: 'rect', w: 3, h: 2, solid: true, interactive: true, text: 'Photo booth has idol-themed filters and instant print.' },
+          media: { type: 'rect', w: 5, h: 1, solid: true, interactive: true, text: 'Media wall is playing behind-the-scenes clips.' },
+          decor: { type: 'rect', w: 1, h: 1, solid: true, interactive: false }
+        },
+        objects: [
+          { preset: 'shelf', x: 3, y: 5 },
+          { preset: 'shelf', x: 3, y: 8 },
+          { preset: 'shelf', x: 6, y: 8 },
+          { preset: 'cashier', x: 4, y: 12 },
+          { preset: 'booth', x: 12, y: 6 },
+          { preset: 'media', x: 7, y: 18 },
+          { preset: 'decor', x: 16, y: 19 },
+          { preset: 'decor', x: 2, y: 20 }
+        ]
+      }
+    };
+
+    class PopupStoreScene extends Phaser.Scene {
+      constructor() {
+        super('PopupStoreScene');
+        this.moveInput = { up:false, down:false, left:false, right:false };
+        this.interactPressed = false;
+      }
+
+      create() {
+        this.cfg = STORE_TEMPLATE;
+        this.p = this.cfg.palette;
+        this.tile = this.cfg.map.tile;
+        this.mapW = this.cfg.map.width;
+        this.mapH = this.cfg.map.height;
+
+        this.cameras.main.setBackgroundColor(this.p.wallTrim);
+        this.physics.world.setBounds(0, 0, this.mapW * this.tile, this.mapH * this.tile);
+
+        this.createTextures();
+        this.drawMap();
+        this.createObjects();
+        this.createPlayer();
+        this.createControls();
+        this.createUI();
+
+        this.physics.add.collider(this.player, this.solidGroup);
+        this.cameras.main.startFollow(this.player, true, 0.15, 0.15);
+        this.cameras.main.setBounds(0, 0, this.mapW * this.tile, this.mapH * this.tile);
+        this.cameras.main.setZoom(2);
+      }
+
+      createTextures() {
+        // Procedurally generated object textures
+        const g = this.make.graphics({ x: 0, y: 0, add: false });
+        g.fillStyle(this.p.shelf, 1).fillRect(0, 0, 32, 16);
+        g.fillStyle(this.p.shelfTop, 1).fillRect(0, 0, 32, 5);
+        g.generateTexture('obj_shelf', 32, 16); g.clear();
+
+        g.fillStyle(this.p.counter, 1).fillRect(0, 0, 64, 16);
+        g.fillStyle(this.p.counterTop, 1).fillRect(0, 0, 64, 5);
+        g.generateTexture('obj_cashier', 64, 16); g.clear();
+
+        g.fillStyle(this.p.photoBooth, 1).fillRect(0, 0, 48, 32);
+        g.fillStyle(0xd8c8e6, 1).fillRect(10, 10, 28, 14);
+        g.generateTexture('obj_booth', 48, 32); g.clear();
+
+        g.fillStyle(this.p.mediaScreen, 1).fillRect(0, 0, 80, 16);
+        g.fillStyle(this.p.mediaGlow, 1).fillRect(8, 4, 64, 8);
+        g.generateTexture('obj_media', 80, 16); g.clear();
+
+        g.fillStyle(this.p.decor, 1).fillRect(0, 0, 16, 16);
+        g.fillStyle(0xf5d7e8, 1).fillRect(4, 4, 8, 8);
+        g.generateTexture('obj_decor', 16, 16); g.destroy();
+
+        this.createPlayerSpriteSheet();
+      }
+
+      createPlayerSpriteSheet() {
+        const fw = 16, fh = 20, frames = 10;
+        const tex = this.textures.createCanvas('player_raw', fw * frames, fh);
+        const ctx = tex.context;
+        const drawFrame = (frame, dir, step) => {
+          const ox = frame * fw;
+          const px = (x, y, c) => { ctx.fillStyle = c; ctx.fillRect(ox + x, y, 1, 1); };
+          const cHair = Phaser.Display.Color.IntegerToColor(this.p.playerHair).rgba;
+          const cBody = Phaser.Display.Color.IntegerToColor(this.p.playerBody).rgba;
+          const cAcc = Phaser.Display.Color.IntegerToColor(this.p.playerAccent).rgba;
+          const cSkin = '#f4cfaf';
+          for (let y=0;y<fh;y++) for (let x=0;x<fw;x++) px(x,y,'rgba(0,0,0,0)');
+
+          // head/body in top-down RPG proportion
+          const bob = step === 1 ? 1 : 0;
+          for (let y=3+bob; y<=7+bob; y++) for (let x=5; x<=10; x++) px(x,y,cHair);
+          for (let y=8+bob; y<=10+bob; y++) for (let x=6; x<=9; x++) px(x,y,cSkin);
+          for (let y=11+bob; y<=16+bob; y++) for (let x=5; x<=10; x++) px(x,y,cBody);
+          for (let y=12+bob; y<=13+bob; y++) for (let x=7; x<=8; x++) px(x,y,cAcc);
+
+          // directional hint
+          if (dir === 'front') { px(6,9+bob,'#3a2c22'); px(9,9+bob,'#3a2c22'); }
+          if (dir === 'back') { for (let x=6;x<=9;x++) px(x,8+bob,cHair); }
+          if (dir === 'left') { px(5,12+bob,cAcc); }
+          if (dir === 'right') { px(10,12+bob,cAcc); }
+
+          // feet animation
+          const legL = step === 2 ? 17 : 16;
+          const legR = step === 0 ? 17 : 16;
+          px(6,legL+bob,'#2a2a35'); px(9,legR+bob,'#2a2a35');
+        };
+
+        // front: 0,1,2 / back: 3,4,5 / left: 6,7 / right: 8,9
+        drawFrame(0, 'front', 0); drawFrame(1, 'front', 1); drawFrame(2, 'front', 2);
+        drawFrame(3, 'back', 0);  drawFrame(4, 'back', 1);  drawFrame(5, 'back', 2);
+        drawFrame(6, 'left', 0);  drawFrame(7, 'left', 2);
+        drawFrame(8, 'right', 0); drawFrame(9, 'right', 2);
+
+        tex.refresh();
+        this.textures.addSpriteSheet('player', tex.getSourceImage(), { frameWidth: fw, frameHeight: fh });
+
+        this.anims.create({ key: 'walk_front', frames: [{key:'player',frame:0},{key:'player',frame:1},{key:'player',frame:2}], frameRate: 7, repeat: -1 });
+        this.anims.create({ key: 'walk_back', frames: [{key:'player',frame:3},{key:'player',frame:4},{key:'player',frame:5}], frameRate: 7, repeat: -1 });
+        this.anims.create({ key: 'walk_left', frames: [{key:'player',frame:6},{key:'player',frame:7}], frameRate: 6, repeat: -1 });
+        this.anims.create({ key: 'walk_right', frames: [{key:'player',frame:8},{key:'player',frame:9}], frameRate: 6, repeat: -1 });
+      }
+
+      drawMap() {
+        const g = this.add.graphics();
+        const w = this.mapW * this.tile;
+        const h = this.mapH * this.tile;
+
+        // floor tiles + subtle checker pattern for indoor feel
+        for (let y=0; y<this.mapH; y++) {
+          for (let x=0; x<this.mapW; x++) {
+            const c = (x + y) % 2 === 0 ? this.p.floorA : this.p.floorB;
+            g.fillStyle(c, 1).fillRect(x*this.tile, y*this.tile, this.tile, this.tile);
+          }
+        }
+
+        // walls
+        g.fillStyle(this.p.wall, 1);
+        g.fillRect(0, 0, w, this.tile);
+        g.fillRect(0, h - this.tile, w, this.tile);
+        g.fillRect(0, 0, this.tile, h);
+        g.fillRect(w - this.tile, 0, this.tile, h);
+
+        // trim
+        g.fillStyle(this.p.wallTrim, 1);
+        g.fillRect(this.tile, this.tile, w - this.tile*2, 2);
+
+        // zone rugs/labels to indicate sections
+        this.cfg.map.zones.forEach((z) => {
+          const c = this.p[z.color];
+          g.fillStyle(c, 0.25).fillRect(z.bounds.x*this.tile, z.bounds.y*this.tile, z.bounds.w*this.tile, z.bounds.h*this.tile);
+          g.lineStyle(1, c, 0.8).strokeRect(z.bounds.x*this.tile+0.5, z.bounds.y*this.tile+0.5, z.bounds.w*this.tile-1, z.bounds.h*this.tile-1);
+        });
+
+        this.wallGroup = this.physics.add.staticGroup();
+        const mkWall = (x, y, w, h) => {
+          const r = this.add.rectangle(x+w/2, y+h/2, w, h, 0xffffff, 0);
+          this.physics.add.existing(r, true);
+          this.wallGroup.add(r);
+        };
+        mkWall(0,0,w,this.tile); mkWall(0,h-this.tile,w,this.tile); mkWall(0,0,this.tile,h); mkWall(w-this.tile,0,this.tile,h);
+      }
+
+      createObjects() {
+        this.solidGroup = this.physics.add.staticGroup();
+        this.interactives = [];
+
+        const textureFor = (preset) => `obj_${preset}`;
+        this.cfg.map.objects.forEach((objDef) => {
+          const preset = this.cfg.map.objectPresets[objDef.preset];
+          const x = objDef.x * this.tile;
+          const y = objDef.y * this.tile;
+          const w = preset.w * this.tile;
+          const h = preset.h * this.tile;
+          const sprite = this.add.image(x + w/2, y + h/2, textureFor(objDef.preset)).setOrigin(0.5);
+
+          if (preset.solid) {
+            const hitbox = this.add.rectangle(x + w/2, y + h/2, w, h, 0xffffff, 0);
+            this.physics.add.existing(hitbox, true);
+            this.solidGroup.add(hitbox);
+          }
+          if (preset.interactive) {
+            this.interactives.push({ x: x + w/2, y: y + h/2, radius: 24, text: preset.text, title: objDef.preset.toUpperCase() });
+          }
+        });
+
+        // Zone interactives
+        this.cfg.map.zones.forEach((z) => {
+          this.interactives.push({
+            x: (z.bounds.x + z.bounds.w/2) * this.tile,
+            y: (z.bounds.y + z.bounds.h/2) * this.tile,
+            radius: 34,
+            text: z.text,
+            title: z.label
+          });
+        });
+      }
+
+      createPlayer() {
+        this.player = this.physics.add.sprite(8 * this.tile, 24 * this.tile, 'player', 0);
+        this.player.setSize(10, 10).setOffset(3, 10);
+        this.player.setCollideWorldBounds(true);
+        this.playerDirection = 'front';
+      }
+
+      createControls() {
+        this.keys = this.input.keyboard.addKeys({ up:'UP', down:'DOWN', left:'LEFT', right:'RIGHT', a:'SPACE' });
+
+        // Touch controls
+        this.uiLayer = this.add.layer().setDepth(1000);
+        const camW = this.scale.width;
+        const camH = this.scale.height;
+
+        const mkBtn = (x, y, r, label) => {
+          const c = this.add.circle(x, y, r, 0x111b1f, 0.75).setScrollFactor(0).setDepth(1001).setStrokeStyle(2, 0x9db5b5, 0.8);
+          const t = this.add.text(x, y, label, { fontFamily:'monospace', fontSize:'16px', color:'#e6f0ef' }).setOrigin(0.5).setScrollFactor(0).setDepth(1002);
+          this.uiLayer.add([c, t]);
+          return c;
+        };
+
+        const dpx = 74, dpy = camH - 86, d = 28;
+        this.btnUp = mkBtn(dpx, dpy - d, 20, '▲');
+        this.btnDown = mkBtn(dpx, dpy + d, 20, '▼');
+        this.btnLeft = mkBtn(dpx - d, dpy, 20, '◀');
+        this.btnRight = mkBtn(dpx + d, dpy, 20, '▶');
+        this.btnA = mkBtn(camW - 58, camH - 84, 26, 'A');
+
+        this.bindTouchButton(this.btnUp, 'up');
+        this.bindTouchButton(this.btnDown, 'down');
+        this.bindTouchButton(this.btnLeft, 'left');
+        this.bindTouchButton(this.btnRight, 'right');
+        this.btnA.setInteractive();
+        this.btnA.on('pointerdown', () => { this.interactPressed = true; });
+      }
+
+      bindTouchButton(button, dir) {
+        button.setInteractive();
+        button.on('pointerdown', () => this.moveInput[dir] = true);
+        button.on('pointerup', () => this.moveInput[dir] = false);
+        button.on('pointerout', () => this.moveInput[dir] = false);
+        button.on('pointerupoutside', () => this.moveInput[dir] = false);
+      }
+
+      createUI() {
+        this.exclamation = this.add.text(0, 0, '!', { fontFamily:'monospace', fontSize:'16px', color:'#ffd84d', stroke:'#2b2206', strokeThickness: 3 }).setOrigin(0.5).setDepth(900).setVisible(false);
+
+        this.dialogOpen = false;
+        this.dialogBg = this.add.rectangle(this.scale.width/2, this.scale.height - 56, this.scale.width - 14, 102, this.p.uiBg, 0.95)
+          .setStrokeStyle(2, this.p.uiBorder, 1).setScrollFactor(0).setDepth(1100).setVisible(false);
+        this.dialogTitle = this.add.text(12, this.scale.height - 100, '', { fontFamily:'monospace', fontSize:'11px', color:'#ffdf6d' })
+          .setScrollFactor(0).setDepth(1101).setVisible(false);
+        this.dialogText = this.add.text(12, this.scale.height - 84, '', {
+          fontFamily:'monospace', fontSize:'10px', color:'#eaf5f2', wordWrap:{ width: this.scale.width - 28 }
+        }).setScrollFactor(0).setDepth(1101).setVisible(false);
+      }
+
+      openDialog(title, text) {
+        this.dialogOpen = true;
+        this.dialogBg.setVisible(true);
+        this.dialogTitle.setText(`[${title}]`).setVisible(true);
+        this.dialogText.setText(text + '\n\nTap A / SPACE to close').setVisible(true);
+      }
+
+      closeDialog() {
+        this.dialogOpen = false;
+        this.dialogBg.setVisible(false);
+        this.dialogTitle.setVisible(false);
+        this.dialogText.setVisible(false);
+      }
+
+      update() {
+        const speed = 80;
+        const up = this.keys.up.isDown || this.moveInput.up;
+        const down = this.keys.down.isDown || this.moveInput.down;
+        const left = this.keys.left.isDown || this.moveInput.left;
+        const right = this.keys.right.isDown || this.moveInput.right;
+        const interact = Phaser.Input.Keyboard.JustDown(this.keys.a) || this.interactPressed;
+        this.interactPressed = false;
+
+        if (interact && this.dialogOpen) {
+          this.closeDialog();
+          return;
+        }
+
+        if (!this.dialogOpen) {
+          let vx = 0, vy = 0;
+          if (up) vy -= speed;
+          if (down) vy += speed;
+          if (left) vx -= speed;
+          if (right) vx += speed;
+          if (vx !== 0 && vy !== 0) { vx *= 0.707; vy *= 0.707; }
+          this.player.setVelocity(vx, vy);
+
+          if (vx === 0 && vy === 0) {
+            this.player.anims.stop();
+          } else if (Math.abs(vx) > Math.abs(vy)) {
+            if (vx > 0) { this.player.play('walk_right', true); this.playerDirection = 'right'; }
+            else { this.player.play('walk_left', true); this.playerDirection = 'left'; }
+          } else {
+            if (vy > 0) { this.player.play('walk_front', true); this.playerDirection = 'front'; }
+            else { this.player.play('walk_back', true); this.playerDirection = 'back'; }
+          }
+
+          // idle frame by last direction
+          if (vx === 0 && vy === 0) {
+            const idleFrame = { front:1, back:4, left:6, right:8 }[this.playerDirection];
+            this.player.setFrame(idleFrame);
+          }
+        } else {
+          this.player.setVelocity(0,0);
+        }
+
+        // proximity check for ! marker
+        let nearest = null;
+        let minDist = Infinity;
+        this.interactives.forEach((it) => {
+          const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, it.x, it.y);
+          if (d < it.radius && d < minDist) { minDist = d; nearest = it; }
+        });
+
+        if (nearest && !this.dialogOpen) {
+          this.exclamation.setPosition(this.player.x, this.player.y - 18).setVisible(true);
+          if (interact) this.openDialog(nearest.title, nearest.text);
+        } else {
+          this.exclamation.setVisible(false);
+        }
+      }
+    }
+
+    const game = new Phaser.Game({
+      type: Phaser.AUTO,
+      parent: 'game-container',
+      width: 320,
+      height: 568,
+      pixelArt: true,
+      backgroundColor: '#0f1417',
+      physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
+      scene: [PopupStoreScene],
+      scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: 320,
+        height: 568
+      }
+    });
+  </script>
+</body>
+</html>

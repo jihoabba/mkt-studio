@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POPUP STOCK SYSTEM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --black: #0a0a0a;
+            --white: #f5f4f0;
+            --gray: #8a8a8a;
+            --border: #2a2a2a;
+            --first: #4ade80;
+            --second: #fb923c;
+            --third: #60a5fa;
+            --fourth: #c084fc;
+            --fifth: #f472b6;
+            --admin: #a78bfa;
+        }
+
+        body {
+            background: var(--black);
+            color: var(--white);
+            font-family: "Pretendard Variable", Pretendard, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 배경 노이즈 텍스처 */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 60px 32px 48px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 헤더 */
+        .header {
+            margin-bottom: 56px;
+        }
+
+        .eyebrow {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            color: var(--gray);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .eyebrow::before {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 1px;
+            background: var(--gray);
+        }
+
+        .title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(52px, 12vw, 88px);
+            line-height: 0.9;
+            letter-spacing: 0.02em;
+            color: var(--white);
+        }
+
+        .title span {
+            display: block;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(245,244,240,0.3);
+        }
+
+        .subtitle {
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--gray);
+            line-height: 1.6;
+            max-width: 360px;
+        }
+
+        /* 섹션 구분 */
+        .section-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.25em;
+            color: var(--gray);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            opacity: 0.6;
+        }
+
+        .section { margin-bottom: 36px; }
+
+        /* 카드 버튼 */
+        .card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 20px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: transparent;
+            color: var(--white);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: transparent;
+            transform: translateX(4px);
+        }
+
+        .card:hover::before { opacity: 1; }
+        .card:active { transform: translateX(4px) scale(0.99); }
+
+        /* 홍대 */
+        .card-first::before { background: linear-gradient(135deg, rgba(74,222,128,0.08), transparent); }
+        .card-first:hover { border-color: rgba(74,222,128,0.3); box-shadow: 0 0 0 1px rgba(74,222,128,0.3), inset 0 0 20px rgba(74,222,128,0.04); }
+        .card-first .dot { background: var(--first); }
+        .card-first .arrow { color: var(--first); }
+
+        /* 부산 */
+        .card-second::before { background: linear-gradient(135deg, rgba(251,146,60,0.08), transparent); }
+        .card-second:hover { border-color: rgba(251,146,60,0.3); box-shadow: 0 0 0 1px rgba(251,146,60,0.3), inset 0 0 20px rgba(251,146,60,0.04); }
+        .card-second .dot { background: var(--second); }
+        .card-second .arrow { color: var(--second); }
+
+        /* Third */
+        .card-third::before { background: linear-gradient(135deg, rgba(96,165,250,0.08), transparent); }
+        .card-third:hover { border-color: rgba(96,165,250,0.3); box-shadow: 0 0 0 1px rgba(96,165,250,0.3), inset 0 0 20px rgba(96,165,250,0.04); }
+        .card-third .dot { background: var(--third); }
+        .card-third .arrow { color: var(--third); }
+
+        /* Fourth */
+        .card-fourth::before { background: linear-gradient(135deg, rgba(192,132,252,0.08), transparent); }
+        .card-fourth:hover { border-color: rgba(192,132,252,0.3); box-shadow: 0 0 0 1px rgba(192,132,252,0.3), inset 0 0 20px rgba(192,132,252,0.04); }
+        .card-fourth .dot { background: var(--fourth); }
+        .card-fourth .arrow { color: var(--fourth); }
+
+        /* Fifth */
+        .card-fifth::before { background: linear-gradient(135deg, rgba(244,114,182,0.08), transparent); }
+        .card-fifth:hover { border-color: rgba(244,114,182,0.3); box-shadow: 0 0 0 1px rgba(244,114,182,0.3), inset 0 0 20px rgba(244,114,182,0.04); }
+        .card-fifth .dot { background: var(--fifth); }
+        .card-fifth .arrow { color: var(--fifth); }
+
+        /* 어드민 */
+        .card-admin::before { background: linear-gradient(135deg, rgba(167,139,250,0.08), transparent); }
+        .card-admin:hover { border-color: rgba(167,139,250,0.3); box-shadow: 0 0 0 1px rgba(167,139,250,0.3), inset 0 0 20px rgba(167,139,250,0.04); }
+        .card-admin .dot { background: var(--admin); }
+        .card-admin .arrow { color: var(--admin); }
+
+        .card-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            shrink: 0;
+            flex-shrink: 0;
+        }
+
+        .dot.pulse { animation: pulse 2s ease-in-out infinite; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .card-info {}
+
+        .card-name {
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--white);
+        }
+
+        .card-desc {
+            font-size: 11px;
+            color: var(--gray);
+            margin-top: 2px;
+            font-family: 'DM Mono', monospace;
+        }
+
+        .arrow {
+            font-size: 18px;
+            font-weight: 300;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover .arrow { transform: translateX(3px); }
+
+        /* 구분선 */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 4px 0 12px;
+        }
+
+        /* 푸터 */
+        .footer {
+            margin-top: auto;
+            padding-top: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .footer-left {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--gray);
+            opacity: 0.5;
+        }
+
+        .footer-right {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--gray);
+            opacity: 0.5;
+        }
+
+        #clock {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--gray);
+            opacity: 0.5;
+        }
+
+        /* 입장 애니메이션 */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(16px);
+            animation: fadeUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-up:nth-child(1) { animation-delay: 0.05s; }
+        .fade-up:nth-child(2) { animation-delay: 0.1s; }
+        .fade-up:nth-child(3) { animation-delay: 0.15s; }
+        .fade-up:nth-child(4) { animation-delay: 0.2s; }
+        .fade-up:nth-child(5) { animation-delay: 0.25s; }
+        .fade-up:nth-child(6) { animation-delay: 0.3s; }
+        .fade-up:nth-child(7) { animation-delay: 0.35s; }
+        .fade-up:nth-child(8) { animation-delay: 0.4s; }
+        .fade-up:nth-child(9) { animation-delay: 0.45s; }
+
+        @media (max-width: 480px) {
+            .container { padding: 40px 20px 32px; }
+            .header { margin-bottom: 40px; }
+        }
+    </style>
+    <!-- Facebook Pixel -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,"script",
+    "https://connect.facebook.net/en_US/fbevents.js");
+    fbq("init", "2914661692095333");
+    fbq("track", "PageView");
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=2914661692095333&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Facebook Pixel -->
+</head>
+<body>
+<div class="container">
+
+    <!-- 헤더 -->
+    <div class="header">
+        <div class="eyebrow fade-up">LINE FRIENDS SQUARE · POPUP SYSTEM</div>
+        <h1 class="title fade-up">
+            LIVE<br>
+            <span>STOCK</span>
+        </h1>
+        <p class="subtitle fade-up">실시간 팝업 재고 관리 시스템.<br>지점을 선택하거나 관리자로 로그인하세요.</p>
+    </div>
+
+    <!-- 고객용 -->
+    <div class="section">
+        <p class="section-label fade-up">고객용 재고 현황</p>
+        <a href="stock-front-first.html" class="card card-first fade-up">
+            <div class="card-left">
+                <div class="dot pulse" style="background:var(--first)"></div>
+                <div class="card-info">
+                    <div class="card-name">First 재고 현황</div>
+                    <div class="card-desc">FIRST STORE</div>
+                </div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+        <a href="stock-front-second.html" class="card card-second fade-up">
+            <div class="card-left">
+                <div class="dot pulse" style="background:var(--second)"></div>
+                <div class="card-info">
+                    <div class="card-name">Second 재고 현황</div>
+                    <div class="card-desc">SECOND STORE</div>
+                </div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+        <a href="stock-front-third.html" class="card card-third fade-up">
+            <div class="card-left">
+                <div class="dot pulse" style="background:var(--third)"></div>
+                <div class="card-info">
+                    <div class="card-name">Third 재고 현황</div>
+                    <div class="card-desc">THIRD STORE</div>
+                </div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+        <a href="stock-front-fourth.html" class="card card-fourth fade-up">
+            <div class="card-left">
+                <div class="dot pulse" style="background:var(--fourth)"></div>
+                <div class="card-info">
+                    <div class="card-name">Fourth 재고 현황</div>
+                    <div class="card-desc">FOURTH STORE</div>
+                </div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+        <a href="stock-front-fifth.html" class="card card-fifth fade-up">
+            <div class="card-left">
+                <div class="dot pulse" style="background:var(--fifth)"></div>
+                <div class="card-info">
+                    <div class="card-name">Fifth 재고 현황</div>
+                    <div class="card-desc">FIFTH STORE</div>
+                </div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+    </div>
+
+    <!-- 스태프용 -->
+    <div class="section">
+        <p class="section-label fade-up">현장 스태프용</p>
+        <a href="stock-back-first.html" class="card card-first fade-up">
+            <div class="card-left">
+                <div class="dot" style="background:var(--first); opacity:0.6"></div>
+                <div class="card-info">
+                    <div class="card-name">First 재고 관리</div>
+                    <div class="card-desc">STOCK MANAGER · FIRST</div>
+                </div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+        <a href="stock-back-second.html" class="card card-second fade-up">
+            <div class="card-left">
+                <div class="dot" style="background:var(--second); opacity:0.6"></div>
+                <div class="card-info">
+                    <div class="card-name">Second 재고 관리</div>
+                    <div class="card-desc">STOCK MANAGER · SECOND</div>
+                </div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+        <a href="stock-back-third.html" class="card card-third fade-up">
+            <div class="card-left">
+                <div class="dot" style="background:var(--third); opacity:0.6"></div>
+                <div class="card-info">
+                    <div class="card-name">Third 재고 관리</div>
+                    <div class="card-desc">STOCK MANAGER · THIRD</div>
+                </div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+        <a href="stock-back-fourth.html" class="card card-fourth fade-up">
+            <div class="card-left">
+                <div class="dot" style="background:var(--fourth); opacity:0.6"></div>
+                <div class="card-info">
+                    <div class="card-name">Fourth 재고 관리</div>
+                    <div class="card-desc">STOCK MANAGER · FOURTH</div>
+                </div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+        <a href="stock-back-fifth.html" class="card card-fifth fade-up">
+            <div class="card-left">
+                <div class="dot" style="background:var(--fifth); opacity:0.6"></div>
+                <div class="card-info">
+                    <div class="card-name">Fifth 재고 관리</div>
+                    <div class="card-desc">STOCK MANAGER · FIFTH</div>
+                </div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+    </div>
+
+    <!-- 어드민 -->
+    <div class="section">
+        <p class="section-label fade-up">관리자</p>
+        <a href="stock-admin.html" class="card card-admin fade-up">
+            <div class="card-left">
+                <div class="dot" style="background:var(--admin)"></div>
+                <div class="card-info">
+                    <div class="card-name">통합 어드민</div>
+                    <div class="card-desc">ADMIN · First · Second · Third · Fourth · Fifth</div>
+                </div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+    </div>
+
+    <!-- 푸터 -->
+    <div class="footer fade-up">
+        <span class="footer-left">LINE FRIENDS SQ. © 2025</span>
+        <span id="clock"></span>
+    </div>
+
+</div>
+
+<script>
+function updateClock() {
+    var now = new Date();
+    document.getElementById('clock').innerText = now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+}
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+</body>
+</html>

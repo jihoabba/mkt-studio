@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이벤트 & 혜택 — K-POP SQUARE 홍대</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black:  #0a0a0a;
+  --white:  #f5f5f3;
+  --gray:   #888;
+  --line:   rgba(255,255,255,0.1);
+  --accent: #e8e0d0;
+  --card:   #111;
+  --dim:    #1a1a1a;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Noto Sans KR', sans-serif;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* ── 헤더 ── */
+header {
+  padding: 24px 24px 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #2a2a2a;
+  border-radius: 50%;
+  color: var(--gray);
+  text-decoration: none;
+  font-size: 16px;
+  transition: border-color 0.2s, color 0.2s;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.back-btn:active { border-color: #555; color: var(--white); }
+
+.header-info { flex: 1; }
+.page-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--gray);
+}
+.page-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 2px;
+  color: var(--white);
+  line-height: 1.1;
+}
+
+/* ── 카운트다운 배너 ── */
+.countdown-banner {
+  margin: 28px 24px 0;
+  background: var(--dim);
+  border: 1px solid #222;
+  border-radius: 4px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.countdown-eyebrow {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--gray);
+}
+
+.countdown-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--white);
+  line-height: 1.4;
+}
+
+.countdown-timer {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.countdown-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.countdown-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  letter-spacing: 1px;
+  color: var(--accent);
+  line-height: 1;
+  min-width: 52px;
+  text-align: center;
+  background: #0d0d0d;
+  border: 1px solid #1e1e1e;
+  border-radius: 3px;
+  padding: 6px 4px;
+}
+
+.countdown-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--gray);
+}
+
+.countdown-sep {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  color: #333;
+  padding-bottom: 14px;
+}
+
+.countdown-event-date {
+  font-size: 11px;
+  color: var(--gray);
+}
+
+.countdown-ended {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--accent);
+}
+
+/* ── 섹션 ── */
+.section {
+  margin: 32px 24px 0;
+}
+
+.section-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--gray);
+  margin-bottom: 14px;
+}
+
+/* ── 이벤트 카드 ── */
+.event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.event-card {
+  background: var(--card);
+  border: 1px solid #1e1e1e;
+  border-radius: 4px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  cursor: default;
+}
+
+.event-card.ongoing {
+  border-color: #2a3a2a;
+}
+
+.event-card-top {
+  padding: 16px 20px 14px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.event-badge {
+  padding: 3px 8px;
+  border-radius: 2px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.badge-ongoing { background: #1a3a1a; color: #4caf50; }
+.badge-upcoming { background: #1a1a2e; color: #7e93e8; }
+.badge-ended { background: #1e1e1e; color: #555; }
+.badge-special { background: #3a2a10; color: #e8a020; }
+
+.event-info { flex: 1; }
+.event-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--white);
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+.event-card.ended .event-title { color: #555; }
+
+.event-period {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--gray);
+}
+.event-card.ended .event-period { color: #444; }
+
+.event-card-body {
+  padding: 0 20px 16px;
+  border-top: 1px solid #181818;
+}
+.event-desc {
+  font-size: 12px;
+  color: var(--gray);
+  line-height: 1.7;
+  padding-top: 12px;
+}
+.event-card.ended .event-desc { color: #3a3a3a; }
+
+.event-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.event-tag {
+  font-size: 11px;
+  padding: 4px 9px;
+  border: 1px solid #2a2a2a;
+  border-radius: 2px;
+  color: #666;
+}
+.event-card.ended .event-tag { color: #333; border-color: #1c1c1c; }
+
+/* ── 혜택 카드 ── */
+.benefit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.benefit-item {
+  background: var(--card);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.benefit-icon { font-size: 22px; }
+.benefit-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--white);
+  line-height: 1.3;
+}
+.benefit-desc {
+  font-size: 11px;
+  color: var(--gray);
+  line-height: 1.5;
+}
+
+/* ── 구분선 ── */
+.divider {
+  height: 1px;
+  background: var(--line);
+  margin: 32px 24px 0;
+}
+
+/* ── 푸터 ── */
+footer {
+  margin: 40px 24px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: #333;
+}
+.footer-loc {
+  font-size: 11px;
+  color: #333;
+  letter-spacing: 1px;
+}
+
+/* ── 애니메이션 ── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+header             { animation: fadeUp 0.4s ease both; }
+.countdown-banner  { animation: fadeUp 0.4s 0.05s ease both; }
+.section:nth-of-type(1) { animation: fadeUp 0.4s 0.1s ease both; }
+.section:nth-of-type(2) { animation: fadeUp 0.4s 0.15s ease both; }
+.divider           { animation: fadeUp 0.3s 0.2s ease both; }
+footer             { animation: fadeUp 0.3s 0.25s ease both; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.pulse-dot { animation: pulse 1.8s ease infinite; }
+</style>
+<!-- Facebook Pixel -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,"script",
+"https://connect.facebook.net/en_US/fbevents.js");
+fbq("init", "2914661692095333");
+fbq("track", "PageView");
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=2914661692095333&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Facebook Pixel -->
+</head>
+<body>
+
+<header>
+  <a class="back-btn" href="./index.html" aria-label="뒤로가기">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+  </a>
+  <div class="header-info">
+    <div class="page-label">K-POP SQUARE HONGDAE</div>
+    <div class="page-title">EVENTS & PERKS</div>
+  </div>
+</header>
+
+<!-- 다음 이벤트 카운트다운 -->
+<div class="countdown-banner">
+  <div class="countdown-eyebrow">NEXT EVENT COUNTDOWN</div>
+  <div class="countdown-title" id="next-event-title">불러오는 중...</div>
+  <div class="countdown-timer" id="countdown-timer">
+    <div class="countdown-unit">
+      <div class="countdown-num" id="cd-days">--</div>
+      <div class="countdown-label">DAYS</div>
+    </div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-unit">
+      <div class="countdown-num" id="cd-hours">--</div>
+      <div class="countdown-label">HRS</div>
+    </div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-unit">
+      <div class="countdown-num" id="cd-mins">--</div>
+      <div class="countdown-label">MIN</div>
+    </div>
+    <div class="countdown-sep">:</div>
+    <div class="countdown-unit">
+      <div class="countdown-num" id="cd-secs">--</div>
+      <div class="countdown-label">SEC</div>
+    </div>
+  </div>
+  <div class="countdown-event-date" id="countdown-date"></div>
+</div>
+
+<!-- 이벤트 목록 -->
+<div class="section">
+  <div class="section-label">ALL EVENTS</div>
+  <div class="event-list">
+
+    <!-- 진행 중 -->
+    <div class="event-card ongoing">
+      <div class="event-card-top">
+        <span class="event-badge badge-ongoing">
+          <span class="pulse-dot" style="display:inline-block;width:6px;height:6px;background:#4caf50;border-radius:50%;margin-right:5px;vertical-align:middle;"></span>LIVE
+        </span>
+        <div class="event-info">
+          <div class="event-title">팝업 오픈 기념 포토 이벤트</div>
+          <div class="event-period">2025.03.01 — 2025.04.30</div>
+        </div>
+      </div>
+      <div class="event-card-body">
+        <div class="event-desc">매장 내 포토존에서 촬영 후 인스타그램에 #KpopSquareHongdae 태그와 함께 게시하면 추첨을 통해 스페셜 굿즈를 드립니다. 당첨자는 매월 말 공식 인스타그램을 통해 발표됩니다.</div>
+        <div class="event-tags">
+          <span class="event-tag">인스타그램</span>
+          <span class="event-tag">추첨</span>
+          <span class="event-tag">포토존</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 진행 중 -->
+    <div class="event-card ongoing">
+      <div class="event-card-top">
+        <span class="event-badge badge-ongoing">
+          <span class="pulse-dot" style="display:inline-block;width:6px;height:6px;background:#4caf50;border-radius:50%;margin-right:5px;vertical-align:middle;"></span>LIVE
+        </span>
+        <div class="event-info">
+          <div class="event-title">3만원 이상 구매 시 캐릭터 스티커 증정</div>
+          <div class="event-period">2025.03.01 — 소진 시 종료</div>
+        </div>
+      </div>
+      <div class="event-card-body">
+        <div class="event-desc">당일 영수증 기준 3만원 이상 구매 시 한정 캐릭터 스티커 1종을 증정합니다. 준비 수량 소진 시 조기 종료되며, 하루 1인 1매 증정입니다.</div>
+        <div class="event-tags">
+          <span class="event-tag">구매 혜택</span>
+          <span class="event-tag">한정 수량</span>
+          <span class="event-tag">스티커</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 예정 -->
+    <div class="event-card upcoming">
+      <div class="event-card-top">
+        <span class="event-badge badge-upcoming">UPCOMING</span>
+        <div class="event-info">
+          <div class="event-title">스프링 에디션 한정 굿즈 드롭</div>
+          <div class="event-period">2025.04.05 10:00 오픈</div>
+        </div>
+      </div>
+      <div class="event-card-body">
+        <div class="event-desc">봄 시즌을 맞아 새롭게 출시되는 스프링 에디션 한정 굿즈. 체리블라썸 테마의 신규 캐릭터 라인업이 공개됩니다. 수량이 한정되어 있으므로 오픈 전 방문을 권장합니다.</div>
+        <div class="event-tags">
+          <span class="event-tag">한정판</span>
+          <span class="event-tag">신상품</span>
+          <span class="event-tag">스프링 에디션</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 스페셜 -->
+    <div class="event-card">
+      <div class="event-card-top">
+        <span class="event-badge badge-special">SPECIAL</span>
+        <div class="event-info">
+          <div class="event-title">팬 아트 전시 × 커뮤니티 이벤트</div>
+          <div class="event-period">2025.04.12 — 2025.04.13</div>
+        </div>
+      </div>
+      <div class="event-card-body">
+        <div class="event-desc">팬들이 직접 제작한 아트워크가 전시됩니다. 참여 신청은 공식 인스타그램 DM을 통해 가능합니다. 전시 참여자 전원에게 매장 할인 쿠폰을 제공합니다.</div>
+        <div class="event-tags">
+          <span class="event-tag">팬 참여</span>
+          <span class="event-tag">전시</span>
+          <span class="event-tag">커뮤니티</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 종료 -->
+    <div class="event-card ended">
+      <div class="event-card-top">
+        <span class="event-badge badge-ended">ENDED</span>
+        <div class="event-info">
+          <div class="event-title">오픈 1주년 기념 대형 포토카드 무료 증정</div>
+          <div class="event-period">2025.02.01 — 2025.02.28</div>
+        </div>
+      </div>
+      <div class="event-card-body">
+        <div class="event-desc">1주년 기념 이벤트로 방문 고객 전원에게 특별 포토카드를 증정했습니다. 이벤트는 종료되었습니다.</div>
+        <div class="event-tags">
+          <span class="event-tag">종료</span>
+          <span class="event-tag">1주년</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 방문객 혜택 -->
+<div class="section">
+  <div class="section-label">VISITOR PERKS</div>
+  <div class="benefit-grid">
+    <div class="benefit-item">
+      <div class="benefit-icon">🎁</div>
+      <div class="benefit-title">구매 전용 쇼핑백</div>
+      <div class="benefit-desc">5만원 이상 구매 시 한정 디자인 쇼핑백 제공</div>
+    </div>
+    <div class="benefit-item">
+      <div class="benefit-icon">📸</div>
+      <div class="benefit-title">무료 포토존</div>
+      <div class="benefit-desc">층별 포토존 무료 이용, 스태프 촬영 도움 제공</div>
+    </div>
+    <div class="benefit-item">
+      <div class="benefit-icon">🧧</div>
+      <div class="benefit-title">생일 혜택</div>
+      <div class="benefit-desc">생일 당일 방문 시 포토카드 랜덤 1매 증정</div>
+    </div>
+    <div class="benefit-item">
+      <div class="benefit-icon">💳</div>
+      <div class="benefit-title">멤버십 적립</div>
+      <div class="benefit-desc">LINE FRIENDS 멤버십 포인트 구매금액 5% 적립</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<footer>
+  <div class="footer-brand">K-POP SQUARE</div>
+  <div class="footer-loc">서울 마포구 홍대</div>
+</footer>
+
+<script>
+// 이벤트 목록과 카운트다운 날짜
+var EVENTS = [
+  { title: '스프링 에디션 한정 굿즈 드롭',  date: new Date('2025-04-05T10:00:00') },
+  { title: '팬 아트 전시 × 커뮤니티 이벤트', date: new Date('2025-04-12T11:00:00') },
+];
+
+function pad(n) { return String(n).padStart(2, '0'); }
+
+function updateCountdown() {
+  var now = Date.now();
+  var next = null;
+
+  for (var i = 0; i < EVENTS.length; i++) {
+    var t = EVENTS[i].date.getTime();
+    if (t > now) {
+      next = EVENTS[i];
+      break;
+    }
+  }
+
+  if (!next) {
+    document.getElementById('next-event-title').textContent = '현재 예정된 이벤트가 없습니다';
+    document.getElementById('countdown-timer').innerHTML = '<div class="countdown-ended">STAY TUNED</div>';
+    document.getElementById('countdown-date').textContent = '새 이벤트 일정을 기다려주세요';
+    return;
+  }
+
+  var diff = next.date.getTime() - now;
+  var days  = Math.floor(diff / 86400000);
+  var hours = Math.floor((diff % 86400000) / 3600000);
+  var mins  = Math.floor((diff % 3600000) / 60000);
+  var secs  = Math.floor((diff % 60000) / 1000);
+
+  document.getElementById('next-event-title').textContent = next.title;
+  document.getElementById('cd-days').textContent  = pad(days);
+  document.getElementById('cd-hours').textContent = pad(hours);
+  document.getElementById('cd-mins').textContent  = pad(mins);
+  document.getElementById('cd-secs').textContent  = pad(secs);
+
+  var d = next.date;
+  var dateStr = d.getFullYear() + '.' +
+    pad(d.getMonth() + 1) + '.' +
+    pad(d.getDate()) + ' ' +
+    pad(d.getHours()) + ':' +
+    pad(d.getMinutes()) + ' 오픈';
+  document.getElementById('countdown-date').textContent = dateStr;
+}
+
+updateCountdown();
+setInterval(updateCountdown, 1000);
+</script>
+
+</body>
+</html>

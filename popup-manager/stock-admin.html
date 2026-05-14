@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POPUP ADMIN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <style>
+        *{box-sizing:border-box;}
+        body{font-family:"Pretendard Variable",Pretendard,sans-serif;background:#f3f4f6;height:100vh;overflow:hidden;}
+        .scrollbar-hide::-webkit-scrollbar{display:none;}
+        .scrollbar-hide{-ms-overflow-style:none;scrollbar-width:none;}
+        .inp{width:100%;border:1px solid #d1d5db;border-radius:8px;padding:7px 11px;font-size:13px;outline:none;transition:border-color .15s;background:#fff;font-family:inherit;}
+        .inp:focus{border-color:#111827;box-shadow:0 0 0 3px rgba(17,24,39,.1);}
+        .lbl{font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;display:block;}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-weight:700;border-radius:8px;transition:all .15s;cursor:pointer;border:none;font-family:inherit;font-size:13px;}
+        .btn:active{transform:scale(.97);}
+        .btn-dark{background:#111827;color:#fff;}
+        .btn-dark:hover:not(:disabled){background:#000;}
+        .btn-dark:disabled{background:#9ca3af;cursor:not-allowed;transform:none;}
+        .btn-gray{background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;}
+        .btn-gray:hover{background:#e5e7eb;}
+        .btn-red{background:#fff1f2;color:#dc2626;border:1px solid #fecaca;}
+        .btn-red:hover{background:#ffe4e6;}
+        .btn-green{background:#f0fdf4;color:#15803d;border:1px solid #86efac;}
+        .btn-green:hover{background:#dcfce7;}
+        .branch-tab{padding:6px 18px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;border:none;font-family:inherit;}
+        .branch-tab.on{background:#fff;color:#111827;box-shadow:0 1px 4px rgba(0,0,0,.12);}
+        .branch-tab.off{background:transparent;color:#9ca3af;}
+        .sub-tab{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;color:#9ca3af;border:none;background:transparent;font-family:inherit;}
+        .sub-tab.on{background:#374151;color:#fff;}
+        .p-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;transition:border-color .15s;cursor:grab;}
+        .p-row:hover{border-color:#9ca3af;}
+        .p-row.drag-over{border-color:#111827;background:#f9fafb;}
+        .chip{display:inline-flex;align-items:center;gap:4px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;padding:3px 9px;font-size:11px;font-weight:600;}
+        .chip-x{color:#9ca3af;cursor:pointer;font-size:13px;line-height:1;}
+        .chip-x:hover{color:#ef4444;}
+        .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);z-index:50;display:flex;align-items:center;justify-content:center;padding:24px;}
+        .modal{background:#fff;border-radius:14px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.22);}
+        .spin{border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;width:14px;height:14px;animation:rot .8s linear infinite;display:inline-block;}
+        @keyframes rot{to{transform:rotate(360deg);}}
+        .login-wrap{height:100vh;display:flex;align-items:center;justify-content:center;}
+        .login-card{background:#fff;border-radius:16px;padding:44px 36px;width:100%;max-width:380px;box-shadow:0 4px 24px rgba(0,0,0,.09);border:1px solid #e5e7eb;}
+        .toast-el{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:11px 18px;border-radius:100px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:200;white-space:nowrap;}
+        .pv-card{background:#fff;border:2px solid rgba(0,0,0,.06);border-radius:12px;padding:10px;margin-bottom:10px;position:relative;overflow:hidden;}
+        .pv-soldout{position:absolute;inset:0;background:rgba(255,255,255,.6);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:5;border-radius:10px;}
+        .pv-opt{font-size:10px;padding:3px 7px;border-radius:5px;font-weight:700;border:1px solid transparent;}
+        .pv-in{background:#DCFCE7;color:#166534;border-color:#86EFAC;}
+        .pv-out{background:#FEE2E2;color:#991B1B;border-color:#FECACA;text-decoration:line-through;}
+        .animate-marquee{display:inline-block;padding-left:100%;animation:mq 18s linear infinite;}
+        @keyframes mq{0%{transform:translate(0,0);}100%{transform:translate(-100%,0);}}
+    </style>
+    <!-- Facebook Pixel -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,"script",
+    "https://connect.facebook.net/en_US/fbevents.js");
+    fbq("init", "2914661692095333");
+    fbq("track", "PageView");
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=2914661692095333&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Facebook Pixel -->
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen" class="login-wrap">
+    <div class="login-card">
+        <div class="text-center mb-7">
+            <div class="inline-flex items-center justify-center w-11 h-11 bg-gray-900 rounded-xl mb-3">
+                <i data-lucide="shield" class="w-5 h-5 text-white"></i>
+            </div>
+            <h1 class="text-xl font-bold">Popup Admin</h1>
+            <p class="text-xs text-gray-400 mt-1">First · Second · Third · Fourth · Fifth 통합 관리</p>
+        </div>
+        <label class="lbl">관리자 비밀번호</label>
+        <input type="password" id="admin-pw" class="inp mb-3" placeholder="비밀번호 입력">
+        <p id="login-error" class="hidden text-xs text-red-500 mb-2 text-center">비밀번호가 올바르지 않습니다.</p>
+        <button id="login-btn" class="btn btn-dark w-full py-3">
+            <i data-lucide="log-in" class="w-4 h-4"></i> 입장
+        </button>
+        <p id="conn-note" class="text-center text-xs text-gray-400 mt-3">Firebase 연결 중...</p>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div id="main-screen" class="hidden h-screen flex flex-col">
+    <header class="bg-gray-900 text-white px-6 py-3 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+            <span class="font-bold text-sm">POPUP ADMIN</span>
+            <div class="flex gap-1 bg-gray-700/60 rounded-2xl p-1">
+                <button class="branch-tab on" id="branch-first">First</button>
+                <button class="branch-tab off" id="branch-second">Second</button>
+                <button class="branch-tab off" id="branch-third">Third</button>
+                <button class="branch-tab off" id="branch-fourth">Fourth</button>
+                <button class="branch-tab off" id="branch-fifth">Fifth</button>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="flex gap-1 bg-gray-800 rounded-xl p-1">
+                <button class="sub-tab on"  id="tab-btn-products">상품 관리</button>
+                <button class="sub-tab"     id="tab-btn-settings">설정</button>
+            </div>
+            <button id="logout-btn" class="btn btn-gray py-1.5 px-3 text-xs">
+                <i data-lucide="log-out" class="w-3.5 h-3.5"></i> 로그아웃
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- 좌측 편집 -->
+        <div class="flex-1 overflow-y-auto scrollbar-hide px-6 py-5">
+            <div id="branch-badge" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-4 bg-green-50 text-green-700 border border-green-200">
+                <span id="branch-dot" class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                <span id="branch-badge-text">홍대점 편집 중</span>
+            </div>
+
+            <!-- 상품 관리 탭 -->
+            <div id="tab-products">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h2 class="text-base font-bold text-gray-900">상품 관리</h2>
+                        <p class="text-xs text-gray-400 mt-0.5" id="product-count">로딩 중...</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="excel-upload-btn" class="btn btn-green px-3 py-2 text-xs">
+                            <i data-lucide="upload" class="w-3.5 h-3.5"></i> 엑셀 업로드
+                        </button>
+                        <button id="add-product-btn" class="btn btn-dark px-3 py-2 text-xs">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> 상품 추가
+                        </button>
+                    </div>
+                </div>
+                <!-- 엑셀 업로드 영역 (숨김) -->
+                <div id="excel-area" class="hidden mb-4 bg-green-50 border border-green-200 rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-xs font-bold text-green-800">엑셀 업로드</p>
+                        <button id="template-download-btn" class="btn btn-green px-3 py-1.5 text-xs">
+                            <i data-lucide="download" class="w-3 h-3"></i> 템플릿 다운받기
+                        </button>
+                    </div>
+                    <label class="flex flex-col items-center justify-center border-2 border-dashed border-green-300 rounded-lg p-5 cursor-pointer hover:bg-green-100 transition-colors">
+                        <i data-lucide="file-spreadsheet" class="w-7 h-7 text-green-500 mb-2"></i>
+                        <span class="text-xs font-bold text-green-700">클릭하여 엑셀 파일 선택</span>
+                        <span class="text-[10px] text-green-500 mt-1">.xlsx, .xls 파일</span>
+                        <input type="file" id="excel-file-input" accept=".xlsx,.xls" class="hidden">
+                    </label>
+                    <p class="text-[10px] text-green-600 mt-2">※ 업로드 후 반드시 내용 확인하고 저장 버튼을 누르세요.</p>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 mb-4 flex items-center gap-2">
+                    <i data-lucide="info" class="w-3.5 h-3.5 text-amber-600 shrink-0"></i>
+                    <p class="text-xs text-amber-800 font-medium">저장하면 해당 지점 고객 화면이 즉시 업데이트되고 재고는 전체 초기화됩니다.</p>
+                </div>
+                <div id="product-list" class="space-y-2 mb-5"></div>
+                <button id="save-products-btn" class="btn btn-dark w-full py-3">
+                    <i data-lucide="save" class="w-4 h-4"></i>
+                    <span>상품 구성 저장 (즉시 반영)</span>
+                </button>
+            </div>
+
+            <!-- 설정 탭 -->
+            <div id="tab-settings" class="hidden">
+                <h2 class="text-base font-bold text-gray-900 mb-4">설정</h2>
+                <div class="bg-white border border-gray-200 rounded-xl p-5 space-y-4 mb-4">
+                    <div><label class="lbl">팝업 장소명</label><input type="text" id="set-location" class="inp"></div>
+                    <div><label class="lbl">온라인 스토어 URL</label><input type="url" id="set-url" class="inp"></div>
+                    <div class="border-t border-gray-100 pt-4">
+                        <p class="text-xs font-bold text-gray-700 mb-2">비밀번호 변경</p>
+                        <label class="lbl">공통 비밀번호 (어드민 + 재고 관리 공용)</label>
+                        <input type="password" id="set-pw" class="inp" placeholder="변경 시에만 입력 (비워두면 유지)">
+                    </div>
+                </div>
+                <div class="bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 mb-4 flex items-start gap-2">
+                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-red-500 mt-0.5 shrink-0"></i>
+                    <p class="text-xs text-red-700 font-medium">비밀번호 변경 시 반드시 메모해두세요.</p>
+                </div>
+                <button id="save-settings-btn" class="btn btn-dark w-full py-3">
+                    <i data-lucide="save" class="w-4 h-4"></i><span>설정 저장 (즉시 반영)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 우측 미리보기 -->
+        <div class="w-[340px] min-w-[340px] h-full bg-[#f8f9fa] border-l border-gray-200 flex flex-col overflow-hidden">
+            <div class="bg-white border-b border-gray-200 px-4 py-3 shrink-0">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-gray-900">POP-UP LIVE STOCK</span>
+                    <span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full font-medium">미리보기</span>
+                </div>
+                <p id="preview-subtitle" class="text-[10px] text-gray-500 mt-0.5"></p>
+            </div>
+            <div id="preview-header-bar" class="bg-green-700 text-white px-3 py-1.5 text-[10px] font-bold flex items-center gap-2 shrink-0 overflow-hidden whitespace-nowrap">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-300 animate-pulse shrink-0"></span>
+                <div class="animate-marquee">실시간 재고 현황 · 붉은색 표시는 품절 · 현장 상황에 따라 차이가 있을 수 있습니다.</div>
+            </div>
+            <div id="preview-list" class="flex-1 overflow-y-auto scrollbar-hide p-3"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 상품 편집 모달 -->
+<div id="product-modal" class="hidden overlay">
+    <div class="modal p-6">
+        <div class="flex items-center justify-between mb-5">
+            <h3 class="text-base font-bold" id="modal-title">상품 추가</h3>
+            <button id="modal-close-btn" class="text-gray-400 hover:text-gray-700 p-1 rounded-lg hover:bg-gray-100">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+                <div><label class="lbl">한글 상품명</label><input type="text" id="pm-name" class="inp"></div>
+                <div><label class="lbl">영문 상품명</label><input type="text" id="pm-engname" class="inp"></div>
+            </div>
+            <div class="grid grid-cols-3 gap-3">
+                <div><label class="lbl">가격 (원)</label><input type="number" id="pm-price" class="inp"></div>
+                <div><label class="lbl">카테고리</label><input type="text" id="pm-category" class="inp"></div>
+                <div>
+                    <label class="lbl">이미지 미리보기</label>
+                    <div id="img-preview" class="w-full h-[34px] rounded-lg bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center text-gray-300">
+                        <i data-lucide="image" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </div>
+            <div><label class="lbl">이미지 URL</label><input type="url" id="pm-image" class="inp" placeholder="https://cdn.shopify.com/..."></div>
+            <div>
+                <label class="lbl">옵션 목록</label>
+                <div id="option-tags" class="flex flex-wrap gap-1.5 min-h-[36px] p-2 border border-dashed border-gray-200 rounded-lg mb-2 bg-gray-50"></div>
+                <div class="grid grid-cols-3 gap-2 mb-2">
+                    <input type="text" id="opt-name"       class="inp" placeholder="옵션명 (고객용)">
+                    <input type="text" id="opt-staff-memo" class="inp" placeholder="직원 메모 (선택)">
+                    <button id="add-option-btn" class="btn btn-dark">추가</button>
+                </div>
+                <p class="text-[10px] text-gray-400 mb-2">직원 메모 예시: 귀 색깔, 사이즈 정보 등 현장 직원만 보는 내용</p>
+                <div class="flex flex-wrap gap-1.5" id="preset-btns">
+                    <button data-preset="mmmm"   class="text-[11px] bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg px-2.5 py-1 font-semibold">MMMM 5종</button>
+                    <button data-preset="single" class="text-[11px] bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg px-2.5 py-1 font-semibold">단품</button>
+                    <button data-preset="free"   class="text-[11px] bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg px-2.5 py-1 font-semibold">FREE</button>
+                    <button data-preset="size"   class="text-[11px] bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg px-2.5 py-1 font-semibold">S-XL</button>
+                    <button data-preset="dreami" class="text-[11px] bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-lg px-2.5 py-1 font-semibold">드리미즈 7종</button>
+                </div>
+            </div>
+        </div>
+        <div class="flex gap-3 mt-5">
+            <button id="modal-cancel-btn" class="btn btn-gray flex-1 py-2.5">취소</button>
+            <button id="modal-save-btn"   class="btn btn-dark flex-1 py-2.5">저장</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast-el hidden">
+    <div class="bg-green-500 rounded-full p-0.5"><i data-lucide="check" class="w-3 h-3 text-white"></i></div>
+    <span id="toast-msg"></span>
+</div>
+
+<script>
+firebase.initializeApp({
+    apiKey: "AIzaSyA4-C8G9bAiRRImJ6JFSidUX6pU1WtSJWc",
+    authDomain: "linefriends-popup-stock.firebaseapp.com",
+    projectId: "linefriends-popup-stock",
+    storageBucket: "linefriends-popup-stock.firebasestorage.app",
+    messagingSenderId: "483475199555",
+    appId: "1:483475199555:web:1be7a3e177096dc02966f6"
+});
+var auth = firebase.auth();
+var db   = firebase.firestore();
+
+var BRANCHES = {
+    first:   { appId:'mmmm-popup-hongdae', name:'First',  defaultLocation:'First Store',  defaultUrl:'https://linefriendssquare.com', badgeClass:'bg-green-50 text-green-700 border-green-200',   dotColor:'bg-green-500',  headerColor:'bg-green-700' },
+    second:  { appId:'mmmm-popup-busan',   name:'Second', defaultLocation:'Second Store', defaultUrl:'https://linefriendssquare.com', badgeClass:'bg-orange-50 text-orange-700 border-orange-200', dotColor:'bg-orange-500', headerColor:'bg-orange-700' },
+    third:   { appId:'mmmm-popup-third',   name:'Third',  defaultLocation:'Third Store',  defaultUrl:'https://linefriendssquare.com', badgeClass:'bg-blue-50 text-blue-700 border-blue-200',      dotColor:'bg-blue-500',   headerColor:'bg-blue-700' },
+    fourth:  { appId:'mmmm-popup-fourth',  name:'Fourth', defaultLocation:'Fourth Store', defaultUrl:'https://linefriendssquare.com', badgeClass:'bg-purple-50 text-purple-700 border-purple-200', dotColor:'bg-purple-500', headerColor:'bg-purple-700' },
+    fifth:   { appId:'mmmm-popup-fifth',   name:'Fifth',  defaultLocation:'Fifth Store',  defaultUrl:'https://linefriendssquare.com', badgeClass:'bg-pink-50 text-pink-700 border-pink-200',      dotColor:'bg-pink-500',   headerColor:'bg-pink-700' }
+};
+var PRESETS = {
+    mmmm:   [{name:"먀미",staffMemo:""},{name:"므모",staffMemo:""},{name:"미므",staffMemo:""},{name:"뫄",staffMemo:""},{name:"몌무",staffMemo:""}],
+    single: [{name:"단품",staffMemo:""}],
+    free:   [{name:"FREE",staffMemo:""}],
+    size:   [{name:"S",staffMemo:""},{name:"M",staffMemo:""},{name:"L",staffMemo:""},{name:"XL",staffMemo:""}],
+    dreami: [{name:"eong",staffMemo:""},{name:"jjun",staffMemo:""},{name:"jjed",staffMemo:""},{name:"jjopoo",staffMemo:""},{name:"kkuping",staffMemo:""},{name:"lemyo",staffMemo:""},{name:"bamjji",staffMemo:""}]
+};
+
+// 엑셀 컬럼 매핑
+var EXCEL_COLS = ['id','name','engName','price','category','image','options'];
+// options 컬럼 형식: "먀미|분홍귀, 므모|파란귀, 미므|" (name|staffMemo 쌍, 쉼표 구분)
+
+var currentBranch   = 'first';
+var editingProducts = [];
+var savedSettings   = {};
+var previewStock    = {};
+var isDirty   = false;
+var modalIdx  = null;
+var modalOpts = [];
+var dragSrc   = null;
+var stockUnsub = null;
+var adminPassword = '0715';
+
+function $id(id){ return document.getElementById(id); }
+function path(sub){ return 'artifacts/'+BRANCHES[currentBranch].appId+'/public/data/'+sub; }
+
+document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+    bindEvents();
+    auth.signInAnonymously()
+        .then(function(){ return db.doc('artifacts/mmmm-popup-hongdae/public/data/config/settings').get(); })
+        .then(function(snap){
+            if(snap.exists && snap.data().adminPassword) adminPassword = snap.data().adminPassword;
+            $id('conn-note').innerText='서버 연결 완료 ✓';
+            $id('conn-note').className='text-center text-xs text-green-500 mt-3';
+        }).catch(function(){
+            $id('conn-note').innerText='연결 실패';
+            $id('conn-note').className='text-center text-xs text-red-400 mt-3';
+        });
+});
+
+function bindEvents() {
+    $id('admin-pw').addEventListener('keypress', function(e){ if(e.key==='Enter') doLogin(); });
+    $id('login-btn').addEventListener('click', doLogin);
+    $id('logout-btn').addEventListener('click', doLogout);
+    $id('branch-first').addEventListener('click', function(){ switchBranch('first'); });
+    $id('branch-second').addEventListener('click',   function(){ switchBranch('second'); });
+    $id('branch-third').addEventListener('click',   function(){ switchBranch('third'); });
+    $id('branch-fourth').addEventListener('click',  function(){ switchBranch('fourth'); });
+    $id('branch-fifth').addEventListener('click',   function(){ switchBranch('fifth'); });
+    $id('tab-btn-products').addEventListener('click', function(){ switchTab('products'); });
+    $id('tab-btn-settings').addEventListener('click',  function(){ switchTab('settings'); });
+    $id('add-product-btn').addEventListener('click', openAdd);
+    $id('save-products-btn').addEventListener('click', saveProducts);
+    $id('save-settings-btn').addEventListener('click', saveSettings);
+    $id('modal-close-btn').addEventListener('click', closeModal);
+    $id('modal-cancel-btn').addEventListener('click', closeModal);
+    $id('modal-save-btn').addEventListener('click', confirmModal);
+    $id('product-modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+    $id('add-option-btn').addEventListener('click', addOption);
+    $id('opt-name').addEventListener('keypress', function(e){ if(e.key==='Enter'){e.preventDefault();addOption();} });
+    $id('pm-image').addEventListener('input', function(e){ setImgPreview(e.target.value); });
+    $id('preset-btns').addEventListener('click', function(e){
+        var btn=e.target.closest('[data-preset]');
+        if(!btn) return;
+        modalOpts=PRESETS[btn.dataset.preset].map(function(o){return Object.assign({},o);});
+        renderOptionTags();
+    });
+    $id('option-tags').addEventListener('click', function(e){
+        var rm=e.target.closest('[data-rmopt]');
+        if(!rm) return;
+        modalOpts.splice(parseInt(rm.dataset.rmopt),1);
+        renderOptionTags();
+    });
+    // 엑셀
+    $id('excel-upload-btn').addEventListener('click', function(){
+        $id('excel-area').classList.toggle('hidden');
+        lucide.createIcons();
+    });
+    $id('template-download-btn').addEventListener('click', downloadTemplate);
+    $id('excel-file-input').addEventListener('change', handleExcelUpload);
+}
+
+function doLogin() {
+    var pw = $id('admin-pw').value;
+    if(pw !== adminPassword){
+        $id('login-error').classList.remove('hidden');
+        $id('admin-pw').value=''; $id('admin-pw').focus(); return;
+    }
+    $id('login-error').classList.add('hidden');
+    loadBranch().then(function(){
+        $id('login-screen').classList.add('hidden');
+        $id('main-screen').classList.remove('hidden');
+        lucide.createIcons();
+        startStockListen();
+    });
+}
+
+function doLogout() {
+    if(stockUnsub){stockUnsub();stockUnsub=null;}
+    $id('main-screen').classList.add('hidden');
+    $id('login-screen').classList.remove('hidden');
+    $id('admin-pw').value='';
+}
+
+function switchBranch(branch) {
+    if(currentBranch===branch) return;
+    if(isDirty && !confirm(BRANCHES[currentBranch].name+' 지점에 저장하지 않은 변경사항이 있습니다.\n저장하지 않고 이동할까요?')) return;
+    isDirty=false;
+    currentBranch=branch;
+    $id('branch-first').className='branch-tab '+(branch==='first'?'on':'off');
+    $id('branch-second').className  ='branch-tab '+(branch==='second'?'on':'off');
+    $id('branch-third').className  ='branch-tab '+(branch==='third'?'on':'off');
+    $id('branch-fourth').className ='branch-tab '+(branch==='fourth'?'on':'off');
+    $id('branch-fifth').className  ='branch-tab '+(branch==='fifth'?'on':'off');
+    var b=BRANCHES[branch];
+    var badge=$id('branch-badge');
+    badge.className='inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-4 border '+b.badgeClass;
+    $id('branch-dot').className='w-1.5 h-1.5 rounded-full '+b.dotColor;
+    $id('branch-badge-text').innerText=b.name+' 편집 중';
+    // 미리보기 헤더 컬러
+    $id('preview-header-bar').className=b.headerColor+' text-white px-3 py-1.5 text-[10px] font-bold flex items-center gap-2 shrink-0 overflow-hidden whitespace-nowrap';
+    if(stockUnsub){stockUnsub();stockUnsub=null;}
+    previewStock={};
+    loadBranch().then(function(){ startStockListen(); });
+}
+
+function loadBranch() {
+    return Promise.all([
+        db.doc(path('config/settings')).get(),
+        db.doc(path('config/products')).get()
+    ]).then(function(results){
+        var b=BRANCHES[currentBranch];
+        var s=results[0].exists ? Object.assign({location:b.defaultLocation,storeUrl:b.defaultUrl,adminPassword:'0715'},results[0].data())
+                                : {location:b.defaultLocation,storeUrl:b.defaultUrl,adminPassword:'0715'};
+        savedSettings=s;
+        var raw=(results[1].exists&&results[1].data().list&&results[1].data().list.length)?results[1].data().list:[];
+        editingProducts=raw.map(function(p){
+            return Object.assign({},p,{options:p.options.map(function(o){
+                return typeof o==='object'?{name:o.name||'',staffMemo:o.staffMemo||''}:{name:o,staffMemo:''};
+            })});
+        });
+        $id('preview-subtitle').innerText=s.location||'';
+        $id('set-location').value=s.location||'';
+        $id('set-url').value=s.storeUrl||'';
+        $id('set-pw').value='';
+        renderProductList(); renderPreview();
+    }).catch(console.error);
+}
+
+function startStockListen() {
+    if(stockUnsub) stockUnsub();
+    stockUnsub=db.doc(path('inventory/all_stock')).onSnapshot(function(snap){
+        previewStock=snap.exists?snap.data():{};
+        renderPreview();
+    });
+}
+
+function switchTab(tab) {
+    $id('tab-products').classList.toggle('hidden',tab!=='products');
+    $id('tab-settings').classList.toggle('hidden',tab!=='settings');
+    $id('tab-btn-products').classList.toggle('on',tab==='products');
+    $id('tab-btn-settings').classList.toggle('on',tab==='settings');
+}
+
+function renderProductList() {
+    $id('product-list').innerHTML=editingProducts.map(function(p,idx){
+        var optSummary=p.options.map(function(o){
+            return o.name+(o.staffMemo?'('+o.staffMemo+')':'');
+        }).join(', ');
+        return '<div class="p-row" draggable="true" data-idx="'+idx+'">' +
+            '<div class="text-gray-300 hover:text-gray-500 shrink-0"><i data-lucide="grip-vertical" class="w-4 h-4"></i></div>' +
+            '<img src="'+(p.image||'')+'" class="w-10 h-10 rounded-lg object-cover border border-gray-200 bg-gray-100 shrink-0">' +
+            '<div class="flex-1 min-w-0">' +
+                '<p class="text-xs font-bold text-gray-900 truncate">'+esc(p.name)+'</p>' +
+                '<p class="text-[10px] text-gray-400 truncate">₩'+Number(p.price).toLocaleString()+' · '+esc(p.category)+' · '+esc(optSummary)+'</p>' +
+            '</div>' +
+            '<div class="flex gap-1.5 shrink-0">' +
+                '<button class="btn btn-gray px-2.5 py-1.5 text-xs" data-edit="'+idx+'"><i data-lucide="pencil" class="w-3 h-3"></i></button>' +
+                '<button class="btn btn-red  px-2.5 py-1.5 text-xs" data-del="'+idx+'"><i data-lucide="trash-2" class="w-3 h-3"></i></button>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+    $id('product-count').innerText='총 '+editingProducts.length+'개 상품';
+    lucide.createIcons();
+    var list=$id('product-list');
+    list.onclick=function(e){
+        var ed=e.target.closest('[data-edit]'),dl=e.target.closest('[data-del]');
+        if(ed) openEdit(parseInt(ed.dataset.edit));
+        if(dl) deleteProduct(parseInt(dl.dataset.del));
+    };
+    list.ondragstart=function(e){var el=e.target.closest('.p-row');if(el){dragSrc=parseInt(el.dataset.idx);el.style.opacity='0.4';}};
+    list.ondragover=function(e){e.preventDefault();var el=e.target.closest('.p-row');if(el)el.classList.add('drag-over');};
+    list.ondragleave=function(e){var el=e.target.closest('.p-row');if(el)el.classList.remove('drag-over');};
+    list.ondragend=function(e){var el=e.target.closest('.p-row');if(el)el.style.opacity='';};
+    list.ondrop=function(e){
+        e.preventDefault();
+        var el=e.target.closest('.p-row');if(!el)return;
+        el.classList.remove('drag-over');
+        var tgt=parseInt(el.dataset.idx);
+        if(dragSrc===null||dragSrc===tgt){dragSrc=null;return;}
+        var item=editingProducts.splice(dragSrc,1)[0];
+        editingProducts.splice(tgt,0,item);
+        dragSrc=null;isDirty=true;renderProductList();renderPreview();
+    };
+}
+
+function renderPreview() {
+    $id('preview-list').innerHTML=editingProducts.map(function(p){
+        var variants=p.options.map(function(o,i){
+            var vid=p.id+'_'+i,out=(previewStock[vid]==='SOLD_OUT');
+            return {name:o.name,out:out};
+        });
+        var allOut=variants.every(function(v){return v.out;});
+        var opts=variants.map(function(v){
+            return '<div class="pv-opt '+(v.out?'pv-out':'pv-in')+'">'+esc(v.name)+'</div>';
+        }).join('');
+        return '<div class="pv-card'+(allOut?' border-gray-200':'')+'">' +
+            (allOut?'<div class="pv-soldout"><span class="bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded-full -rotate-12 shadow">SOLD OUT</span></div>':'') +
+            '<div class="flex gap-2">' +
+                '<img src="'+(p.image||'')+'" class="w-14 h-14 rounded-lg object-cover border border-gray-100 bg-gray-100 shrink-0'+(allOut?' grayscale opacity-50':'')+'">' +
+                '<div class="flex-1 min-w-0">' +
+                    '<span class="text-[8px] text-gray-400 font-bold tracking-wider">'+esc(p.category)+'</span>' +
+                    '<p class="text-[10px] font-bold text-gray-900 leading-tight truncate">'+esc(p.name)+'</p>' +
+                    '<p class="text-[10px] font-bold">&#8361;'+Number(p.price).toLocaleString()+'</p>' +
+                '</div>' +
+            '</div>' +
+            '<div class="mt-2 grid grid-cols-2 gap-1'+(allOut?' opacity-30 grayscale':'')+'">'+opts+'</div>' +
+        '</div>';
+    }).join('');
+}
+
+function saveProducts() {
+    var btn=$id('save-products-btn');
+    btn.disabled=true;btn.innerHTML='<div class="spin"></div><span>저장 중...</span>';
+    // 기존 재고 상태를 유지하고 신규 variant만 IN_STOCK으로 설정
+    var stockObj={};
+    editingProducts.forEach(function(p){p.options.forEach(function(o,i){
+        var vid=p.id+'_'+i;
+        stockObj[vid]=previewStock[vid]||'IN_STOCK';
+    });});
+    db.doc(path('config/products')).set({list:editingProducts})
+        .then(function(){return db.doc(path('inventory/all_stock')).set(stockObj);})
+        .then(function(){previewStock=stockObj;isDirty=false;renderPreview();showToast(BRANCHES[currentBranch].name+' 저장 완료!');})
+        .catch(function(e){alert('저장 실패: '+e.message);})
+        .finally(function(){
+            btn.disabled=false;
+            btn.innerHTML='<i data-lucide="save" class="w-4 h-4"></i><span>상품 구성 저장 (즉시 반영)</span>';
+            lucide.createIcons();
+        });
+}
+
+function saveSettings() {
+    var btn=$id('save-settings-btn');
+    btn.disabled=true;btn.innerHTML='<div class="spin"></div><span>저장 중...</span>';
+    var location=$id('set-location').value.trim();
+    var storeUrl=$id('set-url').value.trim();
+    var newPw=$id('set-pw').value.trim();
+    if(location) savedSettings.location=location;
+    if(storeUrl) savedSettings.storeUrl=storeUrl;
+    if(newPw)    savedSettings.adminPassword=newPw;
+    db.doc(path('config/settings')).set(savedSettings)
+        .then(function(){$id('preview-subtitle').innerText=savedSettings.location||'';$id('set-pw').value='';showToast(BRANCHES[currentBranch].name+' 설정 저장 완료!');})
+        .catch(function(e){alert('저장 실패: '+e.message);})
+        .finally(function(){
+            btn.disabled=false;
+            btn.innerHTML='<i data-lucide="save" class="w-4 h-4"></i><span>설정 저장 (즉시 반영)</span>';
+            lucide.createIcons();
+        });
+}
+
+// ── 상품 모달 ──
+function openAdd() {
+    modalIdx=null;modalOpts=[];
+    ['pm-name','pm-engname','pm-price','pm-category','pm-image'].forEach(function(id){$id(id).value='';});
+    $id('modal-title').innerText='상품 추가';
+    resetImgPreview();renderOptionTags();
+    $id('product-modal').classList.remove('hidden');lucide.createIcons();$id('pm-name').focus();
+}
+function openEdit(idx) {
+    modalIdx=idx;var p=editingProducts[idx];
+    modalOpts=p.options.map(function(o){return {name:o.name||'',staffMemo:o.staffMemo||''};});
+    $id('pm-name').value=p.name;$id('pm-engname').value=p.engName;
+    $id('pm-price').value=p.price;$id('pm-category').value=p.category;
+    $id('pm-image').value=p.image||'';
+    $id('modal-title').innerText='상품 편집';
+    setImgPreview(p.image);renderOptionTags();
+    $id('product-modal').classList.remove('hidden');lucide.createIcons();
+}
+function closeModal() { $id('product-modal').classList.add('hidden'); }
+function confirmModal() {
+    var name=$id('pm-name').value.trim(),engName=$id('pm-engname').value.trim();
+    var price=parseInt($id('pm-price').value)||0,category=$id('pm-category').value.trim().toUpperCase();
+    var image=$id('pm-image').value.trim();
+    if(!name){alert('상품명을 입력하세요.');return;}
+    if(!modalOpts.length){alert('옵션을 1개 이상 추가하세요.');return;}
+    var product={id:modalIdx!==null?editingProducts[modalIdx].id:'g'+Date.now(),name:name,engName:engName,price:price,category:category,image:image,options:modalOpts.slice()};
+    if(modalIdx!==null) editingProducts[modalIdx]=product;
+    else editingProducts.push(product);
+    isDirty=true;
+    closeModal();renderProductList();renderPreview();
+}
+function deleteProduct(idx) {
+    if(!confirm('"'+editingProducts[idx].name+'" 삭제할까요?')) return;
+    editingProducts.splice(idx,1);isDirty=true;renderProductList();renderPreview();
+}
+
+// ── 옵션 ──
+function addOption() {
+    var name=$id('opt-name').value.trim(), staffMemo=$id('opt-staff-memo').value.trim();
+    if(!name){$id('opt-name').focus();return;}
+    if(!modalOpts.find(function(o){return o.name===name;})){modalOpts.push({name:name,staffMemo:staffMemo});renderOptionTags();}
+    $id('opt-name').value='';$id('opt-staff-memo').value='';$id('opt-name').focus();
+}
+function renderOptionTags() {
+    if(!modalOpts.length){$id('option-tags').innerHTML='<span class="text-xs text-gray-400 self-center">옵션을 추가하세요</span>';return;}
+    $id('option-tags').innerHTML=modalOpts.map(function(o,i){
+        return '<span class="chip">'+esc(o.name)+(o.staffMemo?'<span class="text-gray-400 font-normal text-[10px]"> ('+esc(o.staffMemo)+')</span>':'')+
+            '<span class="chip-x" data-rmopt="'+i+'">✕</span></span>';
+    }).join('');
+}
+
+// ── 이미지 미리보기 ──
+function setImgPreview(url){
+    if(url)$id('img-preview').innerHTML='<img src="'+url+'" class="w-full h-full object-cover">';
+    else resetImgPreview();
+}
+function resetImgPreview(){$id('img-preview').innerHTML='<i data-lucide="image" class="w-4 h-4"></i>';lucide.createIcons();}
+
+// ── 엑셀 템플릿 다운로드 ──
+function downloadTemplate() {
+    var wb = XLSX.utils.book_new();
+    var sampleData = [
+        ['id','name','engName','price','category','image','options'],
+        ['g1','MMMM_베이비 코스튬 인형','MMMM_BABY COSTUME PLUSH',23000,'PLUSH','https://cdn.shopify.com/...','먀미|분홍귀, 므모|파란귀, 미므|노란귀, 뫄|초록귀, 몌무|보라귀'],
+        ['g2','단품 예시','SINGLE ITEM',15000,'ACC','https://cdn.shopify.com/...','단품|'],
+    ];
+    var ws = XLSX.utils.aoa_to_sheet(sampleData);
+    // 컬럼 너비
+    ws['!cols'] = [{wch:8},{wch:28},{wch:28},{wch:8},{wch:10},{wch:40},{wch:50}];
+    XLSX.utils.book_append_sheet(wb, ws, '상품목록');
+
+    // 안내 시트
+    var guide = [
+        ['컬럼명','설명','예시'],
+        ['id','상품 고유 ID (영문+숫자)','g1, p2, item_01'],
+        ['name','한글 상품명','MMMM_베이비 코스튬 인형'],
+        ['engName','영문 상품명','MMMM_BABY COSTUME PLUSH'],
+        ['price','가격 (숫자만)','23000'],
+        ['category','카테고리','PLUSH, ACC, FASHION, TECH, LIVING'],
+        ['image','이미지 URL','https://cdn.shopify.com/...'],
+        ['options','옵션 목록','먀미|분홍귀, 므모|파란귀'],
+        ['','"|": 앞: 고객에게 보이는 옵션명','먀미'],
+        ['','"|": 뒤: 직원 메모 (없으면 비워두기)','분홍귀'],
+        ['','"," 로 여러 옵션 구분','먀미|분홍귀, 므모|파란귀'],
+    ];
+    var ws2 = XLSX.utils.aoa_to_sheet(guide);
+    ws2['!cols'] = [{wch:12},{wch:36},{wch:36}];
+    XLSX.utils.book_append_sheet(wb, ws2, '작성방법');
+
+    XLSX.writeFile(wb, 'popup_stock_template.xlsx');
+    showToast('템플릿 다운로드 완료!');
+}
+
+// ── 엑셀 업로드 ──
+function handleExcelUpload(e) {
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+        try {
+            var wb = XLSX.read(ev.target.result, {type:'binary'});
+            var ws = wb.Sheets[wb.SheetNames[0]];
+            var rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+            if(!rows.length){alert('파일이 비어있습니다.');return;}
+
+            // 헤더 찾기
+            var headerRow = rows[0].map(function(h){return String(h).trim();});
+            var colIdx = {};
+            EXCEL_COLS.forEach(function(col){
+                colIdx[col] = headerRow.indexOf(col);
+            });
+            if(colIdx['name']<0){alert('name 컬럼을 찾을 수 없습니다. 템플릿을 사용해주세요.');return;}
+
+            var parsed = [];
+            for(var i=1;i<rows.length;i++){
+                var row=rows[i];
+                var nameVal = colIdx['name']>=0 ? String(row[colIdx['name']]||'').trim() : '';
+                if(!nameVal) continue;
+
+                // options 파싱: "먀미|분홍귀, 므모|파란귀"
+                var optStr = colIdx['options']>=0 ? String(row[colIdx['options']]||'').trim() : '';
+                var options = [];
+                if(optStr) {
+                    optStr.split(',').forEach(function(part){
+                        var parts = part.trim().split('|');
+                        var oName = (parts[0]||'').trim();
+                        var oMemo = (parts[1]!==undefined) ? parts[1].trim() : '';
+                        if(oName) options.push({name:oName, staffMemo:oMemo});
+                    });
+                }
+                if(!options.length) options = [{name:'단품', staffMemo:''}];
+
+                var id = colIdx['id']>=0 ? String(row[colIdx['id']]||'').trim() : '';
+                if(!id) id = 'g'+Date.now()+'_'+i;
+
+                parsed.push({
+                    id:       id,
+                    name:     nameVal,
+                    engName:  colIdx['engName']>=0 ? String(row[colIdx['engName']]||'').trim() : '',
+                    price:    colIdx['price']>=0   ? (parseInt(row[colIdx['price']])||0) : 0,
+                    category: colIdx['category']>=0? String(row[colIdx['category']]||'').trim().toUpperCase() : '',
+                    image:    colIdx['image']>=0   ? String(row[colIdx['image']]||'').trim() : '',
+                    options:  options
+                });
+            }
+
+            if(!parsed.length){alert('유효한 상품 데이터가 없습니다.');return;}
+            if(!confirm(parsed.length+'개 상품을 불러왔습니다. 기존 목록을 덮어씌울까요?')) return;
+
+            editingProducts = parsed;
+            isDirty=true;
+            renderProductList();
+            renderPreview();
+            $id('excel-area').classList.add('hidden');
+            $id('excel-file-input').value='';
+            showToast(parsed.length+'개 상품 업로드 완료! 저장 버튼을 눌러 반영하세요.');
+        } catch(err) {
+            alert('파일 파싱 오류: '+err.message);
+        }
+    };
+    reader.readAsBinaryString(file);
+}
+
+// ── Toast / Util ──
+function showToast(msg){
+    $id('toast-msg').innerText=msg;$id('toast').classList.remove('hidden');
+    setTimeout(function(){$id('toast').classList.add('hidden');},2500);
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>

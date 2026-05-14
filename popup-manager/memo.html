@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>쇼핑 메모장 — K-POP SQUARE 홍대</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>
+:root {
+  --black:  #0a0a0a;
+  --white:  #f5f5f3;
+  --gray:   #888;
+  --line:   rgba(255,255,255,0.1);
+  --accent: #e8e0d0;
+  --card:   #111;
+  --dim:    #1a1a1a;
+  --green:  #4caf50;
+  --red:    #cf6679;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Noto Sans KR', sans-serif;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* ── 헤더 ── */
+header {
+  padding: 24px 24px 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #2a2a2a;
+  border-radius: 50%;
+  color: var(--gray);
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.back-btn:active { border-color: #555; color: var(--white); }
+
+.header-info { flex: 1; }
+.page-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--gray);
+}
+.page-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 2px;
+  color: var(--white);
+  line-height: 1.1;
+}
+
+/* ── 요약 바 ── */
+.summary-bar {
+  margin: 24px 24px 0;
+  background: var(--dim);
+  border: 1px solid #1e1e1e;
+  border-radius: 4px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.summary-left {}
+.summary-count {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 1px;
+  color: var(--accent);
+  line-height: 1;
+}
+.summary-label {
+  font-size: 11px;
+  color: var(--gray);
+  margin-top: 3px;
+}
+
+.summary-price {
+  text-align: right;
+}
+.summary-price-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 1px;
+  color: var(--white);
+}
+.summary-price-label {
+  font-size: 11px;
+  color: var(--gray);
+  margin-top: 3px;
+}
+
+/* ── 섹션 ── */
+.section {
+  margin: 28px 24px 0;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.section-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--gray);
+}
+
+.clear-btn {
+  font-size: 11px;
+  color: #555;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.2s;
+}
+.clear-btn:active { color: var(--red); }
+
+/* ── 로딩 / 빈 상태 ── */
+.state-box {
+  padding: 40px 20px;
+  text-align: center;
+}
+.state-icon { font-size: 32px; margin-bottom: 12px; }
+.state-text { font-size: 13px; color: var(--gray); line-height: 1.6; }
+
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid #222;
+  border-top-color: var(--gray);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── 상품 아이템 ── */
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.product-item {
+  background: var(--card);
+  padding: 14px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s;
+}
+.product-item:active { background: #161616; }
+.product-item.checked { background: #0d0d0d; }
+
+.product-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #333;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+.product-item.checked .product-checkbox {
+  background: var(--green);
+  border-color: var(--green);
+}
+.check-icon {
+  display: none;
+  width: 11px;
+  height: 11px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.product-item.checked .check-icon { display: block; }
+
+.product-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
+  object-fit: cover;
+  background: #1a1a1a;
+  flex-shrink: 0;
+}
+.product-thumb-placeholder {
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
+  background: #1a1a1a;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.product-info { flex: 1; min-width: 0; }
+.product-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.15s;
+}
+.product-item.checked .product-name { color: #555; text-decoration: line-through; }
+
+.product-meta {
+  font-size: 11px;
+  color: var(--gray);
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.product-item.checked .product-meta { color: #3a3a3a; }
+
+.product-price {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.product-item.checked .product-price { color: #444; }
+
+/* ── 수량 스테퍼 ── */
+.qty-ctrl {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.product-item.checked .qty-ctrl { display: flex; }
+.qty-btn {
+  width: 26px;
+  height: 26px;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 3px;
+  color: var(--accent);
+  font-size: 17px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.qty-btn:active { background: #2a2a2a; }
+.qty-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 17px;
+  color: var(--white);
+  min-width: 16px;
+  text-align: center;
+}
+
+/* ── 옵션 선택 패널 ── */
+.options-panel {
+  background: #0d0d0d;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  margin-top: 10px;
+  overflow: hidden;
+  display: none;
+}
+.options-panel.open { display: block; }
+
+.options-panel-title {
+  font-size: 11px;
+  color: var(--gray);
+  padding: 10px 16px 8px;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.options-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 16px 14px;
+}
+
+.option-chip {
+  padding: 5px 12px;
+  border: 1px solid #2a2a2a;
+  border-radius: 2px;
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.option-chip:active { background: #1e1e1e; }
+.option-chip.selected {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(232,224,208,0.06);
+}
+
+/* ── 직접 입력 아이템 ── */
+.custom-add-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.custom-input {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--white);
+  font-family: 'Noto Sans KR', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.custom-input::placeholder { color: #444; }
+.custom-input:focus { border-color: #444; }
+
+.add-btn {
+  padding: 12px 16px;
+  background: var(--dim);
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  color: var(--accent);
+  font-size: 20px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.2s;
+  flex-shrink: 0;
+}
+.add-btn:active { border-color: #555; background: #222; }
+
+.custom-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+.custom-list:empty { display: none; }
+
+.custom-item {
+  background: var(--card);
+  padding: 14px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s;
+}
+.custom-item:active { background: #161616; }
+.custom-item.checked { background: #0d0d0d; }
+
+.custom-text {
+  flex: 1;
+  font-size: 14px;
+  color: var(--white);
+  transition: color 0.15s;
+}
+.custom-item.checked .custom-text { color: #555; text-decoration: line-through; }
+
+.custom-del {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #222;
+  border-radius: 50%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.2s;
+  flex-shrink: 0;
+}
+.custom-del:active { border-color: var(--red); }
+.custom-del svg { width: 12px; height: 12px; stroke: #555; }
+
+/* ── 메모 영역 ── */
+.memo-area {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--white);
+  font-family: 'Noto Sans KR', sans-serif;
+  resize: none;
+  outline: none;
+  line-height: 1.7;
+  min-height: 120px;
+  transition: border-color 0.2s;
+}
+.memo-area::placeholder { color: #444; }
+.memo-area:focus { border-color: #444; }
+
+.memo-save-hint {
+  font-size: 11px;
+  color: #444;
+  margin-top: 8px;
+  text-align: right;
+}
+
+/* ── 전체 초기화 버튼 ── */
+.reset-btn {
+  width: 100%;
+  margin: 28px 0 0;
+  padding: 13px;
+  background: transparent;
+  border: 1px solid #1e1e1e;
+  border-radius: 4px;
+  color: #444;
+  font-size: 13px;
+  font-family: 'Noto Sans KR', sans-serif;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.2s, color 0.2s;
+}
+.reset-btn:active { border-color: var(--red); color: var(--red); }
+
+/* ── 구분선 ── */
+.divider {
+  height: 1px;
+  background: var(--line);
+  margin: 32px 24px 0;
+}
+
+/* ── 푸터 ── */
+footer {
+  margin: 40px 24px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: #333;
+}
+.footer-loc {
+  font-size: 11px;
+  color: #333;
+  letter-spacing: 1px;
+}
+
+/* ── 애니메이션 ── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+header        { animation: fadeUp 0.4s ease both; }
+.summary-bar  { animation: fadeUp 0.4s 0.05s ease both; }
+.section:nth-of-type(1) { animation: fadeUp 0.4s 0.1s ease both; }
+.section:nth-of-type(2) { animation: fadeUp 0.4s 0.15s ease both; }
+.section:nth-of-type(3) { animation: fadeUp 0.4s 0.2s ease both; }
+.divider      { animation: fadeUp 0.3s 0.25s ease both; }
+footer        { animation: fadeUp 0.3s 0.3s ease both; }
+
+@keyframes slideDown {
+  from { opacity:0; transform:translateY(-6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.custom-item { animation: slideDown 0.2s ease both; }
+</style>
+<!-- Facebook Pixel -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,"script",
+"https://connect.facebook.net/en_US/fbevents.js");
+fbq("init", "2914661692095333");
+fbq("track", "PageView");
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=2914661692095333&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Facebook Pixel -->
+</head>
+<body>
+
+<header>
+  <a class="back-btn" href="./index.html" aria-label="뒤로가기">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+  </a>
+  <div class="header-info">
+    <div class="page-label">K-POP SQUARE HONGDAE</div>
+    <div class="page-title">SHOPPING MEMO</div>
+  </div>
+</header>
+
+<!-- 요약 -->
+<div class="summary-bar">
+  <div class="summary-left">
+    <div class="summary-count" id="summary-count">0</div>
+    <div class="summary-label">선택한 상품</div>
+  </div>
+  <div class="summary-price">
+    <div class="summary-price-num" id="summary-price">₩ 0</div>
+    <div class="summary-price-label">예상 금액</div>
+  </div>
+</div>
+
+<!-- 상품 체크리스트 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-label">PRODUCT CHECKLIST</div>
+    <button class="clear-btn" id="clear-products-btn" onclick="clearProducts()">전체 해제</button>
+  </div>
+
+  <div id="products-loading" class="state-box">
+    <div class="spinner"></div>
+    <div class="state-text">상품 목록을 불러오는 중...</div>
+  </div>
+
+  <div id="products-error" class="state-box" style="display:none;">
+    <div class="state-icon">📡</div>
+    <div class="state-text">상품 정보를 불러오지 못했습니다.<br>아래 직접 입력을 이용해 주세요.</div>
+  </div>
+
+  <div id="product-list" class="product-list" style="display:none;"></div>
+</div>
+
+<!-- 직접 입력 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-label">CUSTOM ITEMS</div>
+    <button class="clear-btn" onclick="clearCustom()">전체 삭제</button>
+  </div>
+
+  <div class="custom-add-row">
+    <input
+      class="custom-input"
+      id="custom-input"
+      type="text"
+      placeholder="원하는 굿즈 직접 입력"
+      maxlength="40"
+      onkeydown="if(event.key==='Enter') addCustom()"
+    >
+    <button class="add-btn" onclick="addCustom()">+</button>
+  </div>
+
+  <div class="custom-list" id="custom-list"></div>
+</div>
+
+<!-- 메모 -->
+<div class="section">
+  <div class="section-label">NOTES</div>
+  <textarea
+    class="memo-area"
+    id="memo-area"
+    placeholder="예산, 우선순위, 함께 구매할 굿즈 등 메모하세요"
+    oninput="saveMemo()"
+  ></textarea>
+  <div class="memo-save-hint" id="memo-saved-hint">자동 저장됨</div>
+
+  <button class="reset-btn" onclick="confirmReset()">🗑 메모장 전체 초기화</button>
+</div>
+
+<div class="divider"></div>
+
+<footer>
+  <div class="footer-brand">K-POP SQUARE</div>
+  <div class="footer-loc">서울 마포구 홍대</div>
+</footer>
+
+<script>
+// ── Firebase 설정 (stock-hongdae와 동일) ──
+firebase.initializeApp({
+  apiKey: "AIzaSyA4-C8G9bAiRRImJ6JFSidUX6pU1WtSJWc",
+  authDomain: "linefriends-popup-stock.firebaseapp.com",
+  projectId: "linefriends-popup-stock",
+  storageBucket: "linefriends-popup-stock.firebasestorage.app",
+  messagingSenderId: "483475199555",
+  appId: "1:483475199555:web:1be7a3e177096dc02966f6"
+});
+
+var auth = firebase.auth();
+var db   = firebase.firestore();
+var APP_ID = 'mmmm-popup-hongdae';
+
+// ── 상태 ──
+var products = [];
+var checkedProducts = {}; // { productId: true/false }
+var customItems = [];     // [{ id, text, checked }]
+var memo = '';
+
+var STORAGE_KEY_PRODUCTS = 'memo_checked_products';
+var STORAGE_KEY_CUSTOM   = 'memo_custom_items';
+var STORAGE_KEY_MEMO     = 'memo_notes';
+
+// ── localStorage 불러오기 ──
+function loadStorage() {
+  try {
+    var cp = localStorage.getItem(STORAGE_KEY_PRODUCTS);
+    checkedProducts = cp ? JSON.parse(cp) : {};
+
+    var ci = localStorage.getItem(STORAGE_KEY_CUSTOM);
+    customItems = ci ? JSON.parse(ci) : [];
+
+    var mn = localStorage.getItem(STORAGE_KEY_MEMO);
+    memo = mn || '';
+    document.getElementById('memo-area').value = memo;
+
+    renderCustomList();
+    updateSummary();
+  } catch(e) {}
+}
+
+function saveChecked() {
+  try { localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(checkedProducts)); } catch(e) {}
+}
+function saveCustom() {
+  try { localStorage.setItem(STORAGE_KEY_CUSTOM, JSON.stringify(customItems)); } catch(e) {}
+}
+function saveMemo() {
+  memo = document.getElementById('memo-area').value;
+  try { localStorage.setItem(STORAGE_KEY_MEMO, memo); } catch(e) {}
+}
+
+// ── Firebase 상품 로드 ──
+function loadProducts() {
+  auth.signInAnonymously().then(function() {
+    return db.doc('artifacts/' + APP_ID + '/public/data/config/products').get();
+  }).then(function(snap) {
+    var raw = (snap.exists && snap.data().list) ? snap.data().list : [];
+    products = raw.map(function(p) {
+      return {
+        id:      p.id,
+        name:    p.name || p.engName || '상품',
+        engName: p.engName || '',
+        price:   p.price || 0,
+        image:   p.image || '',
+        options: (p.options || []).map(function(o) {
+          return typeof o === 'string' ? o : (o.name || o.en || '');
+        }),
+        category: p.category || ''
+      };
+    });
+
+    document.getElementById('products-loading').style.display = 'none';
+
+    if (products.length === 0) {
+      document.getElementById('products-error').style.display = 'block';
+      return;
+    }
+
+    renderProductList();
+  }).catch(function(e) {
+    console.error(e);
+    document.getElementById('products-loading').style.display = 'none';
+    document.getElementById('products-error').style.display = 'block';
+  });
+}
+
+// ── 상품 렌더링 ──
+function renderProductList() {
+  var list = document.getElementById('product-list');
+  list.innerHTML = '';
+
+  products.forEach(function(p) {
+    var isChecked = (checkedProducts[p.id] || 0) > 0;
+    var item = document.createElement('div');
+    item.className = 'product-item' + (isChecked ? ' checked' : '');
+    item.setAttribute('data-id', p.id);
+
+    var thumbHtml = p.image
+      ? '<img class="product-thumb" src="' + p.image + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+        + '<div class="product-thumb-placeholder" style="display:none">🛍</div>'
+      : '<div class="product-thumb-placeholder">🛍</div>';
+
+    var priceStr = p.price ? '₩' + p.price.toLocaleString() : '';
+    var catStr   = p.category || '';
+    var metaParts = [catStr, priceStr].filter(Boolean);
+
+    var initQty = (checkedProducts[p.id] || 0) > 0 ? checkedProducts[p.id] : 1;
+
+    item.innerHTML =
+      '<div class="product-checkbox">'
+        + '<svg class="check-icon" viewBox="0 0 12 10"><polyline points="1.5 5 4.5 8.5 10.5 1.5"/></svg>'
+      + '</div>'
+      + thumbHtml
+      + '<div class="product-info">'
+        + '<div class="product-name">' + escapeHtml(p.name) + '</div>'
+        + '<div class="product-meta">' + metaParts.map(escapeHtml).join(' · ') + '</div>'
+      + '</div>'
+      + '<div class="qty-ctrl">'
+        + '<button class="qty-btn qty-minus">−</button>'
+        + '<span class="qty-num">' + initQty + '</span>'
+        + '<button class="qty-btn qty-plus">+</button>'
+      + '</div>'
+      + (priceStr ? '<div class="product-price">' + escapeHtml(priceStr) + '</div>' : '');
+
+    item.querySelector('.qty-minus').addEventListener('click', function(e) { changeQty(p.id, -1, e); });
+    item.querySelector('.qty-plus').addEventListener('click',  function(e) { changeQty(p.id,  1, e); });
+
+    item.addEventListener('click', function() {
+      toggleProduct(p.id);
+    });
+
+    list.appendChild(item);
+  });
+
+  list.style.display = 'flex';
+  updateSummary();
+}
+
+function toggleProduct(id) {
+  checkedProducts[id] = (checkedProducts[id] || 0) > 0 ? 0 : 1;
+  saveChecked();
+
+  var item = document.querySelector('.product-item[data-id="' + id + '"]');
+  if (item) {
+    var isChecked = checkedProducts[id] > 0;
+    item.className = 'product-item' + (isChecked ? ' checked' : '');
+    var qtyNum = item.querySelector('.qty-num');
+    if (qtyNum) qtyNum.textContent = isChecked ? checkedProducts[id] : 1;
+  }
+
+  updateSummary();
+}
+
+function changeQty(id, delta, e) {
+  e.stopPropagation();
+  var cur  = (checkedProducts[id] || 0) > 0 ? checkedProducts[id] : 1;
+  var next = cur + delta;
+  checkedProducts[id] = next <= 0 ? 0 : next;
+  saveChecked();
+
+  var item = document.querySelector('.product-item[data-id="' + id + '"]');
+  if (item) {
+    var isChecked = checkedProducts[id] > 0;
+    item.className = 'product-item' + (isChecked ? ' checked' : '');
+    var qtyNum = item.querySelector('.qty-num');
+    if (qtyNum) qtyNum.textContent = isChecked ? checkedProducts[id] : 1;
+  }
+
+  updateSummary();
+}
+
+function clearProducts() {
+  checkedProducts = {};
+  saveChecked();
+  document.querySelectorAll('.product-item').forEach(function(el) {
+    el.className = 'product-item';
+    var qtyNum = el.querySelector('.qty-num');
+    if (qtyNum) qtyNum.textContent = '1';
+  });
+  updateSummary();
+}
+
+// ── 커스텀 아이템 ──
+function addCustom() {
+  var input = document.getElementById('custom-input');
+  var text = input.value.trim();
+  if (!text) return;
+
+  customItems.push({ id: Date.now(), text: text, checked: false });
+  saveCustom();
+  renderCustomList();
+  updateSummary();
+  input.value = '';
+  input.focus();
+}
+
+function toggleCustom(id) {
+  var item = customItems.find(function(c) { return c.id === id; });
+  if (item) {
+    item.checked = !item.checked;
+    saveCustom();
+    renderCustomList();
+    updateSummary();
+  }
+}
+
+function deleteCustom(id, e) {
+  e.stopPropagation();
+  customItems = customItems.filter(function(c) { return c.id !== id; });
+  saveCustom();
+  renderCustomList();
+  updateSummary();
+}
+
+function clearCustom() {
+  customItems = [];
+  saveCustom();
+  renderCustomList();
+  updateSummary();
+}
+
+function renderCustomList() {
+  var list = document.getElementById('custom-list');
+  list.innerHTML = '';
+
+  customItems.forEach(function(c) {
+    var item = document.createElement('div');
+    item.className = 'custom-item' + (c.checked ? ' checked' : '');
+
+    item.innerHTML =
+      '<div class="product-checkbox">'
+        + '<svg class="check-icon" viewBox="0 0 12 10"><polyline points="1.5 5 4.5 8.5 10.5 1.5"/></svg>'
+      + '</div>'
+      + '<div class="custom-text">' + escapeHtml(c.text) + '</div>'
+      + '<div class="custom-del">'
+        + '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+          + '<line x1="18" y1="6" x2="6" y2="18"></line>'
+          + '<line x1="6" y1="6" x2="18" y2="18"></line>'
+        + '</svg>'
+      + '</div>';
+
+    item.querySelector('.custom-del').addEventListener('click', function(e) {
+      deleteCustom(c.id, e);
+    });
+    item.querySelector('.product-checkbox').addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleCustom(c.id);
+    });
+    item.querySelector('.custom-text').addEventListener('click', function() {
+      toggleCustom(c.id);
+    });
+
+    list.appendChild(item);
+  });
+}
+
+// ── 요약 업데이트 ──
+function updateSummary() {
+  var count = 0;
+  var total = 0;
+
+  products.forEach(function(p) {
+    var qty = checkedProducts[p.id] || 0;
+    if (qty > 0) {
+      count += qty;
+      total += (p.price || 0) * qty;
+    }
+  });
+
+  var customChecked = customItems.filter(function(c) { return c.checked; }).length;
+  count += customChecked;
+
+  document.getElementById('summary-count').textContent = count;
+  document.getElementById('summary-price').textContent =
+    total > 0 ? '₩ ' + total.toLocaleString() : '₩ 0';
+}
+
+// ── 전체 초기화 ──
+function confirmReset() {
+  if (!confirm('메모장 내용을 모두 초기화할까요?')) return;
+  checkedProducts = {};
+  customItems     = [];
+  memo            = '';
+  saveChecked();
+  saveCustom();
+  saveMemo();
+  document.getElementById('memo-area').value = '';
+  renderCustomList();
+
+  // 상품 체크 시각 초기화
+  document.querySelectorAll('.product-item').forEach(function(el) {
+    el.className = 'product-item';
+  });
+  updateSummary();
+}
+
+// ── 유틸 ──
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+// ── 초기화 ──
+loadStorage();
+loadProducts();
+</script>
+
+</body>
+</html>

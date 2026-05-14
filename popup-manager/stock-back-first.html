@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>STOCK MANAGER — First</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <style>
+        body { font-family: "Pretendard Variable", Pretendard, sans-serif; overflow: hidden; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+    <!-- Facebook Pixel -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,"script",
+    "https://connect.facebook.net/en_US/fbevents.js");
+    fbq("init", "2914661692095333");
+    fbq("track", "PageView");
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=2914661692095333&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Facebook Pixel -->
+</head>
+<body class="bg-green-50 text-[#111] h-[100dvh] flex flex-col justify-center items-center">
+
+<!-- 로그인 -->
+<div id="login-screen" class="w-full max-w-sm px-6">
+    <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-14 h-14 bg-green-700 rounded-2xl mb-4">
+            <i data-lucide="package-check" class="w-7 h-7 text-white"></i>
+        </div>
+        <h1 class="text-xl font-bold">재고 관리</h1>
+        <p class="text-sm text-green-700 font-bold mt-1">First Store</p>
+    </div>
+    <input type="password" id="staff-pw" placeholder="비밀번호 입력"
+        class="w-full border-2 border-green-200 rounded-xl p-3.5 mb-3 text-center font-mono text-base focus:border-green-600 outline-none transition-colors bg-white">
+    <button id="login-btn" class="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
+        <i data-lucide="log-in" class="w-4 h-4"></i> 입장
+    </button>
+    <p id="login-error" class="hidden text-center text-xs text-red-500 mt-3">비밀번호가 올바르지 않습니다.</p>
+</div>
+
+<!-- 메인 -->
+<div id="main-screen" class="hidden w-full max-w-md h-full sm:h-auto sm:max-h-[95vh] flex flex-col sm:border-2 sm:border-green-300 sm:rounded-xl sm:shadow-xl bg-white overflow-hidden">
+    <div class="w-full h-full flex flex-col overflow-hidden">
+        <!-- 헤더 — 홍대 GREEN -->
+        <div class="px-4 py-3 flex items-center justify-between shrink-0 bg-green-700 text-white">
+            <div>
+                <p class="font-bold text-base leading-none">STOCK MANAGER</p>
+                <p class="text-[10px] text-green-300 mt-0.5">First Store</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="conn-status" class="text-[10px] font-mono text-green-300">연결 중...</span>
+                <button id="logout-btn" class="text-green-300 hover:text-white transition-colors">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+        <!-- 전체 버튼 -->
+        <div class="px-4 py-2 bg-green-50 border-b border-green-100 flex gap-2 shrink-0">
+            <button id="all-in-btn"  class="flex-1 text-xs font-bold py-2 rounded-lg bg-green-100 text-green-800 border border-green-200 active:scale-95 transition-all">✓ 전체 재고 있음</button>
+            <button id="all-out-btn" class="flex-1 text-xs font-bold py-2 rounded-lg bg-red-100 text-red-700 border border-red-200 active:scale-95 transition-all">✗ 전체 품절 처리</button>
+        </div>
+        <div id="stock-list" class="flex-1 overflow-y-auto p-3 pb-4 scrollbar-hide space-y-3"></div>
+    </div>
+</div>
+
+<div id="toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 bg-gray-900/95 text-white px-5 py-3 rounded-full shadow-2xl z-50 text-sm flex items-center gap-2 whitespace-nowrap">
+    <div class="bg-green-500 rounded-full p-0.5"><i data-lucide="check" class="w-3 h-3 text-white"></i></div>
+    <span id="toast-msg"></span>
+</div>
+
+<script>
+firebase.initializeApp({
+    apiKey: "AIzaSyA4-C8G9bAiRRImJ6JFSidUX6pU1WtSJWc",
+    authDomain: "linefriends-popup-stock.firebaseapp.com",
+    projectId: "linefriends-popup-stock",
+    storageBucket: "linefriends-popup-stock.firebasestorage.app",
+    messagingSenderId: "483475199555",
+    appId: "1:483475199555:web:1be7a3e177096dc02966f6"
+});
+var auth = firebase.auth();
+var db   = firebase.firestore();
+var APP_ID = 'mmmm-popup-hongdae';
+var STOCK_PATH    = 'artifacts/'+APP_ID+'/public/data/inventory/all_stock';
+var PRODUCTS_PATH = 'artifacts/'+APP_ID+'/public/data/config/products';
+var SETTINGS_PATH = 'artifacts/'+APP_ID+'/public/data/config/settings';
+var products = [];
+var settings = { adminPassword:'0715' };
+var unsub = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+    auth.signInAnonymously().then(function() {
+        return db.doc(SETTINGS_PATH).get();
+    }).then(function(snap) {
+        if (snap.exists) settings = Object.assign({}, settings, snap.data());
+    }).catch(console.error);
+    document.getElementById('staff-pw').addEventListener('keypress', function(e){ if(e.key==='Enter') doLogin(); });
+    document.getElementById('login-btn').addEventListener('click', doLogin);
+    document.getElementById('logout-btn').addEventListener('click', doLogout);
+    document.getElementById('all-in-btn').addEventListener('click',  function(){ setAll('IN_STOCK'); });
+    document.getElementById('all-out-btn').addEventListener('click', function(){ setAll('SOLD_OUT'); });
+});
+
+function doLogin() {
+    var pw = document.getElementById('staff-pw').value;
+    if (pw !== (settings.adminPassword||'0715')) {
+        document.getElementById('login-error').classList.remove('hidden');
+        document.getElementById('staff-pw').value = ''; return;
+    }
+    document.getElementById('login-error').classList.add('hidden');
+    loadAndListen();
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('main-screen').classList.remove('hidden');
+    lucide.createIcons();
+}
+
+function doLogout() {
+    if (unsub) { unsub(); unsub = null; }
+    document.getElementById('main-screen').classList.add('hidden');
+    document.getElementById('login-screen').classList.remove('hidden');
+    document.getElementById('staff-pw').value = '';
+}
+
+function loadAndListen() {
+    db.doc(PRODUCTS_PATH).get().then(function(snap) {
+        var raw = (snap.exists && snap.data().list && snap.data().list.length) ? snap.data().list : [];
+        products = raw.map(function(p) {
+            return Object.assign({}, p, {
+                variants: p.options.map(function(o,i){
+                    return {
+                        id: p.id+'_'+i,
+                        name: typeof o==='object' ? o.name : o,
+                        staffMemo: typeof o==='object' ? (o.staffMemo||'') : '', // ★ 직원 메모
+                        status: 'IN_STOCK'
+                    };
+                })
+            });
+        });
+    }).catch(function(){ products=[]; }).then(function() {
+        if (unsub) unsub();
+        unsub = db.doc(STOCK_PATH).onSnapshot(function(snap) {
+            if (snap.exists) {
+                var d = snap.data();
+                products.forEach(function(g){ g.variants.forEach(function(v){ if(d[v.id]!==undefined) v.status=d[v.id]; }); });
+            }
+            renderStock();
+            document.getElementById('conn-status').innerText = '● 실시간 연결';
+        }, function() {
+            document.getElementById('conn-status').innerText = '● 연결 오류';
+        });
+    });
+}
+
+function renderStock() {
+    document.getElementById('stock-list').innerHTML = products.map(function(g) {
+        var soldCount = g.variants.filter(function(v){return v.status==='SOLD_OUT';}).length;
+        var allOut = soldCount === g.variants.length;
+        var btns = g.variants.map(function(v) {
+            var out = v.status==='SOLD_OUT';
+            return '<button class="flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all active:scale-95 select-none relative ' +
+                (out?'bg-red-50 border-red-200 text-red-400':'bg-green-50 border-green-400 text-green-800') +
+                '" data-vid="'+v.id+'" data-next="'+(out?'IN_STOCK':'SOLD_OUT')+'">' +
+                '<span class="text-xs font-bold leading-tight">'+v.name+'</span>' +
+                // ★ staffMemo 있으면 작게 표시
+                (v.staffMemo ? '<span class="text-[9px] font-medium opacity-70 mt-0.5 leading-tight">'+v.staffMemo+'</span>' : '') +
+                '<span class="text-[10px] font-mono mt-1">'+(out?'품절':'판매중')+'</span>' +
+                (!out?'<span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>':'') +
+            '</button>';
+        }).join('');
+        return '<div class="bg-white border '+(allOut?'border-red-200':'border-gray-200')+' rounded-xl p-3">' +
+            '<div class="flex items-center gap-3 mb-3 pb-2 border-b border-gray-100">' +
+                '<img src="'+g.image+'" class="w-10 h-10 rounded-lg bg-gray-100 object-cover border border-gray-200 '+(allOut?'grayscale opacity-60':'')+'">' +
+                '<div class="flex-1 min-w-0">' +
+                    '<p class="text-xs font-bold text-gray-900 truncate">'+g.name+'</p>' +
+                    '<p class="text-[10px] '+(soldCount>0?'text-red-500 font-bold':'text-gray-400')+'">'+soldCount+'/'+g.variants.length+' 품절</p>' +
+                '</div>' +
+                (allOut?'<span class="shrink-0 text-[10px] font-black text-red-600 bg-red-100 border border-red-200 px-2 py-1 rounded-full">ALL SOLD OUT</span>':'') +
+            '</div>' +
+            '<div class="grid grid-cols-3 gap-2">'+btns+'</div>' +
+        '</div>';
+    }).join('');
+    document.getElementById('stock-list').onclick = function(e) {
+        var btn = e.target.closest('[data-vid]');
+        if (!btn) return;
+        toggle(btn.dataset.vid, btn.dataset.next);
+    };
+    lucide.createIcons();
+}
+
+function toggle(id, next) {
+    products.forEach(function(g){ var v=g.variants.find(function(v){return v.id===id;}); if(v) v.status=next; });
+    renderStock();
+    showToast(next==='SOLD_OUT'?'품절 처리':'재고 있음으로 변경');
+    var obj = {}; obj[id] = next;
+    db.doc(STOCK_PATH).set(obj, {merge:true}).catch(function(e){alert('저장 실패: '+e.message);});
+}
+
+function setAll(status) {
+    if (!confirm((status==='SOLD_OUT'?'전체 품절':'전체 재고 있음')+'으로 변경할까요?')) return;
+    var batch = {};
+    products.forEach(function(g){ g.variants.forEach(function(v){ v.status=status; batch[v.id]=status; }); });
+    renderStock();
+    showToast(status==='SOLD_OUT'?'전체 품절 처리':'전체 재고 있음');
+    db.doc(STOCK_PATH).set(batch,{merge:true}).catch(function(e){alert('저장 실패: '+e.message);});
+}
+
+function showToast(msg) {
+    var el = document.getElementById('toast');
+    document.getElementById('toast-msg').innerText = msg;
+    el.classList.remove('hidden');
+    setTimeout(function(){ el.classList.add('hidden'); }, 1800);
+}
+</script>
+</body>
+</html>

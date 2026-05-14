@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>POP-UP LIVE STOCK — Third</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <style>
+        body { font-family: "Pretendard Variable", Pretendard, sans-serif; overflow: hidden; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .animate-marquee { display: inline-block; padding-left: 100%; animation: marquee 18s linear infinite; }
+        @keyframes marquee { 0%{transform:translate(0,0);} 100%{transform:translate(-100%,0);} }
+        .opt-badge { font-size:11px; padding:4px 8px; border-radius:6px; font-weight:700; border:1px solid transparent; display:flex; align-items:center; justify-content:space-between; }
+        .opt-in  { background:#DCFCE7; color:#166534; border-color:#86EFAC; }
+        .opt-out { background:#FEE2E2; color:#991B1B; border-color:#FECACA; text-decoration:line-through; }
+        .soldout-overlay { position:absolute; inset:0; background:rgba(255,255,255,0.6); backdrop-filter:blur(2px); z-index:10; display:flex; align-items:center; justify-content:center; border-radius:10px; }
+    </style>
+    <!-- Facebook Pixel -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,"script",
+    "https://connect.facebook.net/en_US/fbevents.js");
+    fbq("init", "2914661692095333");
+    fbq("track", "PageView");
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=2914661692095333&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Facebook Pixel -->
+</head>
+<body class="bg-[#eff6ff] text-[#111] h-[100dvh] flex flex-col justify-center items-center">
+<div class="w-full max-w-md h-full sm:h-auto sm:max-h-[95vh] flex flex-col sm:border-2 sm:border-blue-300 sm:rounded-xl sm:shadow-xl bg-white overflow-hidden">
+    <div class="w-full h-full flex flex-col bg-white relative overflow-hidden">
+        <!-- 헤더 — Third BLUE -->
+        <div class="bg-blue-700 p-4 flex items-center justify-between shrink-0">
+            <div>
+                <p class="font-bold text-lg leading-none tracking-tight text-white">POP-UP LIVE STOCK</p>
+                <p id="subtitle" class="text-[10px] text-blue-200 font-medium mt-1">Loading...</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-blue-300 animate-pulse inline-block"></span>
+                <span id="last-updated" class="text-[10px] text-blue-200 font-mono">syncing...</span>
+            </div>
+        </div>
+        <!-- 배너 -->
+        <div class="bg-blue-600 text-white px-4 py-2 text-xs font-bold overflow-hidden whitespace-nowrap flex items-center gap-2 shrink-0">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-200 animate-pulse shrink-0"></span>
+            <div class="animate-marquee">실시간 재고 현황입니다. 붉은색 표시는 품절입니다. 현장 상황에 따라 차이가 있을 수 있습니다.</div>
+        </div>
+        <div id="product-list" class="flex-1 overflow-y-auto p-4 pb-36 scrollbar-hide space-y-4"></div>
+        <!-- 푸터 -->
+        <div class="absolute bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur border-t border-blue-100 z-20 flex flex-col gap-2">
+            <button onclick="manualRefresh()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-lg flex items-center justify-center gap-2 text-sm active:scale-[0.98] transition-all">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i> 새로고침
+            </button>
+            <a id="store-link" href="#" target="_blank" class="w-full bg-white border border-blue-200 text-blue-800 font-bold py-3.5 rounded-lg flex items-center justify-center gap-2 text-sm active:scale-[0.98] transition-all hover:bg-blue-50">
+                <i data-lucide="shopping-bag" class="w-4 h-4"></i> 온라인 스토어 방문하기
+            </a>
+        </div>
+    </div>
+</div>
+<script>
+firebase.initializeApp({
+    apiKey: "AIzaSyA4-C8G9bAiRRImJ6JFSidUX6pU1WtSJWc",
+    authDomain: "linefriends-popup-stock.firebaseapp.com",
+    projectId: "linefriends-popup-stock",
+    storageBucket: "linefriends-popup-stock.firebasestorage.app",
+    messagingSenderId: "483475199555",
+    appId: "1:483475199555:web:1be7a3e177096dc02966f6"
+});
+var auth = firebase.auth();
+var db   = firebase.firestore();
+var APP_ID = 'mmmm-popup-third';
+var DEFAULT_SETTINGS = { location:"Third Store", storeUrl:"https://linefriendssquare.com" };
+var products = [];
+var unsub = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+    auth.signInAnonymously().then(function() { loadConfig(); }).catch(console.error);
+});
+
+function loadConfig() {
+    Promise.all([
+        db.doc('artifacts/'+APP_ID+'/public/data/config/settings').get(),
+        db.doc('artifacts/'+APP_ID+'/public/data/config/products').get()
+    ]).then(function(results) {
+        var settings = results[0].exists ? Object.assign({}, DEFAULT_SETTINGS, results[0].data()) : DEFAULT_SETTINGS;
+        document.getElementById('subtitle').innerText = settings.location;
+        document.getElementById('store-link').href = settings.storeUrl;
+        var raw = (results[1].exists && results[1].data().list && results[1].data().list.length) ? results[1].data().list : [];
+        products = raw.map(function(p) {
+            return Object.assign({}, p, {
+                variants: p.options.map(function(o,i) {
+                    return { id:p.id+'_'+i, name:typeof o==='object'?o.name:o, status:'IN_STOCK' };
+                })
+            });
+        });
+        render(); listenStock();
+    }).catch(console.error);
+}
+
+function listenStock() {
+    if (unsub) return;
+    unsub = db.doc('artifacts/'+APP_ID+'/public/data/inventory/all_stock').onSnapshot(function(snap) {
+        if (snap.exists) {
+            var d = snap.data();
+            products.forEach(function(g) { g.variants.forEach(function(v) { if(d[v.id]!==undefined) v.status=d[v.id]; }); });
+        }
+        render();
+        var t = new Date();
+        document.getElementById('last-updated').innerText = t.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    });
+}
+
+function render() {
+    document.getElementById('product-list').innerHTML = products.map(function(g) {
+        var allOut = g.variants.every(function(v){return v.status==='SOLD_OUT';});
+        var opts = g.variants.map(function(v) {
+            var out = v.status==='SOLD_OUT';
+            return '<div class="opt-badge '+(out?'opt-out':'opt-in')+'">' +
+                '<span>'+v.name+'</span>' +
+                '<span class="text-[9px] opacity-80 ml-2 whitespace-nowrap">'+(out?'SOLD OUT':'재고 있음')+'</span>' +
+            '</div>';
+        }).join('');
+        return '<div class="relative bg-white border-2 '+(allOut?'border-gray-200':'border-blue-100')+' rounded-xl p-3 shadow-sm overflow-hidden">' +
+            (allOut?'<div class="soldout-overlay"><div class="bg-red-600 text-white text-sm font-black px-4 py-2 rounded-full -rotate-12 shadow-lg">SOLD OUT</div></div>':'') +
+            '<div class="flex gap-4">' +
+                '<div class="w-24 h-24 shrink-0 rounded-lg bg-gray-50 overflow-hidden border border-black/5">' +
+                    '<img src="'+g.image+'" class="w-full h-full object-cover'+(allOut?' grayscale opacity-50':'')+'" loading="lazy">' +
+                '</div>' +
+                '<div class="flex-1 min-w-0 flex flex-col">' +
+                    '<span class="text-[10px] text-blue-600 font-bold tracking-wider">'+g.category+'</span>' +
+                    '<h3 class="text-sm font-bold text-gray-900 leading-tight mb-0.5">'+g.name+'</h3>' +
+                    '<p class="text-[10px] text-gray-400 leading-tight mb-1 truncate">'+g.engName+'</p>' +
+                    '<div class="text-sm font-bold mt-auto">&#8361;'+Number(g.price).toLocaleString()+'</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="mt-3 grid grid-cols-2 gap-1.5'+(allOut?' opacity-30 grayscale':'')+'">'+opts+'</div>' +
+        '</div>';
+    }).join('');
+    lucide.createIcons();
+}
+function manualRefresh() { render(); }
+</script>
+</body>
+</html>
