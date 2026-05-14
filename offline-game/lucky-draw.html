@@ -129,12 +129,25 @@
             letter-spacing: -0.5px;
             white-space: nowrap;
         }
+        .chip-count {
+            display: inline-block;
+            font-size: 18px;
+            font-weight: 900;
+            color: #fff;
+            background: #E85342;
+            border: 2px solid #3F1F0E;
+            border-radius: 999px;
+            padding: 2px 12px;
+            margin-top: 2px;
+            box-shadow: 0 2px 0 #3F1F0E;
+            letter-spacing: -0.5px;
+        }
 
-        /* ── 9×9 grid ── */
+        /* ── 10×10 grid ── */
         .lottery-grid {
             display: grid;
-            grid-template-columns: repeat(9, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 8px;
             width: 1000px;
         }
         .slot {
@@ -168,7 +181,7 @@
         }
         .slot-q {
             font-family: 'Black Han Sans', 'Pretendard', sans-serif;
-            font-size: 38px;
+            font-size: 34px;
             color: #3F1F0E;
             line-height: 1;
             position: relative;
@@ -324,7 +337,7 @@
                 <span class="tword">행운의</span>
                 <span class="tword tword-2">뽑기</span>
             </div>
-            <div class="title-tag">81칸 중 한 칸을 골라 행운을 뜯어보세요!</div>
+            <div class="title-tag">100칸 중 한 칸을 골라 행운을 뜯어보세요!</div>
         </div>
     </div>
 
@@ -355,15 +368,15 @@
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────
 var PRIZES = [
-    { id:'sticker',   name:'스티커',        short:'스티커',  count:62, desc:'카운터에서 수령하세요',         char:'noo_pink',   color:'#F1C8C8' },
-    { id:'coupon20',  name:'20% 할인쿠폰',  short:'20%쿠폰', count:5,  desc:'구매 시 사용 가능합니다',       char:'noo_pink',   color:'#E85342' },
-    { id:'fragrance', name:'방향제',        short:'방향제',  count:5,  desc:'카운터에서 수령하세요',         char:'noo_blue',   color:'#1E76C9' },
-    { id:'coin',      name:'인형뽑기 코인', short:'뽑기코인',count:4,  desc:'인형뽑기 기계에서 사용하세요',  char:'noo_gray',   color:'#C9C2BA' },
-    { id:'fan',       name:'부채',          short:'부채',    count:3,  desc:'카운터에서 수령하세요',         char:'noo_blue',   color:'#1E76C9' },
-    { id:'coupon30',  name:'30% 할인쿠폰',  short:'30%쿠폰', count:2,  desc:'구매 시 사용 가능합니다',       char:'noo_golden', color:'#F8E22B' },
+    { id:'sticker',   name:'스티커',        short:'스티커',  count:81, desc:'카운터에서 수령하세요',         img:'lucky_sticker.png', color:'#F1C8C8' },
+    { id:'fragrance', name:'방향제',        short:'방향제',  count:5,  desc:'카운터에서 수령하세요',         img:'lucky_fresh.png',   color:'#1E76C9' },
+    { id:'fan',       name:'부채',          short:'부채',    count:3,  desc:'카운터에서 수령하세요',         img:'lucky_fan.png',     color:'#1E76C9' },
+    { id:'coin',      name:'인형뽑기 코인', short:'뽑기코인',count:4,  desc:'인형뽑기 기계에서 사용하세요',  img:'lucky_coin.png',    color:'#C9C2BA' },
+    { id:'coupon20',  name:'20% 할인쿠폰',  short:'20%쿠폰', count:5,  desc:'구매 시 사용 가능합니다',       img:'lucky_20.png',      color:'#E85342' },
+    { id:'coupon30',  name:'30% 할인쿠폰',  short:'30%쿠폰', count:2,  desc:'구매 시 사용 가능합니다',       img:'lucky_30.png',      color:'#F8E22B' },
 ];
 
-var STORAGE_KEY = 'lfs_draw_session';
+var STORAGE_KEY = 'lfs_draw_session_v2';
 
 // ── Board ──────────────────────────────────────────────────────────────────
 function buildPool() {
@@ -417,7 +430,7 @@ function renderPrizeChips() {
 
         var img = document.createElement('img');
         img.className = 'chip-img';
-        img.src = './img/' + p.char + '_crop.png';
+        img.src = './img/' + p.img;
         img.alt = '';
 
         imgWrap.appendChild(img);
@@ -426,8 +439,13 @@ function renderPrizeChips() {
         name.className = 'chip-name';
         name.textContent = p.name;
 
+        var count = document.createElement('div');
+        count.className = 'chip-count';
+        count.textContent = p.count + '개';
+
         chip.appendChild(imgWrap);
         chip.appendChild(name);
+        chip.appendChild(count);
         container.appendChild(chip);
     });
 }
@@ -469,7 +487,7 @@ function renderGrid() {
         front.style.borderColor = prize.color;
 
         var fImg = document.createElement('img');
-        fImg.src = './img/' + prize.char + '_crop.png';
+        fImg.src = './img/' + prize.img;
         fImg.alt = '';
         front.appendChild(fImg);
 
@@ -510,7 +528,7 @@ function onSlotClick(idx, el) {
 // ── Result ────────────────────────────────────────────────────────────────
 function showResult(prizeId) {
     var prize = getPrize(prizeId);
-    document.getElementById('resultChar').src = './img/' + prize.char + '_crop.png';
+    document.getElementById('resultChar').src = './img/' + prize.img;
     document.getElementById('resultName').textContent = prize.name;
     document.getElementById('resultDesc').textContent = prize.desc;
     document.getElementById('result-overlay').classList.remove('hidden');

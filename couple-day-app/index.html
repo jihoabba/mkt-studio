@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>부부의 날 · 우리는 어떤 부부상?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<style>
+  :root {
+    /* Brand */
+    --primary: #e60023;
+    --primary-pressed: #cc001f;
+    --on-primary: #ffffff;
+
+    /* Surface */
+    --canvas: #ffffff;
+    --surface-soft: #fbfbf9;
+    --surface-card: #f6f6f3;
+    --secondary-bg: #e5e5e0;
+    --secondary-pressed: #c8c8c1;
+    --surface-dark: #262622;
+
+    /* Lines */
+    --hairline: #dadad3;
+    --hairline-soft: #e5e5e0;
+
+    /* Text */
+    --ink: #000000;
+    --ink-soft: #211922;
+    --body: #33332e;
+    --charcoal: #262622;
+    --mute: #62625b;
+    --ash: #91918c;
+    --stone: #c8c8c1;
+    --on-dark: #ffffff;
+
+    /* Semantic */
+    --error: #9e0a0a;
+    --error-deep: #cc001f;
+    --success-deep: #103c25;
+    --success-pale: #c7f0da;
+    --focus-outer: #435ee5;
+
+    /* Type */
+    --font: 'Pretendard', 'Inter', -apple-system, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+
+    /* Radius */
+    --r-md: 16px;
+    --r-lg: 32px;
+    --r-full: 9999px;
+
+    /* Spacing */
+    --s-xxs: 4px;
+    --s-xs: 6px;
+    --s-sm: 8px;
+    --s-md: 12px;
+    --s-lg: 16px;
+    --s-xl: 24px;
+    --s-xxl: 32px;
+    --s-section: 64px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *:focus-visible {
+    outline: 2px solid var(--focus-outer);
+    outline-offset: 2px;
+  }
+  html, body { background: var(--surface-soft); }
+  body {
+    color: var(--body);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  img { display: block; max-width: 100%; }
+  button { font-family: inherit; }
+
+  /* ---------- Primary nav ---------- */
+  .primary-nav {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--canvas);
+    border-bottom: 1px solid var(--hairline);
+    height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px;
+  }
+  .primary-nav .wordmark {
+    font-size: 16px; font-weight: 700; letter-spacing: -.01em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .primary-nav .wordmark .accent { color: var(--primary); }
+  .primary-nav .nav-meta { font-size: 12px; color: var(--mute); }
+
+  /* ---------- Stage ---------- */
+  .stage {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: var(--s-section) 24px;
+  }
+
+  /* ---------- Screen ---------- */
+  .screen { display: none; }
+  .screen.active {
+    display: block;
+    animation: fadeUp .35s cubic-bezier(.2,.7,.2,1) both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto var(--s-section);
+  }
+  .hero-kicker {
+    display: inline-block;
+    font-size: 14px; font-weight: 700;
+    color: var(--primary);
+    letter-spacing: -.01em;
+    margin-bottom: 24px;
+  }
+  .display-xl {
+    font-size: clamp(40px, 7vw, 70px);
+    line-height: 1.05;
+    font-weight: 600;
+    letter-spacing: -1.5px;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+  .hero-sub {
+    font-size: 16px; color: var(--mute);
+    max-width: 480px; margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  /* ---------- Upload grid ---------- */
+  .upload-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 880px;
+    margin: 0 auto var(--s-xxl);
+  }
+  .upload-card {
+    background: var(--canvas);
+    border-radius: var(--r-md);
+    padding: 24px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .upload-label {
+    font-size: 12px; font-weight: 700; color: var(--mute);
+    letter-spacing: .04em; text-transform: uppercase;
+  }
+
+  .drop-zone {
+    aspect-ratio: 1;
+    background: var(--surface-card);
+    border-radius: var(--r-md);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    position: relative; overflow: hidden;
+    transition: background .15s ease;
+  }
+  .drop-zone:hover { background: var(--hairline-soft); }
+  .drop-zone.has-image { background: var(--ink); }
+  .drop-zone img { width: 100%; height: 100%; object-fit: cover; }
+  .drop-zone .placeholder {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    color: var(--mute);
+    pointer-events: none;
+  }
+  .drop-zone .placeholder svg {
+    width: 32px; height: 32px; opacity: .6;
+  }
+  .drop-zone .placeholder span {
+    font-size: 14px; font-weight: 600;
+    letter-spacing: -.01em;
+  }
+  .drop-zone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  }
+
+  .nickname-input {
+    width: 100%;
+    background: var(--canvas);
+    border: 1px solid var(--ash);
+    border-radius: var(--r-md);
+    padding: 11px 15px;
+    font: inherit; font-size: 16px; font-weight: 500;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s, padding .15s;
+  }
+  .nickname-input:focus {
+    border: 2px solid var(--ink);
+    padding: 10px 14px;
+  }
+  .nickname-input::placeholder { color: var(--ash); font-weight: 400; }
+
+  /* Filter-chip-style gender pills */
+  .gender-pills { display: flex; gap: 8px; }
+  .gender-pills button {
+    flex: 1;
+    background: var(--surface-card);
+    color: var(--ink);
+    border: none;
+    padding: 10px 16px;
+    border-radius: var(--r-full);
+    font-size: 14px; font-weight: 700;
+    letter-spacing: -.01em;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+    min-height: 40px;
+  }
+  .gender-pills button:hover { background: var(--hairline-soft); }
+  .gender-pills button.active {
+    background: var(--ink);
+    color: var(--on-dark);
+  }
+
+  /* ---------- CTA row ---------- */
+  .cta-row {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: var(--on-primary);
+    border: none;
+    padding: 0 24px;
+    height: 48px;
+    border-radius: var(--r-md);
+    font-size: 14px; font-weight: 700; letter-spacing: -.01em;
+    cursor: pointer;
+    transition: background .15s;
+    min-width: 160px;
+  }
+  .btn-primary:not(:disabled):active { background: var(--primary-pressed); }
+  .btn-primary:disabled {
+    background: var(--surface-card);
+    color: var(--ash);
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background: var(--secondary-bg);
+    color: var(--ink);
+    border: none;
+    padding: 0 24px;
+    height: 48px;
+    border-radius: var(--r-md);
+    font-size: 14px; font-weight: 700; letter-spacing: -.01em;
+    cursor: pointer;
+    transition: background .15s;
+    min-width: 160px;
+  }
+  .btn-secondary:active { background: var(--secondary-pressed); }
+
+  .model-status {
+    font-size: 12px; color: var(--mute);
+    letter-spacing: -.01em;
+    min-height: 18px;
+  }
+  .model-status.ready { color: var(--success-deep); }
+  .model-status.error { color: var(--primary); }
+
+  .error-box {
+    display: none;
+    background: #fff0f0;
+    color: var(--error);
+    border-radius: var(--r-md);
+    padding: 12px 16px;
+    font-size: 14px; font-weight: 600;
+  }
+  .error-box.show { display: block; }
+
+  /* ---------- Loading screen ---------- */
+  .loading-stage {
+    display: flex; flex-direction: column; align-items: center; gap: 24px;
+    padding: 120px 24px;
+    text-align: center;
+  }
+  .loading-dots { display: flex; gap: 8px; }
+  .loading-dots span {
+    width: 10px; height: 10px;
+    background: var(--primary);
+    border-radius: var(--r-full);
+    animation: dotPulse 1.2s ease-in-out infinite;
+  }
+  .loading-dots span:nth-child(2) { animation-delay: .15s; }
+  .loading-dots span:nth-child(3) { animation-delay: .3s; }
+  @keyframes dotPulse {
+    0%, 100% { transform: scale(.5); opacity: .35; }
+    50% { transform: scale(1); opacity: 1; }
+  }
+  .loading-stage h2 {
+    font-size: 28px; font-weight: 700;
+    letter-spacing: -1.2px;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .loading-step {
+    font-size: 14px; color: var(--mute);
+    transition: opacity .2s;
+  }
+
+  /* ---------- Result ---------- */
+  .result-header {
+    text-align: center;
+    margin: 0 auto var(--s-xxl);
+    max-width: 760px;
+  }
+  .result-header + .result-header { margin-top: var(--s-section); }
+  .result-kicker {
+    font-size: 12px; font-weight: 700;
+    color: var(--mute);
+    text-transform: uppercase; letter-spacing: .04em;
+    margin-bottom: 12px;
+  }
+  .heading-xl {
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -1.2px;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .heading-xl .amp {
+    color: var(--mute); font-weight: 400;
+    margin: 0 8px;
+    font-style: normal;
+  }
+  .result-date, .result-sub {
+    font-size: 14px; color: var(--mute);
+  }
+  .result-sub { margin-top: 8px; }
+
+  /* Two-up grid for pin cards and product cards */
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 880px;
+    margin: 0 auto var(--s-section);
+  }
+
+  /* Pin card — image full-bleed, no padding, overlay pill */
+  .pin-card {
+    background: var(--surface-card);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .pin-image {
+    aspect-ratio: 4/5;
+    position: relative;
+    overflow: hidden;
+    background: var(--hairline-soft);
+  }
+  .pin-image img {
+    width: 100%; height: 100%; object-fit: cover;
+    position: relative; z-index: 1;
+  }
+  .pin-image .char-svg { display: none; } /* legacy mounting node, hidden */
+  .pin-overlay-pill {
+    position: absolute;
+    bottom: 12px; left: 12px;
+    background: var(--canvas);
+    color: var(--ink);
+    font-size: 12px; font-weight: 700;
+    padding: 6px 12px 6px 8px;
+    border-radius: var(--r-full);
+    z-index: 2;
+    letter-spacing: -.01em;
+    display: inline-flex; align-items: center; gap: 4px;
+    line-height: 1.4;
+  }
+  .pin-overlay-pill .emoji { font-size: 14px; line-height: 1; }
+  .pin-meta {
+    padding: 16px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .pin-who {
+    font-size: 12px; font-weight: 700;
+    color: var(--mute);
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  .pin-vibe {
+    font-size: 12px; color: var(--mute);
+    font-style: italic;
+    letter-spacing: -.01em;
+  }
+  .pin-desc {
+    font-size: 14px; color: var(--body);
+    line-height: 1.4;
+    margin-top: 4px;
+  }
+
+  /* Product card (.product is the class used by JS in makeProductCard) */
+  .product {
+    background: var(--surface-card);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .product .product-img {
+    aspect-ratio: 1;
+    background: var(--canvas);
+    overflow: hidden;
+    position: relative;
+  }
+  .product .product-img img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .product .product-tag {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: var(--canvas);
+    color: var(--ink);
+    font-size: 12px; font-weight: 700;
+    padding: 6px 12px;
+    border-radius: var(--r-full);
+    z-index: 2;
+    letter-spacing: -.01em;
+  }
+  .product .product-name {
+    padding: 16px 16px 4px;
+    font-size: 14px; font-weight: 600;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .product .product-price {
+    padding: 0 16px 16px;
+    font-size: 14px; font-weight: 700;
+    letter-spacing: -.01em;
+  }
+  .product .product-price .strike {
+    text-decoration: line-through;
+    color: var(--ash);
+    font-weight: 400;
+    margin-right: 8px;
+  }
+  .product .product-price .now {
+    color: var(--primary);
+  }
+
+  /* Result CTA row — horizontal */
+  .result-cta {
+    display: flex; gap: 12px; justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--s-xl);
+  }
+
+  .footnote {
+    text-align: center;
+    font-size: 12px; color: var(--mute);
+    margin-top: var(--s-xl);
+  }
+
+  /* Site footer */
+  .site-footer {
+    border-top: 1px solid var(--hairline);
+    background: var(--canvas);
+    padding: 32px 24px;
+    margin-top: var(--s-section);
+  }
+  .site-footer .footer-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    font-size: 12px; color: var(--mute);
+  }
+  .site-footer .wordmark { font-weight: 700; color: var(--ink); }
+  .site-footer .accent { color: var(--primary); }
+
+  /* Responsive */
+  @media (max-width: 720px) {
+    .stage { padding: 32px 16px; }
+    .upload-grid { grid-template-columns: 1fr; }
+    .result-grid { grid-template-columns: 1fr; }
+    .display-xl { font-size: 40px; letter-spacing: -1px; }
+    .heading-xl { font-size: 28px; }
+    .site-footer .footer-inner { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+  <nav class="primary-nav">
+    <a href="#" class="wordmark">LINE FRIENDS <span class="accent">SQUARE</span></a>
+    <span class="nav-meta">부부의 날 · 2026.05.21</span>
+  </nav>
+
+  <main class="stage">
+    <!-- UPLOAD -->
+    <section class="screen active" id="screen-upload">
+      <header class="hero">
+        <div class="hero-kicker">MAY 21 · 부부의 날</div>
+        <h1 class="display-xl">우리는 어떤<br>부부상일까요?</h1>
+        <p class="hero-sub">사진 두 장을 올리면 AI가 어울리는 캐릭터상과 굿즈를 골라드려요.</p>
+      </header>
+
+      <div class="upload-grid">
+        <div class="upload-card">
+          <span class="upload-label">한 사람</span>
+          <div class="drop-zone" id="dz1">
+            <div class="placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="5" width="18" height="14" rx="1"/>
+                <circle cx="12" cy="12" r="3.5"/>
+                <path d="M8 5l1.5-2h5L16 5"/>
+              </svg>
+              <span>사진 업로드</span>
+            </div>
+            <input type="file" id="photo1" accept="image/*" />
+          </div>
+          <input type="text" class="nickname-input" id="name1" placeholder="이름 또는 별명" maxlength="10" />
+          <div class="gender-pills" data-slot="1">
+            <button type="button" data-gender="male">남자</button>
+            <button type="button" data-gender="female">여자</button>
+          </div>
+        </div>
+
+        <div class="upload-card">
+          <span class="upload-label">또 한 사람</span>
+          <div class="drop-zone" id="dz2">
+            <div class="placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="5" width="18" height="14" rx="1"/>
+                <circle cx="12" cy="12" r="3.5"/>
+                <path d="M8 5l1.5-2h5L16 5"/>
+              </svg>
+              <span>사진 업로드</span>
+            </div>
+            <input type="file" id="photo2" accept="image/*" />
+          </div>
+          <input type="text" class="nickname-input" id="name2" placeholder="이름 또는 별명" maxlength="10" />
+          <div class="gender-pills" data-slot="2">
+            <button type="button" data-gender="male">남자</button>
+            <button type="button" data-gender="female">여자</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-row">
+        <button class="btn-primary" id="analyze-btn" disabled>분석 시작</button>
+        <div class="model-status" id="model-status">AI 모델 로딩 중…</div>
+        <div class="error-box" id="error-box"></div>
+      </div>
+    </section>
+
+    <!-- LOADING -->
+    <section class="screen" id="screen-loading">
+      <div class="loading-stage">
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+        <h2>두 분의 분위기를 읽고 있어요</h2>
+        <div class="loading-step" id="loading-step">잠시만요…</div>
+      </div>
+    </section>
+
+    <!-- RESULT -->
+    <section class="screen" id="screen-result">
+      <header class="result-header">
+        <div class="result-kicker">두 분의 결과</div>
+        <h2 class="heading-xl">
+          <span id="r-char1">·</span>상<span class="amp">×</span><span id="r-char2">·</span>상
+        </h2>
+        <p class="result-date" id="r-date">— 2026년 5월 21일 —</p>
+      </header>
+
+      <div class="result-grid">
+        <article class="pin-card">
+          <div class="pin-image" id="r-frame1">
+            <div class="char-svg" id="r-svg1"></div>
+            <img id="r-photo1" alt="" />
+            <div class="pin-overlay-pill"><span class="emoji" id="r-emoji1"></span><span id="r-name1-char">·</span></div>
+          </div>
+          <div class="pin-meta">
+            <div class="pin-who" id="r-who1">한 사람</div>
+            <div class="pin-vibe" id="r-vibe1">vibe</div>
+            <div class="pin-desc" id="r-desc1">설명</div>
+          </div>
+        </article>
+
+        <article class="pin-card">
+          <div class="pin-image" id="r-frame2">
+            <div class="char-svg" id="r-svg2"></div>
+            <img id="r-photo2" alt="" />
+            <div class="pin-overlay-pill"><span class="emoji" id="r-emoji2"></span><span id="r-name2-char">·</span></div>
+          </div>
+          <div class="pin-meta">
+            <div class="pin-who" id="r-who2">또 한 사람</div>
+            <div class="pin-vibe" id="r-vibe2">vibe</div>
+            <div class="pin-desc" id="r-desc2">설명</div>
+          </div>
+        </article>
+      </div>
+
+      <header class="result-header">
+        <div class="result-kicker">두 분께 어울리는 굿즈</div>
+        <h2 class="heading-xl">함께 담으면 <span style="color: var(--primary);">20% 자동할인</span></h2>
+        <p class="result-sub">5월 21일 한정 · 코드 입력 없이 적용</p>
+      </header>
+
+      <div class="result-grid" id="r-products"></div>
+
+      <div class="result-cta">
+        <button class="btn-primary" id="checkout-btn">두 굿즈 함께 담기</button>
+        <button class="btn-secondary" id="retry-btn">다시 해보기</button>
+      </div>
+
+      <p class="footnote">No. <span id="r-cert-no">000-000</span> · 본 결과는 재미를 위한 분석이에요</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="wordmark">LINE FRIENDS <span class="accent">SQUARE</span></div>
+      <div>© 2026 · AX TF · couple day mvp</div>
+    </div>
+  </footer>
+
+<script>
+/* =========================================================
+   캐릭터 데이터
+   ========================================================= */
+const CHAR_EMOJI = {
+  BROWN: '🐻', BRACHIO: '🦖', QUOKKA: '🦘', RENINI: '🐸',
+  CONY: '🐰', SALLY: '🐥', DOOGI: '🦆', OLIVERPANG: '🐶',
+};
+
+const CHARACTERS = {
+  BROWN:     { name: '브라운',         gender: 'male',   animal: '곰',     vibe: 'soft & solid',     desc: '말은 적지만 곁에 있으면 마음이 단단해지는 듬직한 사람.' },
+  BRACHIO:   { name: '브라키오',       gender: 'male',   animal: '공룡',   vibe: 'big & gentle',     desc: '큰 덩치 안에 따뜻한 마음을 품은, 든든한 거인 같은 사람.' },
+  QUOKKA:    { name: '다이노탱 쿼카',  gender: 'male',   animal: '쿼카',   vibe: 'sunny & cute',     desc: '항상 웃는 듯한 표정으로 주변을 환하게 만드는 사람.' },
+  RENINI:    { name: '레니니',         gender: 'male',   animal: '개구리', vibe: 'cool & quirky',    desc: '독특한 매력과 의외의 다정함을 동시에 가진 사람.' },
+  CONY:      { name: '코니',           gender: 'female', animal: '토끼',   vibe: 'playful & bright', desc: '장난기 가득한 표정과 무한한 에너지의 소유자.' },
+  SALLY:     { name: '샐리',           gender: 'female', animal: '병아리', vibe: 'tiny & adorable',  desc: '작고 동그란 분위기, 보기만 해도 미소가 새어나오는 사람.' },
+  DOOGI:     { name: '두기',           gender: 'female', animal: '오리',   vibe: 'soft & dreamy',    desc: '잔잔하고 부드러운 분위기로 마음을 편안하게 해주는 사람.' },
+  OLIVERPANG:{ name: '올리버팡',       gender: 'female', animal: '강아지', vibe: 'warm & loyal',     desc: '한결같이 따뜻한 사랑을 주는, 마음이 큰 사람.' },
+};
+
+const ANIMAL_TO_CHARACTER = {
+  male:   { '곰': 'BROWN', '공룡': 'BRACHIO', '쿼카': 'QUOKKA', '개구리': 'RENINI' },
+  female: { '토끼': 'CONY', '병아리': 'SALLY', '오리': 'DOOGI', '강아지': 'OLIVERPANG' },
+};
+
+const PRODUCTS = {
+  BROWN:      { name: '브라운 키링',           price: 12000, sale: 9600,  image: 'https://linefriendssquare.com/cdn/shop/files/line-friends-keyring----1212550037.jpg?v=1774221251&width=1946' },
+  BRACHIO:    { name: '브라키오 쿠션',         price: 38000, sale: 30400, image: 'https://linefriendssquare.com/cdn/shop/files/joguman-cushion--new-38881604960455.jpg?v=1708892604&width=1946' },
+  QUOKKA:     { name: '다이노탱 쿼카 스티커카드', price: 5000,  sale: 4000,  image: 'https://linefriendssquare.com/cdn/shop/files/dinotaeng-sticker-card---41369013190855.jpg?v=1734496859&width=1946' },
+  RENINI:     { name: '레니니 인형',           price: 35000, sale: 28000, image: 'https://linefriendssquare.com/cdn/shop/files/line-friends-plush---38940430270663.jpg?v=1709621959&width=1946' },
+  CONY:       { name: '코니 키링',             price: 12000, sale: 9600,  image: 'https://linefriendssquare.com/cdn/shop/files/line-friends-keyring---40135464255687.jpg?v=1726338719&width=1946' },
+  SALLY:      { name: '샐리 키링',             price: 12000, sale: 9600,  image: 'https://linefriendssquare.com/cdn/shop/files/line-friends-keyring----1212550041.jpg?v=1771744091&width=1946' },
+  DOOGI:      { name: '두기 키링',             price: 12000, sale: 9600,  image: 'https://linefriendssquare.com/cdn/shop/files/doohambba-keyring----1212549484.jpg?v=1771736919&width=1946' },
+  OLIVERPANG: { name: '올리버팡 키링',         price: 14000, sale: 11200, image: 'https://linefriendssquare.com/cdn/shop/files/lazy-tail-club-living---lofa-seoul-x-lazy-tail-club-1212547544.jpg?v=1766363470&width=1946' },
+};
+
+/* =========================================================
+   상태 & DOM
+   ========================================================= */
+const state = {
+  photo1: null,
+  photo2: null,
+  name1: '',
+  name2: '',
+  gender1: null,
+  gender2: null,
+};
+
+const $ = (id) => document.getElementById(id);
+
+function setupDropZone(zoneId, inputId, slot) {
+  const zone = $(zoneId);
+  const input = $(inputId);
+
+  const handleFile = (file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      state[slot] = { file, dataUrl: reader.result };
+      zone.classList.add('has-image');
+
+      while (zone.firstChild) zone.removeChild(zone.firstChild);
+
+      const img = document.createElement('img');
+      img.src = reader.result;
+      img.alt = '';
+      zone.appendChild(img);
+
+      const newInput = document.createElement('input');
+      newInput.type = 'file';
+      newInput.id = inputId;
+      newInput.accept = 'image/*';
+      newInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+      zone.appendChild(newInput);
+
+      checkReady();
+    };
+    reader.readAsDataURL(file);
+  };
+
+  input.addEventListener('change', (e) => handleFile(e.target.files[0]));
+}
+setupDropZone('dz1', 'photo1', 'photo1');
+setupDropZone('dz2', 'photo2', 'photo2');
+
+$('name1').addEventListener('input', (e) => { state.name1 = e.target.value.trim(); });
+$('name2').addEventListener('input', (e) => { state.name2 = e.target.value.trim(); });
+
+function checkReady() {
+  $('analyze-btn').disabled = !(state.photo1 && state.photo2 && state.gender1 && state.gender2);
+}
+
+document.querySelectorAll('.gender-pills').forEach(group => {
+  const slot = group.dataset.slot;
+  group.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      group.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state['gender' + slot] = btn.dataset.gender;
+      checkReady();
+    });
+  });
+});
+
+/* =========================================================
+   AI 모델 로딩 (face-api.js)
+   ========================================================= */
+let modelsReady = false;
+async function loadModels() {
+  const statusEl = $('model-status');
+  try {
+    await Promise.all([
+      faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+      faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+    ]);
+    modelsReady = true;
+    statusEl.textContent = '✓ AI 모델 준비 완료';
+    statusEl.className = 'model-status ready';
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = '⚠️ 모델 로딩 실패';
+    statusEl.className = 'model-status error';
+  }
+}
+window.addEventListener('load', () => {
+  if (typeof faceapi === 'undefined') {
+    $('model-status').textContent = '⚠️ face-api.js 로드 실패';
+    $('model-status').className = 'model-status error';
+    return;
+  }
+  loadModels();
+});
+
+/* =========================================================
+   분석 실행
+   ========================================================= */
+$('analyze-btn').addEventListener('click', async () => {
+  $('error-box').classList.remove('show');
+  showScreen('loading');
+  cycleLoadingSteps();
+
+  try {
+    const [r1, r2] = await analyzeAI();
+    renderResult(r1, r2);
+    showScreen('result');
+  } catch (err) {
+    console.error(err);
+    clearInterval(loadingTimer);
+    showError(err.message || '분석 중 문제가 발생했어요. 다시 시도해주세요.');
+    showScreen('upload');
+  }
+});
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $('screen-' + name).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showError(msg) {
+  const box = $('error-box');
+  box.textContent = msg;
+  box.classList.add('show');
+}
+
+let loadingTimer;
+function cycleLoadingSteps() {
+  const steps = [
+    '두 분의 표정을 살펴보고 있어요',
+    '캐릭터상을 고르는 중',
+    '딱 맞는 굿즈를 매칭하는 중',
+    '거의 다 됐어요',
+  ];
+  let i = 0;
+  $('loading-step').textContent = steps[0];
+  clearInterval(loadingTimer);
+  loadingTimer = setInterval(() => {
+    i = (i + 1) % steps.length;
+    const el = $('loading-step');
+    el.style.opacity = 0;
+    setTimeout(() => {
+      el.textContent = steps[i];
+      el.style.opacity = 1;
+    }, 200);
+  }, 1400);
+}
+
+/* =========================================================
+   AI 분석 — 얼굴 랜드마크 → 비율 → 룰 매핑
+   ========================================================= */
+async function analyzeAI() {
+  if (!modelsReady) throw new Error('AI 모델이 아직 로딩 중이에요. 잠시 후 다시 시도해주세요.');
+
+  const [f1, f2] = await Promise.all([
+    extractFaceFeatures(state.photo1.dataUrl),
+    extractFaceFeatures(state.photo2.dataUrl),
+  ]);
+
+  const r1 = classifyByRules(f1, state.gender1);
+  const r2 = classifyByRules(f2, state.gender2);
+
+  clearInterval(loadingTimer);
+
+  return [
+    { character: r1.character, name: state.name1 || '한 사람',   photo: state.photo1.dataUrl, reason: r1.reason },
+    { character: r2.character, name: state.name2 || '또 한 사람', photo: state.photo2.dataUrl, reason: r2.reason },
+  ];
+}
+
+async function loadImage(src) {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img);
+    img.onerror = rej;
+    img.src = src;
+  });
+}
+
+async function extractFaceFeatures(dataUrl) {
+  const img = await loadImage(dataUrl);
+  const detection = await faceapi
+    .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.4 }))
+    .withFaceLandmarks();
+
+  if (!detection) {
+    throw new Error('얼굴을 찾을 수 없어요. 정면을 향한 다른 사진으로 시도해주세요.');
+  }
+
+  const lm = detection.landmarks.positions;
+  const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+
+  const faceWidth  = dist(lm[0], lm[16]);
+  const faceHeight = dist(lm[8], lm[27]);
+  const jawWidth   = dist(lm[4], lm[12]);
+  const cheekFullness = dist(lm[2], lm[14]) / faceWidth;
+
+  const chinAngle = (() => {
+    const a = { x: lm[6].x - lm[8].x, y: lm[6].y - lm[8].y };
+    const b = { x: lm[10].x - lm[8].x, y: lm[10].y - lm[8].y };
+    const dot = a.x * b.x + a.y * b.y;
+    return Math.acos(dot / (Math.hypot(a.x,a.y) * Math.hypot(b.x,b.y)));
+  })();
+
+  const rEyeW = dist(lm[36], lm[39]);
+  const lEyeW = dist(lm[42], lm[45]);
+  const eyeW  = (rEyeW + lEyeW) / 2;
+  const rEyeH = (dist(lm[37], lm[41]) + dist(lm[38], lm[40])) / 2;
+  const lEyeH = (dist(lm[43], lm[47]) + dist(lm[44], lm[46])) / 2;
+  const eyeH  = (rEyeH + lEyeH) / 2;
+
+  const mouthWidth = dist(lm[48], lm[54]);
+  const upperLip = dist(lm[51], lm[62]);
+  const lowerLip = dist(lm[57], lm[66]);
+  const noseLength = dist(lm[27], lm[33]);
+
+  return {
+    roundness:     faceWidth / faceHeight,
+    length:        faceHeight / faceWidth,
+    jawWidth:      jawWidth / faceWidth,
+    cheekFullness,
+    chinSharpness: chinAngle,
+    eyeSize:       (eyeW * eyeH) / (faceWidth * faceHeight),
+    eyeRoundness:  eyeH / eyeW,
+    mouthWidth:    mouthWidth / faceWidth,
+    lipFullness:   (upperLip + lowerLip) / faceHeight,
+    noseLength:    noseLength / faceHeight,
+  };
+}
+
+function classifyByRules(f, gender) {
+  const scores = {};
+  const reasons = {};
+
+  if (gender === 'male') {
+    scores.BROWN = (f.roundness > 0.92 ? 2.5 : f.roundness > 0.85 ? 1 : 0)
+                 + (f.cheekFullness > 0.78 ? 1.5 : 0)
+                 + (f.chinSharpness > 1.7 ? 1 : 0);
+    reasons.BROWN = '둥글고 듬직한 얼굴 라인이 브라운을 닮았어요';
+
+    scores.BRACHIO = (f.length > 1.05 ? 2.5 : f.length > 0.98 ? 1 : 0)
+                   + (f.chinSharpness < 1.55 ? 1.5 : 0)
+                   + (f.noseLength > 0.34 ? 1 : 0);
+    reasons.BRACHIO = '길쭉하고 또렷한 얼굴선이 브라키오상';
+
+    scores.QUOKKA = (f.cheekFullness > 0.82 ? 2 : 0)
+                  + (f.eyeSize < 0.009 ? 1.5 : 0)
+                  + (f.mouthWidth > 0.36 ? 1 : 0);
+    reasons.QUOKKA = '볼이 통통하고 미소 짓는 듯한 쿼카상';
+
+    scores.RENINI = (f.eyeSize > 0.011 ? 2 : 0)
+                  + (f.eyeRoundness > 0.34 ? 1.5 : 0)
+                  + (f.mouthWidth > 0.4 ? 1.5 : 0);
+    reasons.RENINI = '시원한 눈매와 넓은 입이 레니니 같아요';
+  } else {
+    scores.CONY = (f.eyeSize > 0.011 ? 2.5 : f.eyeSize > 0.009 ? 1 : 0)
+                + (f.eyeRoundness > 0.34 ? 1.5 : 0)
+                + (f.mouthWidth < 0.35 ? 1 : 0);
+    reasons.CONY = '동그란 큰 눈이 코니를 닮았어요';
+
+    scores.SALLY = (f.roundness > 0.95 ? 2.5 : f.roundness > 0.9 ? 1.2 : 0)
+                 + (f.eyeSize < 0.009 ? 1.5 : 0)
+                 + (f.mouthWidth < 0.32 ? 1 : 0);
+    reasons.SALLY = '동글동글 귀여운 분위기가 샐리 같아요';
+
+    scores.DOOGI = (f.length > 1.0 ? 1.5 : 0)
+                 + (f.lipFullness > 0.07 ? 2 : f.lipFullness > 0.055 ? 1 : 0)
+                 + (f.mouthWidth > 0.36 ? 1 : 0);
+    reasons.DOOGI = '도톰한 입술과 부드러운 라인이 두기상';
+
+    scores.OLIVERPANG = (Math.abs(f.roundness - 0.92) < 0.08 ? 1.5 : 0)
+                      + (f.mouthWidth > 0.34 ? 1.5 : 0)
+                      + (f.eyeRoundness > 0.30 ? 1 : 0)
+                      + 0.5;
+    reasons.OLIVERPANG = '친근하고 따뜻한 분위기의 올리버팡상';
+  }
+
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const winner = sorted[0][0];
+  return { character: winner, reason: reasons[winner] };
+}
+
+/* =========================================================
+   결과 렌더
+   ========================================================= */
+function renderResult(r1, r2) {
+  const c1 = CHARACTERS[r1.character];
+  const c2 = CHARACTERS[r2.character];
+
+  $('r-char1').textContent = c1.name;
+  $('r-char2').textContent = c2.name;
+  const today = new Date();
+  $('r-date').textContent = `${today.getFullYear()}년 ${today.getMonth()+1}월 ${today.getDate()}일`;
+
+  // 페어 1
+  $('r-photo1').src = r1.photo;
+  $('r-who1').textContent = r1.name;
+  $('r-emoji1').textContent = CHAR_EMOJI[r1.character];
+  $('r-name1-char').textContent = c1.name + '상';
+  $('r-vibe1').textContent = c1.vibe;
+  $('r-desc1').textContent = r1.reason || c1.desc;
+
+  // 페어 2
+  $('r-photo2').src = r2.photo;
+  $('r-who2').textContent = r2.name;
+  $('r-emoji2').textContent = CHAR_EMOJI[r2.character];
+  $('r-name2-char').textContent = c2.name + '상';
+  $('r-vibe2').textContent = c2.vibe;
+  $('r-desc2').textContent = r2.reason || c2.desc;
+
+  // 제품
+  const products = $('r-products');
+  while (products.firstChild) products.removeChild(products.firstChild);
+  products.appendChild(makeProductCard(PRODUCTS[r1.character], c1.name));
+  products.appendChild(makeProductCard(PRODUCTS[r2.character], c2.name));
+
+  $('r-cert-no').textContent = generateCertNo();
+}
+
+function makeProductCard(product, charName) {
+  const card = document.createElement('article');
+  card.className = 'product';
+
+  const imgWrap = document.createElement('div');
+  imgWrap.className = 'product-img';
+  const img = document.createElement('img');
+  img.src = product.image;
+  img.alt = product.name;
+  img.loading = 'lazy';
+  imgWrap.appendChild(img);
+
+  const tag = document.createElement('div');
+  tag.className = 'product-tag';
+  tag.textContent = charName + '상 PICK';
+  imgWrap.appendChild(tag);
+
+  const name = document.createElement('div');
+  name.className = 'product-name';
+  name.textContent = product.name;
+
+  const price = document.createElement('div');
+  price.className = 'product-price';
+  const strike = document.createElement('span');
+  strike.className = 'strike';
+  strike.textContent = '₩' + product.price.toLocaleString();
+  const now = document.createElement('span');
+  now.className = 'now';
+  now.textContent = '₩' + product.sale.toLocaleString();
+  price.appendChild(strike);
+  price.appendChild(now);
+
+  card.appendChild(imgWrap);
+  card.appendChild(name);
+  card.appendChild(price);
+  return card;
+}
+
+function generateCertNo() {
+  const r = () => Math.floor(Math.random()*900+100);
+  return `${r()}-${r()}`;
+}
+
+$('retry-btn').addEventListener('click', () => {
+  showScreen('upload');
+});
+
+$('checkout-btn').addEventListener('click', () => {
+  alert('데모입니다 — 실제 연동 시 Shopify 장바구니에 두 상품이 자동 추가되고 20% 자동할인이 적용됩니다.');
+});
+</script>
+</body>
+</html>
