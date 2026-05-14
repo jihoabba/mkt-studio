@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🍓 TRUZ 과일게임</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bebas+Neue&family=Noto+Sans+KR:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;}
+body{
+  font-family:'Noto Sans KR',sans-serif;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  background: linear-gradient(160deg, #FFF3D6 0%, #FFE8B0 50%, #FFD880 100%);
+  position:relative;
+}
+
+/* 배경 도트 패턴 */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image: radial-gradient(circle, rgba(180,120,20,0.08) 1px, transparent 1px);
+  background-size:28px 28px;
+  pointer-events:none;
+}
+
+/* TOP BAR */
+.top-bar{
+  width:100%;max-width:420px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px 6px;gap:8px;flex-shrink:0;
+}
+.score-box{
+  background:rgba(255,255,255,0.7);
+  border:2.5px solid rgba(180,120,20,0.3);
+  border-radius:12px;
+  padding:6px 16px;text-align:center;min-width:80px;
+  box-shadow: 0 2px 8px rgba(180,120,20,0.15), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+.score-label{
+  font-family:'Black Han Sans',sans-serif;font-size:8px;
+  letter-spacing:.2em;color:rgba(140,80,0,.5);
+}
+.score-val{
+  font-family:'Bebas Neue',sans-serif;font-size:26px;
+  color:#8B4500;line-height:1;
+}
+.game-title{
+  font-family:'Black Han Sans',sans-serif;font-size:13px;
+  color:#6B3000;letter-spacing:.05em;text-align:center;line-height:1.4;
+}
+.game-title small{display:block;font-size:8px;color:rgba(100,50,0,.4);letter-spacing:.15em;}
+
+/* NEXT + RESTART */
+.next-bar{
+  width:100%;max-width:420px;
+  display:flex;align-items:center;gap:8px;
+  padding:2px 14px 6px;flex-shrink:0;
+}
+.next-label{
+  font-family:'Black Han Sans',sans-serif;font-size:9px;
+  letter-spacing:.15em;color:rgba(100,60,0,.4);
+}
+.next-preview{
+  width:40px;height:40px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.6);
+  border:2px solid rgba(180,120,20,0.25);
+  border-radius:50%;
+}
+.btn-restart{
+  margin-left:auto;
+  background:#E8001D;
+  border:none;border-radius:8px;
+  color:#fff;font-family:'Black Han Sans',sans-serif;
+  font-size:11px;letter-spacing:.05em;padding:8px 14px;cursor:pointer;
+  box-shadow:0 3px 0 #9A000F, 0 4px 8px rgba(232,0,29,0.3);
+  transition:all .1s;
+}
+.btn-restart:active{transform:translateY(2px);box-shadow:0 1px 0 #9A000F;}
+
+/* CANVAS */
+.canvas-wrap{position:relative;width:100%;max-width:420px;flex:1;min-height:0;}
+canvas{display:block;width:100%!important;background:transparent;}
+
+/* GAMEOVER */
+#gameOverlay{
+  display:none;position:absolute;inset:0;
+  background:rgba(255,240,200,.92);
+  backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:100;
+}
+#gameOverlay.show{display:flex;}
+.over-title{
+  font-family:'Black Han Sans',sans-serif;font-size:40px;
+  color:#E8001D;text-shadow:3px 3px 0 rgba(232,0,29,.2);
+}
+.over-score{font-family:'Bebas Neue',sans-serif;font-size:60px;color:#8B4500;line-height:1;}
+.over-sub{font-size:13px;color:rgba(100,50,0,.5);}
+.over-btn{
+  background:#E8001D;color:#fff;border:none;border-radius:12px;
+  font-family:'Black Han Sans',sans-serif;font-size:16px;
+  padding:14px 40px;cursor:pointer;margin-top:4px;
+  box-shadow:0 4px 0 #9A000F, 0 6px 16px rgba(232,0,29,0.3);
+  transition:all .1s;
+}
+.over-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #9A000F;}
+
+/* MERGE FLASH */
+.mflash{
+  position:absolute;pointer-events:none;
+  font-family:'Black Han Sans',sans-serif;font-size:15px;
+  color:#8B4500;
+  background:rgba(255,255,255,0.85);
+  border:2px solid rgba(180,120,20,0.3);
+  border-radius:20px;padding:3px 10px;
+  white-space:nowrap;z-index:50;
+  animation:flashUp .7s ease forwards;
+}
+@keyframes flashUp{
+  0%  {opacity:1;transform:translate(-50%,-50%) scale(.7);}
+  30% {opacity:1;transform:translate(-50%,-110%) scale(1.15);}
+  100%{opacity:0;transform:translate(-50%,-200%) scale(.9);}
+}
+
+/* EVO BAR */
+.evo-bar{
+  width:100%;max-width:420px;
+  padding:6px 14px 10px;flex-shrink:0;
+  background:rgba(255,255,255,0.4);
+  border-top:1px solid rgba(180,120,20,.15);
+}
+.evo-label{
+  font-family:'Black Han Sans',sans-serif;font-size:8px;
+  letter-spacing:.2em;color:rgba(100,60,0,.35);margin-bottom:4px;
+}
+.evo-row{display:flex;gap:4px;align-items:flex-end;overflow-x:auto;}
+.evo-row::-webkit-scrollbar{display:none;}
+.evo-item{display:flex;flex-direction:column;align-items:center;gap:1px;flex-shrink:0;}
+.evo-name{font-family:'Black Han Sans',sans-serif;color:rgba(100,60,0,.45);white-space:nowrap;}
+.evo-arrow{color:rgba(180,120,20,.4);font-size:10px;flex-shrink:0;padding-bottom:8px;}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="score-box">
+    <div class="score-label">SCORE</div>
+    <div class="score-val" id="scoreVal">0</div>
+  </div>
+  <div class="game-title">🍓 TRUZ 과일게임<small>같은 캐릭터 합치기!</small></div>
+  <div class="score-box">
+    <div class="score-label">BEST</div>
+    <div class="score-val" id="bestVal">0</div>
+  </div>
+</div>
+
+<div class="next-bar">
+  <div class="next-label">NEXT</div>
+  <div class="next-preview" id="nextPreview"></div>
+  <button class="btn-restart" onclick="restartGame()">다시시작</button>
+</div>
+
+<div class="canvas-wrap" id="canvasWrap">
+  <canvas id="gameCanvas"></canvas>
+  <div id="gameOverlay">
+    <div class="over-title">GAME OVER!</div>
+    <div class="over-score" id="overScore">0</div>
+    <div class="over-sub">캐릭터가 넘쳤어요 🍓</div>
+    <button class="over-btn" onclick="restartGame()">다시 도전!</button>
+  </div>
+</div>
+
+<div class="evo-bar">
+  <div class="evo-label">EVOLUTION GUIDE  (작은 것 → 큰 것)</div>
+  <div class="evo-row" id="evoRow"></div>
+</div>
+
+<script>
+/* ══════════════════
+   TRUZ 과일 데이터
+   크기 순서 (작 → 대)
+   ══════════════════ */
+const FRUITS = [
+  // physR: 충돌 반경 비율 (클수록 빽빽하게 쌓임)
+  // imgScale: 이미지 그리기 크기 = r * imgScale (클수록 크게 보임, PNG 여백 보정)
+  { char:'우피',  fruit:'블루베리', emoji:'🫐', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/woopy_430x.png?v=1773909607',  r:16,  score:1,   color:'#6A9FD0', physR:0.85, imgScale:3.5 },
+  { char:'칠리',  fruit:'체리',    emoji:'🍒', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/chilly_430x.png?v=1773909606', r:22,  score:3,   color:'#D05060', physR:0.86, imgScale:3.3 },
+  { char:'본본',  fruit:'딸기',    emoji:'🍓', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/bonbon_f965b30d-2e2e-41f0-a486-1a026dd019db_430x.png?v=1773909606', r:29,  score:6,   color:'#E06070', physR:0.87, imgScale:3.1 },
+  { char:'루루',  fruit:'배',      emoji:'🍐', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/ruru_f3676f4f-0a8f-4320-a2bc-53a535d126cf_430x.png?v=1773909606',   r:37,  score:10,  color:'#80C080', physR:0.87, imgScale:2.9 },
+  { char:'히쿤',  fruit:'오렌지',  emoji:'🍊', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/hikun_430x.png?v=1773909606',  r:46,  score:15,  color:'#F08840', physR:0.88, imgScale:2.7 },
+  { char:'요치',  fruit:'사과',    emoji:'🍎', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/yochi_430x.png?v=1773909607',  r:56,  score:21,  color:'#D84040', physR:0.89, imgScale:2.5 },
+  { char:'포동',  fruit:'아보카도',emoji:'🥑', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/podong_430x.png?v=1773909606', r:66,  score:28,  color:'#509860', physR:0.90, imgScale:2.4 },
+  { char:'라우',  fruit:'레몬',    emoji:'🍋', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/rawoo_430x.png?v=1773909606',  r:77,  score:36,  color:'#D8C020', physR:0.91, imgScale:2.3 },
+  { char:'솜',    fruit:'포도',    emoji:'🍇', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/som_fc675c83-f12b-4de5-9ffb-041e22037ebd_430x.png?v=1773909606',    r:89,  score:45,  color:'#9060C0', physR:0.92, imgScale:2.2 },
+  { char:'로미',  fruit:'바나나',  emoji:'🍌', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/romi_430x.png?v=1773909606',   r:104, score:100, color:'#D8B820', physR:0.93, imgScale:2.1 },
+];
+
+/* 이미지 사전 로드 */
+const fruitImages = {};
+FRUITS.forEach(f => {
+  const im = new Image();
+  im.src = f.img;
+  fruitImages[f.img] = im;
+});
+
+const DROP_MAX = 5;
+
+/* ══════════════════
+   MATTER.JS
+   ══════════════════ */
+const { Engine, Bodies, Body, World, Events, Runner } = Matter;
+
+let engine, runner;
+let physBodies = [];
+let mergingIds = new Set();
+let pendingMerges = [];
+
+/* squish 상태: id → {val, vx, vy} */
+const squishMap = new Map();
+
+let score = 0;
+let best  = parseInt(localStorage.getItem('truz_game_best') || '0');
+let curIdx, nextIdx;
+let canDrop = true;
+let isGameOver = false;
+let cursorX;
+
+let canvas, ctx, W, H;
+const WALL_T = 20;
+const DROP_Y  = 50;
+const CEIL_Y  = 80;
+let animId;
+
+function initGame() {
+  const wrap = document.getElementById('canvasWrap');
+  W = Math.min(wrap.clientWidth, 420);
+  H = wrap.clientHeight;
+
+  canvas = document.getElementById('gameCanvas');
+  canvas.width  = W;
+  canvas.height = H;
+  ctx = canvas.getContext('2d');
+  cursorX = W / 2;
+
+  if (runner) Runner.stop(runner);
+  if (engine) { Events.off(engine); Engine.clear(engine); }
+  cancelAnimationFrame(animId);
+
+  physBodies = [];
+  mergingIds.clear();
+  pendingMerges = [];
+  squishMap.clear();
+  score = 0;
+  isGameOver = false;
+  canDrop = true;
+
+  engine = Engine.create({ gravity:{ x:0, y:2.2 } });
+
+  const wOpt = { isStatic:true, friction:.5, restitution:.3, render:{fillStyle:'#fff'} };
+  /* 물리 바닥을 버킷 시각 바닥보다 15px 위로 → 모바일에서 과일이 안 잠김 */
+  const floorY = H - BUCKET_PAD - 15;
+  const floor = Bodies.rectangle(W/2, floorY + WALL_T/2, W + WALL_T*4, WALL_T, wOpt);
+  const wL    = Bodies.rectangle(BUCKET_PAD - WALL_T/2, H/2, WALL_T, H*3, wOpt);
+  const wR    = Bodies.rectangle(W - BUCKET_PAD + WALL_T/2, H/2, WALL_T, H*3, wOpt);
+  World.add(engine.world, [floor, wL, wR]);
+
+  Events.on(engine, 'collisionStart', e => {
+    for (const {bodyA, bodyB} of e.pairs) {
+      const a = physBodies.find(f=>f.body===bodyA);
+      const b = physBodies.find(f=>f.body===bodyB);
+
+      /* squish: 충돌 방향 기반 */
+      if (a) triggerSquish(a.id, bodyA, bodyB);
+      if (b) triggerSquish(b.id, bodyB, bodyA);
+
+      if (!a||!b) continue;
+      if (a.idx !== b.idx) continue;
+      if (a.idx >= FRUITS.length-1) continue;
+      if (mergingIds.has(a.id)||mergingIds.has(b.id)) continue;
+      mergingIds.add(a.id); mergingIds.add(b.id);
+      pendingMerges.push({a, b, idx:a.idx});
+    }
+  });
+
+  runner = Runner.create();
+  Runner.run(runner, engine);
+
+  curIdx  = randIdx();
+  nextIdx = randIdx();
+  updateUI();
+  document.getElementById('gameOverlay').classList.remove('show');
+  setupInput();
+  loop();
+}
+
+function triggerSquish(id, self, other) {
+  /* 충돌 벡터 계산 → 그 방향으로 squish */
+  const dx = self.position.x - other.position.x;
+  const dy = self.position.y - other.position.y;
+  const len = Math.sqrt(dx*dx+dy*dy) || 1;
+  squishMap.set(id, { val:0.38, nx:dx/len, ny:dy/len });
+}
+
+/* ══════════════
+   GAME LOOP
+   ══════════════ */
+function loop() {
+  animId = requestAnimationFrame(loop);
+  processMerges();
+  updateSquish();
+  draw();
+  if (!isGameOver) checkGameOver();
+}
+
+function updateSquish() {
+  for (const [id, s] of squishMap) {
+    s.val *= 0.72;
+    if (s.val < 0.008) squishMap.delete(id);
+  }
+}
+
+/* ══════════════
+   DRAW
+   ══════════════ */
+const BUCKET_PAD = 3;
+const BUCKET_RAD = 16;
+
+function getBucketRect() {
+  return { x: BUCKET_PAD, y: CEIL_Y, w: W - BUCKET_PAD*2, h: H - CEIL_Y - BUCKET_PAD };
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  drawBackground();
+  drawBucketFill();
+  drawGhostFruit(); /* 클립 전에 그려야 버킷 위 고스트가 잘리지 않음 */
+
+  /* ── 버킷 내부 클립: 과일이 박스 밖으로 삐져나오지 않음 ── */
+  ctx.save();
+  const {x, y, w, h} = getBucketRect();
+  roundRect(ctx, x, y, w, h, [0, 0, BUCKET_RAD, BUCKET_RAD]);
+  ctx.clip();
+
+  drawDangerLine();
+  drawDropGuide();
+  drawAllFruits();
+
+  ctx.restore();
+
+  /* 버킷 테두리를 마지막에 덮어씌워 클립 경계 자연스럽게 처리 */
+  drawBucketBorder();
+}
+
+function drawBackground() {
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#FFF6DC');
+  g.addColorStop(1, '#FFE9A0');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.fillStyle = 'rgba(180,120,20,0.06)';
+  for (let yy = 14; yy < H; yy += 28) {
+    for (let xx = 14; xx < W; xx += 28) {
+      ctx.beginPath();
+      ctx.arc(xx, yy, 2, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+}
+
+function drawBucketFill() {
+  const {x, y, w, h} = getBucketRect();
+  ctx.fillStyle = 'rgba(255,252,230,0.45)';
+  roundRect(ctx, x, y, w, h, [0, 0, BUCKET_RAD, BUCKET_RAD]);
+  ctx.fill();
+
+  /* 좌측 세로 반사광 */
+  const shine = ctx.createLinearGradient(x+6, 0, x+20, 0);
+  shine.addColorStop(0, 'rgba(255,255,255,0.25)');
+  shine.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = shine;
+  roundRect(ctx, x+6, y+4, 14, h-8, [0, 0, 4, 4]);
+  ctx.fill();
+}
+
+function drawBucketBorder() {
+  const {x, y, w, h} = getBucketRect();
+
+  /* 외부 테두리 — 황금색 */
+  ctx.strokeStyle = 'rgba(190,130,30,0.55)';
+  ctx.lineWidth = 4;
+  roundRect(ctx, x, y, w, h, [0, 0, BUCKET_RAD, BUCKET_RAD]);
+  ctx.stroke();
+
+  /* 내부 하이라이트 */
+  ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+  ctx.lineWidth = 2;
+  roundRect(ctx, x+4, y+4, w-8, h-8, [0, 0, BUCKET_RAD-2, BUCKET_RAD-2]);
+  ctx.stroke();
+}
+
+function roundRect(ctx, x, y, w, h, radii) {
+  const [tl=0, tr=0, br=0, bl=0] = Array.isArray(radii) ? radii : [radii,radii,radii,radii];
+  ctx.beginPath();
+  ctx.moveTo(x+tl, y);
+  ctx.lineTo(x+w-tr, y); ctx.arcTo(x+w, y, x+w, y+tr, tr);
+  ctx.lineTo(x+w, y+h-br); ctx.arcTo(x+w, y+h, x+w-br, y+h, br);
+  ctx.lineTo(x+bl, y+h); ctx.arcTo(x, y+h, x, y+h-bl, bl);
+  ctx.lineTo(x, y+tl); ctx.arcTo(x, y, x+tl, y, tl);
+  ctx.closePath();
+}
+
+function drawDangerLine() {
+  ctx.strokeStyle = 'rgba(232,0,29,0.25)';
+  ctx.setLineDash([6,5]);
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(3, CEIL_Y);
+  ctx.lineTo(W-3, CEIL_Y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawDropGuide() {
+  /* 반투명 세로선 */
+  ctx.strokeStyle = 'rgba(180,120,20,0.18)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([5,5]);
+  ctx.beginPath();
+  ctx.moveTo(cursorX, CEIL_Y);
+  ctx.lineTo(cursorX, H);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawGhostFruit() {
+  const fi = FRUITS[curIdx];
+  ctx.save();
+  ctx.globalAlpha = 0.5;
+  ctx.translate(cursorX, DROP_Y);
+  drawFruitCentered(ctx, fi, null);
+  ctx.restore();
+}
+
+function drawAllFruits() {
+  for (const f of physBodies) {
+    const {x, y} = f.body.position;
+    const angle   = f.body.angle;
+    const fd      = FRUITS[f.idx];
+    const sq      = squishMap.get(f.id) || null;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    drawFruitCentered(ctx, fd, sq);
+    ctx.restore();
+  }
+}
+
+/* 현재 변환 origin (0,0) 기준으로 과일 그리기 */
+function drawFruitCentered(ctx, fd, sq) {
+  let scaleX = 1, scaleY = 1;
+  if (sq && sq.val > 0.008) {
+    /* 충돌 방향 기준 squish:
+       충돌 축 방향(nx,ny)으로 납작, 수직 방향으로 팽창 */
+    const compress = sq.val * 0.32;
+    const expand   = sq.val * 0.22;
+    /* 단순화: 수직 방향 compress, 수평 expand */
+    scaleX = 1 + expand;
+    scaleY = 1 - compress;
+  }
+
+  ctx.scale(scaleX, scaleY);
+
+  const im = fruitImages[fd.img];
+  const s  = fd.r * fd.imgScale; /* 크기별 개별 조정: 큰 과일일수록 imgScale 작아짐 */
+
+  if (im && im.complete && im.naturalWidth > 0) {
+    /* 부드러운 그림자 */
+    ctx.shadowColor  = 'rgba(100,60,0,0.22)';
+    ctx.shadowBlur   = fd.r * 0.5;
+    ctx.shadowOffsetX = fd.r * 0.04;
+    ctx.shadowOffsetY = fd.r * 0.12;
+    ctx.drawImage(im, -s/2, -s/2, s, s);
+
+    ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+  } else {
+    /* 이미지 로드 전 fallback */
+    ctx.beginPath();
+    ctx.arc(0, 0, fd.r, 0, Math.PI*2);
+    const g = ctx.createRadialGradient(-fd.r*.2, -fd.r*.2, fd.r*.05, 0, 0, fd.r);
+    g.addColorStop(0, hexToRgba(fd.color, 0.6));
+    g.addColorStop(1, fd.color);
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.font = `${fd.r*1.35}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(fd.emoji, 0, fd.r*0.06);
+  }
+}
+
+function hexToRgba(hex, a) {
+  const c = parseInt(hex.replace('#',''), 16);
+  return `rgba(${c>>16},${(c>>8)&0xFF},${c&0xFF},${a})`;
+}
+
+/* ══════════════
+   DROP
+   ══════════════ */
+function drop(x) {
+  if (!canDrop || isGameOver) return;
+  canDrop = false;
+  const fd   = FRUITS[curIdx];
+  const cx   = Math.max(fd.r + 4, Math.min(W - fd.r - 4, x));
+  const body = Bodies.circle(cx, DROP_Y, fd.r * fd.physR, {
+    restitution: .45,
+    friction: .55,
+    frictionAir: .007,
+    density: .002,
+  });
+  const id = ++_uid;
+  body._id = id; body._idx = curIdx;
+  World.add(engine.world, body);
+  physBodies.push({ body, idx:curIdx, id });
+
+  curIdx  = nextIdx;
+  nextIdx = randIdx();
+  updateUI();
+  setTimeout(() => { if (!isGameOver) canDrop = true; }, 520);
+}
+let _uid = 0;
+
+/* ══════════════
+   MERGE
+   ══════════════ */
+function processMerges() {
+  if (!pendingMerges.length) return;
+  const batch = pendingMerges.splice(0);
+  for (const {a, b, idx} of batch) {
+    if (!physBodies.find(f=>f.id===a.id) || !physBodies.find(f=>f.id===b.id)) continue;
+    const mx = (a.body.position.x + b.body.position.x) / 2;
+    const my = (a.body.position.y + b.body.position.y) / 2;
+
+    World.remove(engine.world, a.body);
+    World.remove(engine.world, b.body);
+    physBodies = physBodies.filter(f=>f.id!==a.id && f.id!==b.id);
+    squishMap.delete(a.id); squishMap.delete(b.id);
+    mergingIds.delete(a.id); mergingIds.delete(b.id);
+
+    const ni  = idx + 1;
+    const nfd = FRUITS[ni];
+    const nb  = Bodies.circle(mx, Math.max(my, CEIL_Y + nfd.r * nfd.physR + 2), nfd.r * nfd.physR, {
+      restitution:.45, friction:.55, frictionAir:.007, density:.002,
+    });
+    const nid = ++_uid;
+    nb._id = nid; nb._idx = ni;
+    World.add(engine.world, nb);
+    physBodies.push({ body:nb, idx:ni, id:nid });
+
+    /* 합체 시 살짝 팽창 squish */
+    squishMap.set(nid, { val:-0.35, nx:0, ny:1 }); /* 음수 = 팽창 */
+
+    score += nfd.score;
+    if (score > best) { best = score; localStorage.setItem('truz_game_best', best); }
+    updateUI();
+    spawnFlash(mx, my, nfd.score, nfd.img);
+  }
+}
+
+/* ══════════════
+   GAME OVER
+   ══════════════ */
+let overTimer = null;
+function checkGameOver() {
+  let danger = false;
+  for (const f of physBodies) {
+    const spd = Math.abs(f.body.velocity.y) + Math.abs(f.body.velocity.x);
+    if (f.body.position.y - FRUITS[f.idx].r < CEIL_Y && spd < 1.5) {
+      danger = true; break;
+    }
+  }
+  if (danger) {
+    if (!overTimer) overTimer = setTimeout(() => {
+      if (!isGameOver) triggerOver();
+    }, 900);
+  } else {
+    clearTimeout(overTimer); overTimer = null;
+  }
+}
+function triggerOver() {
+  isGameOver = true; canDrop = false;
+  document.getElementById('overScore').textContent = score;
+  document.getElementById('gameOverlay').classList.add('show');
+}
+
+/* ══════════════
+   INPUT
+   ══════════════ */
+function setupInput() {
+  canvas.onmousemove = e => {
+    if (isGameOver) return;
+    const rect = canvas.getBoundingClientRect();
+    cursorX = (e.clientX - rect.left) * (W / rect.width);
+  };
+  canvas.onclick = e => {
+    if (isGameOver) return;
+    const rect = canvas.getBoundingClientRect();
+    cursorX = (e.clientX - rect.left) * (W / rect.width);
+    drop(cursorX);
+  };
+  canvas.ontouchmove = e => {
+    e.preventDefault();
+    if (isGameOver) return;
+    const rect = canvas.getBoundingClientRect();
+    cursorX = (e.touches[0].clientX - rect.left) * (W / rect.width);
+  };
+  canvas.ontouchend = e => {
+    e.preventDefault();
+    if (isGameOver) return;
+    drop(cursorX);
+  };
+}
+
+/* ══════════════
+   UI
+   ══════════════ */
+function updateUI() {
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('bestVal').textContent  = best;
+  const nf = FRUITS[nextIdx];
+  document.getElementById('nextPreview').innerHTML =
+    `<img src="${nf.img}" alt="${nf.char}" style="width:32px;height:32px;object-fit:contain;">`;
+}
+
+function spawnFlash(x, y, pts, imgSrc) {
+  const wrap = document.getElementById('canvasWrap');
+  const el = document.createElement('div');
+  el.className = 'mflash';
+  el.innerHTML = `<img src="${imgSrc}" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:3px;">+${pts}`;
+  el.style.left = x + 'px';
+  el.style.top  = y + 'px';
+  wrap.appendChild(el);
+  setTimeout(()=>el.remove(), 720);
+}
+
+/* ══════════════
+   EVO BAR
+   ══════════════ */
+function buildEvo() {
+  const row = document.getElementById('evoRow');
+  row.innerHTML = '';
+  FRUITS.forEach((f, i) => {
+    if (i > 0) {
+      const a = document.createElement('div');
+      a.className = 'evo-arrow'; a.textContent = '→';
+      row.appendChild(a);
+    }
+    const sz = 10 + i * 1.9;
+    const item = document.createElement('div');
+    item.className = 'evo-item';
+    item.innerHTML = `
+      <img src="${f.img}" alt="${f.char}" style="width:${sz}px;height:${sz}px;object-fit:contain;">
+      <div class="evo-name" style="font-size:${Math.max(6, sz*0.52)}px">${f.char}</div>
+    `;
+    row.appendChild(item);
+  });
+}
+
+function randIdx() {
+  return Math.floor(Math.random() * DROP_MAX);
+}
+
+function restartGame() {
+  clearTimeout(overTimer); overTimer = null;
+  initGame();
+}
+
+/* ══ START ══ */
+buildEvo();
+initGame();
+
+window.addEventListener('resize', restartGame);
+</script>
+</body>
+</html>

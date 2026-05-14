@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAN SQUARE — Choose Your Version</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #08080f;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Noto Sans KR', sans-serif;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Ambient background blobs */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.18;
+    pointer-events: none;
+    animation: drift 8s ease-in-out infinite alternate;
+  }
+  .blob-1 { width: 500px; height: 500px; background: #ff3cac; top: -100px; left: -100px; animation-delay: 0s; }
+  .blob-2 { width: 400px; height: 400px; background: #00d2ff; bottom: -80px; right: -80px; animation-delay: 2s; }
+  .blob-3 { width: 300px; height: 300px; background: #7928ca; top: 40%; left: 40%; animation-delay: 4s; }
+
+  @keyframes drift {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(30px, 20px) scale(1.05); }
+  }
+
+  /* Main container */
+  .container {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 40px 24px;
+    max-width: 860px;
+    width: 100%;
+  }
+
+  /* Logo */
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(56px, 10vw, 96px);
+    letter-spacing: 8px;
+    background: linear-gradient(135deg, #ff3cac 0%, #7928ca 50%, #00d2ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    text-align: center;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    letter-spacing: 5px;
+    color: #444466;
+    text-transform: uppercase;
+    margin-top: 6px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  /* vs divider */
+  .vs-label {
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: #333355;
+    text-transform: uppercase;
+    margin: 20px 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    max-width: 600px;
+  }
+  .vs-label::before, .vs-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #2a2a44, transparent);
+  }
+
+  /* Cards wrapper */
+  .cards {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    max-width: 640px;
+    justify-content: center;
+  }
+
+  @media (max-width: 540px) {
+    .cards { flex-direction: column; align-items: center; }
+    .card { width: 100% !important; max-width: 300px; }
+  }
+
+  /* Card */
+  .card {
+    flex: 1;
+    max-width: 300px;
+    background: #0f0f1a;
+    border-radius: 24px;
+    padding: 28px 24px 28px;
+    border: 1px solid #1e1e30;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), border-color 0.25s, box-shadow 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .card.claude::before { background: radial-gradient(ellipse at top, rgba(255,60,172,0.08) 0%, transparent 70%); }
+  .card.gemini::before { background: radial-gradient(ellipse at top, rgba(66,133,244,0.08) 0%, transparent 70%); }
+
+  .card:hover { transform: translateY(-6px); }
+  .card:hover::before { opacity: 1; }
+  .card.claude:hover { border-color: rgba(255,60,172,0.4); box-shadow: 0 20px 60px rgba(255,60,172,0.12), 0 0 0 1px rgba(255,60,172,0.15); }
+  .card.gemini:hover { border-color: rgba(66,133,244,0.4); box-shadow: 0 20px 60px rgba(66,133,244,0.12), 0 0 0 1px rgba(66,133,244,0.15); }
+
+  /* AI logo mark */
+  .ai-mark {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+  }
+  .card.claude .ai-mark { background: linear-gradient(135deg, #1a0a2e, #2d0a4a); border: 1px solid rgba(255,60,172,0.25); }
+  .card.gemini .ai-mark { background: linear-gradient(135deg, #0a1628, #0a2040); border: 1px solid rgba(66,133,244,0.25); }
+
+  .card-by {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .card.claude .card-by { color: rgba(255,60,172,0.6); }
+  .card.gemini .card-by { color: rgba(66,133,244,0.6); }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f0f0f5;
+    margin-bottom: 10px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .card-desc {
+    font-size: 12px;
+    color: #555570;
+    text-align: center;
+    line-height: 1.6;
+    margin-bottom: 22px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* CTA button */
+  .card-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    position: relative;
+    z-index: 1;
+    letter-spacing: 0.3px;
+  }
+  .card.claude .card-btn { background: linear-gradient(135deg, #ff3cac, #7928ca); color: white; }
+  .card.gemini .card-btn { background: linear-gradient(135deg, #4285f4, #34a853); color: white; }
+  .card-btn:hover { opacity: 0.88; }
+
+  /* Bottom note */
+  .footnote {
+    margin-top: 32px;
+    font-size: 11px;
+    color: #2a2a40;
+    letter-spacing: 1px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<div class="container">
+
+  <div class="logo">FAN SQUARE</div>
+  <div class="logo-sub">K-POP Fan Platform · Mockup Preview</div>
+
+  <div class="vs-label">어떤 버전을 볼까요?</div>
+
+  <div class="cards">
+
+    <!-- Claude card -->
+    <a class="card claude" href="fan-square-claude.html" target="_blank">
+      <div class="ai-mark">🤖</div>
+      <div class="card-by">Made by</div>
+      <div class="card-title">Claude 버전</div>
+      <div class="card-desc">Anthropic Claude가<br>설계한 목업</div>
+      <button class="card-btn">Claude 버전 보기 →</button>
+    </a>
+
+    <!-- Gemini card -->
+    <a class="card gemini" href="fan-square-gemini.html" target="_blank">
+      <div class="ai-mark">✨</div>
+      <div class="card-by">Made by</div>
+      <div class="card-title">Gemini 버전</div>
+      <div class="card-desc">Google Gemini가<br>설계한 목업</div>
+      <button class="card-btn">Gemini 버전 보기 →</button>
+    </a>
+
+  </div>
+
+  <div class="footnote">FAN SQUARE © 2025 · LINE FRIENDS SQUARE HONGDAE</div>
+
+</div>
+
+</body>
+</html>

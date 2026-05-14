@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TRUZ FRUIT FARM — 산지직송 프리오더</title>
+<!-- LFS 가이드 폰트: Apple SD Gothic Neo (한글), SF Pro Display (영문/숫자) -->
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css');
+/* ──────────────────────────────────────────
+   LFS DESIGN TOKEN
+   폰트: Apple SD Gothic Neo / SF Pro Display
+   메인텍스트: #111, #222
+   포인트: #f83baa(핑크), #7c3eee(퍼플)
+   배경: #fff / #f6f8fa / #ebedee
+   서브텍스트: #888, #616161
+   보더: #dcdee0 / #ebedee
+   버튼 radius: 2px
+   레이아웃: max-width 1080px (모바일), 1920px 기준 좌우 여백 370px
+────────────────────────────────────────── */
+:root {
+  --font-ko: 'Apple SD Gothic Neo', 'Pretendard', -apple-system, sans-serif;
+  --font-en: 'SF Pro Display', 'Pretendard', -apple-system, sans-serif;
+  --color-text-primary:   #111;
+  --color-text-secondary: #222;
+  --color-text-muted:     #888;
+  --color-text-sub:       #616161;
+  --color-pink:    #f83baa;
+  --color-purple:  #7c3eee;
+  --color-pink-light: #fff0f8;
+  --color-purple-light: #f5f0ff;
+  --color-bg:      #ffffff;
+  --color-bg-sub:  #f6f8fa;
+  --color-bg-gray: #ebedee;
+  --color-border:        #dcdee0;
+  --color-border-light:  #ebedee;
+  --radius-btn: 2px;
+  --radius-card: 2px;
+  --color-fresh: #2eaa6b;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { font-size:16px; }
+body {
+  font-family: var(--font-ko);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  max-width: 1080px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+/* ── HEADER (LFS 가이드 기반) ── */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-bg);
+  width: 100%;
+  border-bottom: 1px solid var(--color-border-light);
+}
+/* 메인 헤더 */
+.header-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 52px;
+}
+/* 로고 */
+.header-logo {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+.header-logo-main {
+  font-family: var(--font-en);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.header-logo-sub {
+  font-family: var(--font-ko);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--color-pink);
+  letter-spacing: 0.04em;
+  margin-top: 1px;
+}
+/* 헤더 아이콘 */
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.header-icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: color 0.15s;
+  border-radius: var(--radius-btn);
+}
+.header-icon-btn:hover { color: var(--color-pink); }
+@media (min-width: 768px) {
+  .header-main { padding: 0 32px; height: 60px; }
+  .header-logo-main { font-size: 18px; }
+}
+@media (min-width: 1024px) {
+  .header-main { padding: 0 64px; height: 64px; }
+  .header-logo-main { font-size: 20px; }
+}
+.banner-wrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-bg-gray);
+}
+.banner-track {
+  display: flex;
+  transition: transform 0.4s cubic-bezier(.4,0,.2,1);
+}
+.banner-slide {
+  min-width: 100%;
+  position: relative;
+  aspect-ratio: 3/2;
+  overflow: hidden;
+}
+.banner-slide img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.1) 65%, transparent 100%);
+}
+.banner-copy {
+  position: absolute;
+  bottom: 28px;
+  left: 20px;
+}
+/* LFS: 태그 → #f83baa 핑크, sharp 사각형 */
+.banner-copy .bc-tag {
+  display: inline-block;
+  background: var(--color-pink);
+  color: #fff;
+  font-family: var(--font-en);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 8px;
+  margin-bottom: 8px;
+  letter-spacing: 0.08em;
+  border-radius: var(--radius-btn);
+}
+.banner-copy .bc-main {
+  font-family: var(--font-ko);
+  font-size: 21px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.3;
+  letter-spacing: -0.03em;
+  margin-bottom: 6px;
+}
+.banner-copy .bc-sub {
+  font-family: var(--font-ko);
+  font-size: 12px;
+  color: rgba(255,255,255,0.75);
+  font-weight: 400;
+}
+/* LFS: dark slide → #f6f8fa 밝은 배경으로 전환 */
+.banner-slide.light-bg {
+  background: var(--color-bg-sub);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.banner-slide.light-bg .banner-copy {
+  position: relative;
+  bottom: auto; left: auto;
+  text-align: center;
+  padding: 40px 24px;
+}
+.banner-slide.light-bg .bc-main {
+  color: var(--color-text-primary);
+}
+.banner-slide.light-bg .bc-sub {
+  color: var(--color-text-muted);
+}
+/* LFS: 도트 → 핑크 */
+.banner-dots {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  padding: 10px 0 6px;
+  background: var(--color-bg);
+}
+.banner-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.banner-dot.active {
+  background: var(--color-pink);
+  width: 16px;
+  border-radius: 2px;
+}
+/* ── NOTICE BAR ── */
+/* LFS: 검정 배경 → #f6f8fa, 텍스트 #222 */
+.notice-bar {
+  background: var(--color-bg-sub);
+  border-bottom: 1px solid var(--color-border-light);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  overflow: hidden;
+}
+.notice-bar .nb-tag {
+  background: var(--color-pink);
+  color: #fff;
+  font-family: var(--font-en);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  flex-shrink: 0;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-btn);
+}
+.notice-bar .nb-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--color-text-muted);
+  font-family: var(--font-ko);
+}
+/* LFS: 강조 텍스트 → 핑크 */
+.notice-bar .nb-date {
+  color: var(--color-pink);
+  flex-shrink: 0;
+  font-weight: 700;
+  font-family: var(--font-en);
+}
+/* ── COUNTDOWN ── */
+/* LFS: 화이트 배경, 보더 분리선 */
+.cd-bar {
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border-light);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cd-bar-label {
+  font-family: var(--font-ko);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+.cd-bar-nums { display: flex; align-items: center; gap: 4px; }
+.cd-bar-unit { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+/* LFS: 카운트다운 박스 → #f6f8fa 배경, 핑크 숫자 */
+.cd-bar-n {
+  background: var(--color-bg-sub);
+  border: 1px solid var(--color-border-light);
+  color: var(--color-pink);
+  font-family: var(--font-en);
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  padding: 3px 7px;
+  min-width: 34px;
+  text-align: center;
+  line-height: 1;
+  border-radius: var(--radius-btn);
+}
+.cd-bar-l {
+  font-family: var(--font-ko);
+  font-size: 8px;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+.cd-bar-sep {
+  font-family: var(--font-en);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-border);
+  margin-bottom: 10px;
+}
+/* ── DIVIDER ── */
+.sec-divider {
+  height: 1px;
+  background: var(--color-border-light);
+}
+.spacer {
+  height: 8px;
+  background: var(--color-bg-sub);
+  border-top: 1px solid var(--color-border-light);
+  border-bottom: 1px solid var(--color-border-light);
+}
+/* ── SEC HEADER ── */
+/* LFS: 폰트 ExtraBold, 포인트 → 핑크 */
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 24px 16px 14px;
+}
+.sec-head-title {
+  font-family: var(--font-ko);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+}
+.sec-head-title span { color: var(--color-pink); }
+/* ── CHARACTER GRID ── */
+.char-grid-wrap { padding: 0 16px 8px; }
+.char-grid-5x2 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.char-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.char-item:active { transform: scale(0.94); }
+/* LFS: 캐릭터 이미지 테두리 → 기본 #ebedee, 활성 → 핑크 */
+.char-img-wrap {
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border-light);
+  overflow: hidden;
+  background: var(--color-bg-sub);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s;
+}
+.char-item.active .char-img-wrap {
+  border-color: var(--color-pink);
+  box-shadow: 0 0 0 3px rgba(248,59,170,0.1);
+}
+.char-img-wrap img { width: 82%; height: 82%; object-fit: contain; }
+.char-fruit-label {
+  font-family: var(--font-ko);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+/* LFS: 캐릭터 디테일 → 화이트 배경, #ebedee 보더 */
+.char-detail {
+  margin: 8px 16px 4px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  background: var(--color-bg);
+  min-height: 88px;
+  transition: background 0.3s;
+}
+.char-detail-img {
+  width: 56px; height: 56px;
+  object-fit: contain;
+  flex-shrink: 0;
+  animation: popChar 0.3s cubic-bezier(.36,2,.6,1) both;
+}
+@keyframes popChar {
+  0%  { transform: scale(0.5); }
+  100%{ transform: scale(1); }
+}
+.char-detail-name {
+  font-family: var(--font-ko);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 3px;
+  color: var(--color-text-primary);
+}
+/* LFS: 과일명 → 핑크 */
+.char-detail-fruit {
+  font-family: var(--font-ko);
+  font-size: 11px;
+  color: var(--color-pink);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.char-detail-desc {
+  font-family: var(--font-ko);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  font-weight: 400;
+}
+/* ── PRODUCT GRID ── */
+/* LFS: 카드 보더 → #ebedee, radius → 2px */
+.product-grid-2col {
+  padding: 0 16px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.product-card-v {
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--color-bg);
+  transition: box-shadow 0.15s;
+  cursor: pointer;
+}
+.product-card-v:hover {
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+}
+.product-card-thumb {
+  aspect-ratio: 1/1;
+  overflow: hidden;
+  background: var(--color-bg-sub);
+  position: relative;
+}
+.product-card-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s;
+}
+.product-card-v:hover .product-card-thumb img { transform: scale(1.04); }
+/* LFS: 뱃지 → 핑크/퍼플, radius 2px */
+.product-card-badge {
+  position: absolute;
+  top: 8px; left: 8px;
+  background: var(--color-pink);
+  color: #fff;
+  font-family: var(--font-ko);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  letter-spacing: 0.04em;
+  border-radius: var(--radius-btn);
+}
+.product-card-badge.new {
+  background: var(--color-purple);
+}
+.product-card-body { padding: 12px 12px 14px; }
+.product-card-origin {
+  font-family: var(--font-en);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  margin-bottom: 3px;
+  letter-spacing: 0.02em;
+}
+.product-card-name {
+  font-family: var(--font-ko);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  color: var(--color-text-primary);
+}
+.product-card-price {
+  font-family: var(--font-en);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+}
+.product-card-unit {
+  font-family: var(--font-ko);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+  margin-top: 2px;
+}
+/* ── FRESH TAG ── */
+.product-fresh-tag {
+  font-family: var(--font-ko);
+  font-size: 10px;
+  color: var(--color-fresh);
+  font-weight: 600;
+  margin-top: 6px;
+  letter-spacing: -0.01em;
+}
+/* tagPulse animation */
+@keyframes tagPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.nb-tag { animation: tagPulse 2s ease-in-out infinite; }
+/* secTick animation */
+@keyframes secTick {
+  0%   { transform: scaleX(0); transform-origin: left; }
+  100% { transform: scaleX(1); transform-origin: left; }
+}
+
+/* ── GAME SECTION (이벤트) ── */
+/* LFS: 다크 섹션 제거 → #f6f8fa 밝은 배경, 보더로 구분 */
+.game-section {
+  background: var(--color-bg-sub);
+  overflow: hidden;
+  border-top: 1px solid var(--color-border-light);
+}
+.game-promo-head {
+  padding: 24px 16px 20px;
+  border-bottom: 1px solid var(--color-border-light);
+  text-align: center;
+}
+/* LFS: 태그 → 퍼플 */
+.game-promo-tag {
+  display: inline-block;
+  background: var(--color-purple-light);
+  color: var(--color-purple);
+  font-family: var(--font-en);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 8px;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+  border-radius: var(--radius-btn);
+}
+.game-promo-title {
+  font-family: var(--font-ko);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+/* LFS: em 강조 → 핑크 */
+.game-promo-title em {
+  font-style: normal;
+  color: var(--color-pink);
+}
+.game-promo-sub {
+  font-family: var(--font-ko);
+  font-size: 12px;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  font-weight: 400;
+}
+/* LFS: 쿠폰 박스 → 화이트 배경, 핑크 점선 보더 */
+.game-promo-coupon {
+  margin-top: 16px;
+  border: 1px dashed rgba(248, 59, 170, 0.3);
+  background: var(--color-bg);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-radius: var(--radius-card);
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+}
+.coupon-desc {
+  font-family: var(--font-ko);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+  font-weight: 400;
+}
+/* LFS: 쿠폰 수치 → 핑크 */
+.coupon-val {
+  font-family: var(--font-en);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-pink);
+  letter-spacing: -0.02em;
+}
+.coupon-cond {
+  font-family: var(--font-ko);
+  font-size: 9px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+  font-weight: 400;
+}
+.coupon-score-label {
+  font-family: var(--font-ko);
+  font-size: 9px;
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+  text-align: right;
+  font-weight: 400;
+}
+.coupon-score-val {
+  font-family: var(--font-en);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+.coupon-score-target {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-purple);
+}
+/* LFS: CTA 버튼 → 핑크 배경, 화이트 텍스트, radius 2px */
+.game-cta-btn {
+  display: block;
+  margin-top: 16px;
+  background: var(--color-pink);
+  color: #fff;
+  text-align: center;
+  font-family: var(--font-ko);
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  transition: background 0.15s, transform 0.15s;
+  border-radius: var(--radius-btn);
+}
+.game-cta-btn:hover { background: #e62d9a; }
+.game-cta-btn:active { transform: scale(0.98); }
+/* game controls (게임 내부) */
+.game-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 4px;
+}
+.g-score-box {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  padding: 5px 12px;
+  text-align: center;
+  min-width: 70px;
+  border-radius: var(--radius-card);
+}
+.g-score-label {
+  font-family: var(--font-en);
+  font-size: 8px;
+  color: var(--color-pink);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+.g-score-val {
+  font-family: var(--font-en);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.game-next-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px 6px;
+}
+.g-next-label {
+  font-family: var(--font-en);
+  font-size: 9px;
+  color: var(--color-text-muted);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+.g-next-img { width: 28px; height: 28px; object-fit: contain; }
+.g-restart-btn {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-family: var(--font-ko);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-radius: var(--radius-btn);
+}
+.g-restart-btn:hover {
+  border-color: var(--color-pink);
+  color: var(--color-pink);
+}
+.canvas-container { position: relative; width: 100%; }
+#gameCanvas { display: block; width: 100% !important; background: transparent; }
+#gOverlay {
+  display: none;
+  position: absolute; inset: 0;
+  background: rgba(255,255,255,0.96);
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 8px; z-index: 50;
+}
+#gOverlay.show { display: flex; }
+.g-over-title {
+  font-family: var(--font-ko);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--color-pink);
+}
+.g-over-score {
+  font-family: var(--font-en);
+  font-size: 52px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+.g-over-sub {
+  font-family: var(--font-ko);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+.g-over-coupon {
+  border: 1px dashed rgba(248, 59, 170, 0.3);
+  padding: 12px 24px;
+  text-align: center;
+  margin: 4px 0 8px;
+  border-radius: var(--radius-card);
+}
+.g-over-coupon-label {
+  font-family: var(--font-ko);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+.g-over-coupon-val {
+  font-family: var(--font-en);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-pink);
+}
+.g-over-coupon-desc {
+  font-family: var(--font-ko);
+  font-size: 9px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+.g-over-btn {
+  background: var(--color-pink);
+  color: #fff;
+  border: none;
+  font-family: var(--font-ko);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 12px 32px;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+  border-radius: var(--radius-btn);
+}
+.g-over-btn:hover { background: #e62d9a; transform: scale(1.04); }
+.mflash {
+  position: absolute; pointer-events: none;
+  font-family: var(--font-en);
+  font-size: 12px; font-weight: 700;
+  color: var(--color-pink);
+  white-space: nowrap; z-index: 40;
+  animation: fup 0.6s ease forwards;
+}
+@keyframes fup {
+  0%   { opacity:1; transform:translate(-50%,-50%) scale(.7); }
+  40%  { opacity:1; transform:translate(-50%,-130%) scale(1.1); }
+  100% { opacity:0; transform:translate(-50%,-210%) scale(.9); }
+}
+/* LFS: 에볼루션 바 → 밝은 배경 */
+.evo-bar {
+  padding: 12px 14px 16px;
+  border-top: 1px solid var(--color-border-light);
+}
+.evo-label {
+  font-family: var(--font-en);
+  font-size: 8px;
+  color: var(--color-text-muted);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  margin-bottom: 8px;
+}
+.evo-row { display: flex; gap: 2px; align-items: flex-end; overflow-x: auto; }
+.evo-row::-webkit-scrollbar { display: none; }
+.evo-item { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
+.evo-img { object-fit: contain; }
+.evo-name {
+  font-family: var(--font-ko);
+  font-size: 7px;
+  color: var(--color-text-muted);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.evo-arrow {
+  color: var(--color-border);
+  font-size: 9px;
+  flex-shrink: 0;
+  padding-bottom: 10px;
+}
+/* ── SNS BANNER ── */
+/* LFS: 알림 섹션 → SNS 소식 확인 배너 */
+.sns-banner {
+  background: var(--color-bg-sub);
+  border-top: 1px solid var(--color-border-light);
+  padding: 40px 16px 0;
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+}
+.sns-banner-text {
+  font-family: var(--font-ko);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+.sns-banner-text strong {
+  color: var(--color-pink);
+}
+.sns-btn-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+.sns-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-family: var(--font-en);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 14px 28px;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: all 0.15s;
+  border-radius: var(--radius-btn);
+  min-width: 180px;
+}
+.sns-btn:hover {
+  border-color: var(--color-pink);
+  color: var(--color-pink);
+}
+.sns-btn svg {
+  flex-shrink: 0;
+}
+/* 캐릭터 이미지 영역 */
+.sns-char-img {
+  display: block;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  object-fit: contain;
+}
+/* ── FRUIT ROLLING BANNER ── */
+.fruit-banner-section { background: var(--color-bg); }
+.fruit-banner-wrap {
+  position: relative;
+  overflow: hidden;
+  margin-top: 14px;
+}
+.fruit-banner-track {
+  display: flex;
+  transition: transform 0.45s cubic-bezier(.4,0,.2,1);
+}
+.fruit-banner-slide {
+  min-width: 100%;
+  aspect-ratio: 3/2;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 28px;
+  overflow: hidden;
+}
+/* 이모지 (누끼 대체) */
+.fruit-banner-emoji {
+  font-size: 110px;
+  line-height: 1;
+  filter: drop-shadow(4px 8px 20px rgba(0,0,0,0.25));
+  flex-shrink: 0;
+  margin-right: 16px;
+  animation: fruitFloat 3s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+@keyframes fruitFloat {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%       { transform: translateY(-10px) rotate(2deg); }
+}
+/* 카피 */
+.fruit-banner-copy {
+  flex: 1;
+  text-align: right;
+}
+.fbc-tag {
+  display: inline-block;
+  font-family: var(--font-en);
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.14em;
+  border: 1px solid rgba(255,255,255,0.3);
+  padding: 2px 8px;
+  border-radius: 2px;
+  margin-bottom: 10px;
+}
+.fbc-main {
+  font-family: var(--font-ko);
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+  margin-bottom: 10px;
+}
+.fbc-sub {
+  font-family: var(--font-ko);
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  font-weight: 400;
+  line-height: 1.6;
+}
+/* 네비 버튼 */
+.fruit-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  transition: background 0.15s;
+  z-index: 10;
+  backdrop-filter: blur(4px);
+}
+.fruit-nav:hover { background: rgba(255,255,255,0.35); }
+.fruit-nav-prev { left: 12px; }
+.fruit-nav-next { right: 12px; }
+/* 도트 */
+.fruit-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+}
+.fruit-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.fruit-dot.active {
+  background: #fff;
+  width: 16px;
+  border-radius: 2px;
+}
+/* 반응형 */
+@media (min-width: 768px) {
+  .fruit-banner-slide { padding: 40px 56px; aspect-ratio: 16/6; }
+  .fruit-banner-emoji { font-size: 160px; }
+  .fbc-main { font-size: 36px; }
+  .fbc-sub { font-size: 13px; }
+  .fbc-tag { font-size: 10px; }
+}
+@media (min-width: 1024px) {
+  .fruit-banner-slide { padding: 52px 80px; aspect-ratio: 16/5; }
+  .fruit-banner-emoji { font-size: 200px; }
+  .fbc-main { font-size: 48px; }
+  .fbc-sub { font-size: 14px; }
+}
+@media (min-width: 768px) {
+  .banner-copy { bottom: 36px; left: 36px; }
+  .banner-copy .bc-main { font-size: 30px; }
+  .banner-copy .bc-sub { font-size: 14px; }
+  .cd-bar { padding: 16px 32px; }
+  .cd-bar-n { font-size: 22px; min-width: 44px; }
+  .cd-bar-label { font-size: 13px; }
+  .sec-head { padding: 28px 32px 16px; }
+  .sec-head-title { font-size: 20px; }
+  .char-grid-wrap { padding: 0 32px 12px; }
+  .char-grid-5x2 { grid-template-columns: repeat(10, 1fr); gap: 14px; }
+  .char-img-wrap { width: 62px; height: 62px; }
+  .char-detail { margin: 12px 32px 8px; }
+  .char-detail-img { width: 64px; height: 64px; }
+  .char-detail-name { font-size: 17px; }
+  .char-detail-desc { font-size: 12px; }
+  .product-grid-2col { padding: 0 32px 28px; gap: 16px; }
+  .product-card-name { font-size: 15px; }
+  .game-promo-head { padding: 28px 32px 24px; }
+  .game-promo-title { font-size: 24px; }
+  .sns-banner { padding: 48px 32px 0; }
+  .sns-banner-text { font-size: 14px; }
+  .sns-btn { min-width: 200px; font-size: 14px; }
+}
+@media (min-width: 1024px) {
+  .banner-copy { bottom: 60px; left: 72px; }
+  .banner-copy .bc-tag { font-size: 11px; padding: 4px 12px; margin-bottom: 12px; }
+  .banner-copy .bc-main { font-size: 44px; }
+  .banner-copy .bc-sub { font-size: 16px; }
+  .cd-bar { padding: 18px 64px; }
+  .cd-bar-n { font-size: 26px; min-width: 50px; }
+  .cd-bar-label { font-size: 14px; }
+  .cd-bar-sep { font-size: 20px; }
+  .sec-head { padding: 36px 64px 20px; }
+  .sec-head-title { font-size: 22px; }
+  .char-grid-wrap { padding: 0 64px 16px; }
+  .char-img-wrap { width: 72px; height: 72px; }
+  .char-detail { margin: 16px 64px 8px; padding: 20px 24px; }
+  .char-detail-img { width: 72px; height: 72px; }
+  .char-detail-name { font-size: 18px; }
+  .char-detail-desc { font-size: 13px; }
+  .product-grid-2col { padding: 0 64px 40px; gap: 20px; }
+  .product-card-name { font-size: 16px; }
+  .product-card-price { font-size: 18px; }
+  .bottom-row { display: block; }
+  .game-section { border-right: none; }
+  .game-promo-head { padding: 40px 56px 36px; }
+  .game-promo-title { font-size: 28px; }
+  .game-promo-sub { font-size: 14px; }
+  .sns-banner { padding: 56px 64px 0; border-top: 1px solid var(--color-border-light); }
+  .sns-banner-text { font-size: 15px; }
+  .sns-btn { min-width: 220px; padding: 16px 40px; }
+}
+</style>
+</head>
+<body>
+<!-- ── SITE HEADER (LFS 가이드) ── -->
+<header class="site-header">
+  <div class="header-main">
+    <a class="header-logo" href="#">
+      <span class="header-logo-main">TRUZ FRUIT FARM</span>
+      <span class="header-logo-sub">산지직송 프리오더</span>
+    </a>
+    <div class="header-icons">
+      <!-- 장바구니 -->
+      <a class="header-icon-btn" href="https://linefriendssquare.com/cart" aria-label="장바구니">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+      </a>
+      <!-- 마이페이지 -->
+      <a class="header-icon-btn" href="https://linefriendssquare.com/account/login" aria-label="마이페이지">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</header>
+<!-- BANNER SLIDER -->
+<div class="banner-wrap">
+  <div class="banner-track" id="bannerTrack">
+    <div class="banner-slide">
+      <img src="https://cdn.shopify.com/s/files/1/0513/1599/8919/files/product_sample1_430x.jpg?v=1773909608" alt="">
+      <div class="banner-overlay"></div>
+      <div class="banner-copy">
+        <div class="bc-tag">4.21 첫 수확</div>
+        <div class="bc-main">산지직송 귀여움<br>트루즈 과일농장</div>
+        <div class="bc-sub">올해 첫 수확분 · 수량 한정 프리오더</div>
+      </div>
+    </div>
+    <div class="banner-slide">
+      <img src="https://cdn.shopify.com/s/files/1/0513/1599/8919/files/product_sample2_430x.jpg?v=1773909607" alt="">
+      <div class="banner-overlay"></div>
+      <div class="banner-copy">
+        <div class="bc-tag">당도 보장</div>
+        <div class="bc-main">당도 선별 완료<br>상위 1% 프리미엄<br>트루즈 프루츠</div>
+        <div class="bc-sub">산지에서 검수 후 직배송</div>
+      </div>
+    </div>
+    <!-- 3번째: 게임 이벤트 안내 -->
+    <div class="banner-slide light-bg">
+      <div class="banner-copy">
+        <div class="bc-tag">GAME EVENT</div>
+        <div class="bc-main" style="font-size:24px;">수확 체험 게임<br>도전하기.</div>
+        <div class="bc-sub" style="margin-top:8px;">과일 합치고 점수 달성하면<br>프리오더 할인쿠폰 즉시 발급</div>
+      </div>
+    </div>
+    <!-- 4번째: 쿠폰 강조 -->
+    <div class="banner-slide light-bg">
+      <div class="banner-copy">
+        <div class="bc-tag">COUPON</div>
+        <div class="bc-main" style="font-size:22px;">잘 하면<br>쿠폰 줌.<br>못 해도 재밌음.</div>
+        <div class="bc-sub" style="margin-top:8px;">200pt 달성 → 10% 할인쿠폰<br>프리오더 전 품목 적용</div>
+      </div>
+    </div>
+  </div>
+  <div class="banner-dots" id="bannerDots"></div>
+</div>
+<!-- NOTICE BAR -->
+<div class="notice-bar">
+  <div class="nb-tag">입하 예정</div>
+  <div class="nb-text">금일 오전 산지 출발 — 첫 수확분 한정, 조기 마감 예상</div>
+  <div class="nb-date">4.21 AM 11:00</div>
+</div>
+<!-- COUNTDOWN -->
+<div class="cd-bar">
+  <div class="cd-bar-label">입하까지</div>
+  <div class="cd-bar-nums">
+    <div class="cd-bar-unit"><div class="cd-bar-n" id="cd-d">00</div><div class="cd-bar-l">일</div></div>
+    <div class="cd-bar-sep">:</div>
+    <div class="cd-bar-unit"><div class="cd-bar-n" id="cd-h">00</div><div class="cd-bar-l">시간</div></div>
+    <div class="cd-bar-sep">:</div>
+    <div class="cd-bar-unit"><div class="cd-bar-n" id="cd-m">00</div><div class="cd-bar-l">분</div></div>
+    <div class="cd-bar-sep">:</div>
+    <div class="cd-bar-unit"><div class="cd-bar-n" id="cd-s">00</div><div class="cd-bar-l">초</div></div>
+  </div>
+</div>
+<div class="sec-divider"></div>
+<!-- TODAY'S FRUIT -->
+<div class="sec-head">
+  <div class="sec-head-title">오늘의 <span>입고 품목</span></div>
+</div>
+<div class="char-grid-wrap">
+  <div class="char-grid-5x2" id="charGrid"></div>
+</div>
+<div class="char-detail" id="charDetail"></div>
+<div class="sec-divider" style="margin-top:16px;"></div>
+<!-- PRODUCT LIST -->
+<div class="sec-head">
+  <div class="sec-head-title">오늘 <span>수확</span></div>
+</div>
+<div class="product-grid-2col">
+  <div class="product-card-v">
+    <div class="product-card-thumb">
+      <img src="https://cdn.shopify.com/s/files/1/0513/1599/8919/files/product_sample1_430x.jpg?v=1773909608" alt="플러시 키링">
+      <div class="product-card-badge">첫 수확</div>
+    </div>
+    <div class="product-card-body">
+      <div class="product-card-origin">산지직송 · Plush Keyring</div>
+      <div class="product-card-name">과일 코스튬<br>플러시 키링</div>
+      <div class="product-card-price">19,000<span style="font-size:10px;font-weight:400;color:var(--color-text-muted);">원</span></div>
+      <div class="product-card-unit">10종 · H 10cm · 당도 보장</div>
+      <div class="product-fresh-tag">🌿 산지직송 · 신선도 보장</div>
+    </div>
+  </div>
+  <div class="product-card-v">
+    <div class="product-card-thumb">
+      <img src="https://cdn.shopify.com/s/files/1/0513/1599/8919/files/product_sample2_430x.jpg?v=1773909607" alt="모니터 인형">
+      <div class="product-card-badge new">GAP 인증</div>
+    </div>
+    <div class="product-card-body">
+      <div class="product-card-origin">농장직배송 · Monitor Plush</div>
+      <div class="product-card-name">과일박스<br>모니터 인형</div>
+      <div class="product-card-price">21,000<span style="font-size:10px;font-weight:400;color:var(--color-text-muted);">원</span></div>
+      <div class="product-card-unit">10종 · H 10cm · 무농약</div>
+      <div class="product-fresh-tag">📦 과일박스 패키지 포함</div>
+    </div>
+  </div>
+</div>
+<div class="spacer"></div>
+<!-- 이 과일 어때요? ROLLING BANNER -->
+<div class="fruit-banner-section">
+  <div class="sec-head" style="padding-bottom:0;">
+    <div class="sec-head-title">제철 <span>과일 도감</span></div>
+  </div>
+  <div class="fruit-banner-wrap">
+    <div class="fruit-banner-track" id="fruitTrack">
+      <!-- 1. 체리 — 진홍 -->
+      <div class="fruit-banner-slide" style="background:#c0392b;">
+        <div class="fruit-banner-emoji">🍒</div>
+        <div class="fruit-banner-copy">
+          <div class="fbc-tag">CHERRY · 칠리</div>
+          <div class="fbc-main">새콤한 걸<br>좋아하면<br>이거</div>
+          <div class="fbc-sub">당도 16.5˚Bx · 비타민C 폭탄 · 산지직송</div>
+        </div>
+      </div>
+      <!-- 2. 사과 — 애플레드 -->
+      <div class="fruit-banner-slide" style="background:#b03a2e;">
+        <div class="fruit-banner-emoji">🍎</div>
+        <div class="fruit-banner-copy">
+          <div class="fbc-tag">APPLE · 요치</div>
+          <div class="fbc-main">하루 한 알<br>병원 갈 일<br>없음</div>
+          <div class="fbc-sub">무농약 재배 · 껍질째 OK · 아삭함 보장</div>
+        </div>
+      </div>
+      <!-- 3. 오렌지 — 주황 -->
+      <div class="fruit-banner-slide" style="background:#e67e22;">
+        <div class="fruit-banner-emoji">🍊</div>
+        <div class="fruit-banner-copy">
+          <div class="fbc-tag">ORANGE · 히쿤</div>
+          <div class="fbc-main">즙이 많아<br>손이 바쁜<br>발렌시아</div>
+          <div class="fbc-sub">과즙 함량 상위 1% · 착즙용으로도 추천</div>
+        </div>
+      </div>
+      <!-- 4. 바나나 — 노랑 -->
+      <div class="fruit-banner-slide" style="background:#d4ac0d;">
+        <div class="fruit-banner-emoji">🍌</div>
+        <div class="fruit-banner-copy">
+          <div class="fbc-tag">BANANA · 로미</div>
+          <div class="fbc-main">운동 전후<br>이거 하나면<br>끝</div>
+          <div class="fbc-sub">천연 에너지바 · 반점 생길 때가 당도 최고</div>
+        </div>
+      </div>
+      <!-- 5. 포도 — 퍼플 -->
+      <div class="fruit-banner-slide" style="background:#6c3483;">
+        <div class="fruit-banner-emoji">🍇</div>
+        <div class="fruit-banner-copy">
+          <div class="fbc-tag">GRAPE · 솜</div>
+          <div class="fbc-main">껍질째<br>드세요<br>진짜입니다</div>
+          <div class="fbc-sub">레스베라트롤 · 항산화 No.1 · 씨 없음</div>
+        </div>
+      </div>
+      <!-- 6. 딸기 — 로즈레드 -->
+      <div class="fruit-banner-slide" style="background:#cb4335;">
+        <div class="fruit-banner-emoji">🍓</div>
+        <div class="fruit-banner-copy">
+          <div class="fbc-tag">STRAWBERRY · 본본</div>
+          <div class="fbc-main">귤보다<br>비타민 C<br>두 배</div>
+          <div class="fbc-sub">꼭지 달린 채 세척 · 논산 산지 당일 출하</div>
+        </div>
+      </div>
+      <!-- 7. 배 — 황금빛 아이보리 -->
+      <div class="fruit-banner-slide" style="background:#c9a84c;">
+        <div class="fruit-banner-emoji">🍐</div>
+        <div class="fruit-banner-copy">
+          <div class="fbc-tag">PEAR · 루루</div>
+          <div class="fbc-main">고기 먹고<br>이거 안 먹으면<br>손해</div>
+          <div class="fbc-sub">수분 88% · 소화효소 풍부 · 갈증 해소 甲</div>
+        </div>
+      </div>
+      <!-- 8. 레몬 — 레몬옐로우 -->
+      <div class="fruit-banner-slide" style="background:#b7950b;">
+        <div class="fruit-banner-emoji">🍋</div>
+        <div class="fruit-banner-copy">
+          <div class="fbc-tag">LEMON · 라우</div>
+          <div class="fbc-main">물에<br>한 조각이면<br>피로 회복</div>
+          <div class="fbc-sub">구연산 함유 · 면역력 부스터 · 무왁스</div>
+        </div>
+      </div>
+      <!-- 9. 아보카도 — 짙은 그린 -->
+      <div class="fruit-banner-slide" style="background:#1e6b3a;">
+        <div class="fruit-banner-emoji">🥑</div>
+        <div class="fruit-banner-copy">
+          <div class="fbc-tag">AVOCADO · 포동</div>
+          <div class="fbc-main">숲의 버터<br>이건 진짜<br>슈퍼푸드</div>
+          <div class="fbc-sub">불포화지방산 · 콜레스테롤 DOWN · 후숙 완료</div>
+        </div>
+      </div>
+      <!-- 10. 블루베리 — 딥블루 -->
+      <div class="fruit-banner-slide" style="background:#1a3a6b;">
+        <div class="fruit-banner-emoji">🫐</div>
+        <div class="fruit-banner-copy">
+          <div class="fbc-tag">BLUEBERRY · 우피</div>
+          <div class="fbc-main">눈 피로<br>이거 한 줌이면<br>해결</div>
+          <div class="fbc-sub">안토시아닌 · 뇌 건강 · 냉동 보관 시 영양 UP</div>
+        </div>
+      </div>
+    </div><!-- /.fruit-banner-track -->
+    <!-- 이전/다음 버튼 -->
+    <button class="fruit-nav fruit-nav-prev" id="fruitPrev" aria-label="이전">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="fruit-nav fruit-nav-next" id="fruitNext" aria-label="다음">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <!-- 도트 -->
+    <div class="fruit-dots" id="fruitDots"></div>
+  </div>
+</div>
+<div class="spacer"></div>
+<div class="bottom-row">
+<!-- GAME SECTION -->
+<div class="game-section">
+  <div class="game-promo-head">
+    <div class="game-promo-tag">수확 체험</div>
+    <div class="game-promo-title">과일 합치기<br><em>수확 체험 이벤트</em></div>
+    <div class="game-promo-sub">
+      같은 과일끼리 합치면 더 큰 과일로 진화합니다.<br>
+      200pt 달성 시 프리오더 할인쿠폰을 바로 드려요.
+    </div>
+    <div class="game-promo-coupon">
+      <div class="coupon-left">
+        <div class="coupon-desc">수확 완료 보상</div>
+        <div class="coupon-val">10% OFF</div>
+        <div class="coupon-cond">프리오더 전 품목 적용</div>
+      </div>
+      <div class="coupon-right">
+        <div class="coupon-score-label">목표 점수</div>
+        <div class="coupon-score-val"><span class="coupon-score-target">200</span> pt</div>
+      </div>
+    </div>
+    <a href="game.html" class="game-cta-btn">수확 체험 시작하기</a>
+  </div>
+</div>
+<!-- SNS BANNER -->
+<div class="sns-banner">
+  <p class="sns-banner-text">
+    입하 소식 · 깜짝 할인 · 한정 이벤트<br>
+    <strong>농장 소식을 SNS에서 가장 먼저 받아보세요</strong>
+  </p>
+  <div class="sns-btn-row">
+    <a class="sns-btn" href="https://www.instagram.com/linefriends_square/" target="_blank">
+      <!-- Instagram 아이콘 -->
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8"/>
+        <circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.8"/>
+        <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+      </svg>
+      INSTAGRAM 바로가기
+    </a>
+    <a class="sns-btn" href="https://x.com/linefriendsinfo" target="_blank">
+      <!-- X 아이콘 -->
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+      </svg>
+      X 바로가기
+    </a>
+  </div>
+  <!-- 캐릭터 이미지 자리 (실제 이미지 없을 시 빈 공간) -->
+  <div style="height:8px;"></div>
+</div>
+</div><!-- /.bottom-row -->
+<script>
+/* ── CHARACTER DATA ── */
+const CHARS = [
+  { name:'칠리', eng:'CHILLI', fruit:'체리',     emoji:'🍒', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/chilly_430x.png?v=1773909606',  accent:'#f83baa', bg:'#fff0f8',
+    desc:'비타민 C가 풍부해 면역력 강화에 도움을 줍니다. 항산화 성분이 풍부하며 심혈관 건강에도 좋아요.' },
+  { name:'요치', eng:'YOCHI',  fruit:'사과',     emoji:'🍎', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/yochi_430x.png?v=1773909607',   accent:'#f83baa', bg:'#fff0f8',
+    desc:'하루 한 알이면 의사가 필요 없다는 사과. 식이섬유와 폴리페놀이 풍부해 소화 건강에 탁월합니다.' },
+  { name:'히쿤', eng:'HIKUN',  fruit:'오렌지',   emoji:'🍊', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/hikun_430x.png?v=1773909606',   accent:'#7c3eee', bg:'#f5f0ff',
+    desc:'비타민 C의 왕. 피부 미용과 피로 회복에 탁월하며 시원한 향이 기분 전환에 도움을 줍니다.' },
+  { name:'로미', eng:'ROMY',   fruit:'바나나',   emoji:'🍌', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/romi_430x.png?v=1773909606',    accent:'#7c3eee', bg:'#f5f0ff',
+    desc:'칼륨이 풍부해 근육 피로 해소에 좋습니다. 운동 전후 에너지 보충에 탁월한 천연 스포츠 식품.' },
+  { name:'솜',   eng:'SOM',    fruit:'포도',     emoji:'🍇', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/som_fc675c83-f12b-4de5-9ffb-041e22037ebd_430x.png?v=1773909606',     accent:'#7c3eee', bg:'#f5f0ff',
+    desc:'레스베라트롤 함량이 높아 항노화 효과가 뛰어납니다. 껍질째 먹으면 폴리페놀 흡수 극대화.' },
+  { name:'본본', eng:'BONBON', fruit:'딸기',     emoji:'🍓', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/bonbon_f965b30d-2e2e-41f0-a486-1a026dd019db_430x.png?v=1773909606',  accent:'#f83baa', bg:'#fff0f8',
+    desc:'비타민 C 함량이 귤의 2배. 엽산이 풍부해 피부 재생에 도움을 주며 달콤한 맛으로 스트레스도 해소.' },
+  { name:'루루', eng:'RURU',   fruit:'배',       emoji:'🍐', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/ruru_f3676f4f-0a8f-4320-a2bc-53a535d126cf_430x.png?v=1773909606',    accent:'#f83baa', bg:'#fff0f8',
+    desc:'수분 함량이 88%로 갈증 해소에 탁월. 소화 효소가 풍부해 고기 먹은 뒤 디저트로 제격입니다.' },
+  { name:'라우', eng:'LAWOO',  fruit:'레몬',     emoji:'🍋', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/rawoo_430x.png?v=1773909606',   accent:'#7c3eee', bg:'#f5f0ff',
+    desc:'구연산이 풍부해 피로 회복에 탁월합니다. 살균·해독 효과가 있어 면역력 강화에 도움을 줍니다.' },
+  { name:'포동', eng:'PODONG', fruit:'아보카도', emoji:'🥑', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/podong_430x.png?v=1773909606',  accent:'#7c3eee', bg:'#f5f0ff',
+    desc:'불포화 지방산이 풍부한 슈퍼푸드. 나쁜 콜레스테롤을 낮추고 눈 건강에 좋은 루테인이 가득.' },
+  { name:'우피', eng:'WOOPY',  fruit:'블루베리', emoji:'🫐', img:'https://cdn.shopify.com/s/files/1/0513/1599/8919/files/woopy_430x.png?v=1773909607',   accent:'#7c3eee', bg:'#f5f0ff',
+    desc:'안토시아닌이 풍부해 눈 피로 해소와 시력 보호에 탁월. 뇌 기능 향상에도 도움이 되는 슈퍼베리.' },
+];
+/* ── BANNER ── */
+let bIdx = 0;
+const bSlides = document.querySelectorAll('.banner-slide');
+const dotsWrap = document.getElementById('bannerDots');
+bSlides.forEach((_,i) => {
+  const d = document.createElement('div');
+  d.className = 'banner-dot' + (i===0 ? ' active' : '');
+  d.onclick = () => goSlide(i);
+  dotsWrap.appendChild(d);
+});
+function goSlide(i) {
+  bIdx = i;
+  document.getElementById('bannerTrack').style.transform = `translateX(-${i*100}%)`;
+  document.querySelectorAll('.banner-dot').forEach((d,j)=>d.classList.toggle('active',j===i));
+}
+let bTimer = setInterval(() => goSlide((bIdx+1)%bSlides.length), 4200);
+const bt = document.getElementById('bannerTrack');
+let bTX = 0;
+bt.addEventListener('touchstart', e => { bTX=e.touches[0].clientX; clearInterval(bTimer); });
+bt.addEventListener('touchend', e => {
+  const dx = bTX - e.changedTouches[0].clientX;
+  if(Math.abs(dx)>40) goSlide(dx>0 ? Math.min(bIdx+1, bSlides.length-1) : Math.max(bIdx-1,0));
+  bTimer = setInterval(() => goSlide((bIdx+1)%bSlides.length), 4200);
+});
+/* ── COUNTDOWN ── */
+const TARGET = new Date('2026-04-21T11:00:00+09:00');
+function tickCd() {
+  const diff = TARGET - new Date();
+  if(diff<=0) return;
+  const d=Math.floor(diff/86400000), h=Math.floor((diff%86400000)/3600000),
+        m=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000);
+  document.getElementById('cd-d').textContent=String(d).padStart(2,'0');
+  document.getElementById('cd-h').textContent=String(h).padStart(2,'0');
+  document.getElementById('cd-m').textContent=String(m).padStart(2,'0');
+  document.getElementById('cd-s').textContent=String(s).padStart(2,'0');
+}
+tickCd(); setInterval(tickCd, 1000);
+/* ── CHARACTERS ── */
+function renderCharDetail(idx) {
+  const c = CHARS[idx];
+  const el = document.getElementById('charDetail');
+  el.style.background = c.bg;
+  el.innerHTML = `
+    <img class="char-detail-img" src="${c.img}" alt="${c.name}">
+    <div>
+      <div class="char-detail-name">${c.name} <span style="font-family:'SF Pro Display',sans-serif;font-size:12px;font-weight:400;color:var(--color-text-muted)">${c.eng}</span></div>
+      <div class="char-detail-fruit">${c.emoji} ${c.fruit}</div>
+      <div class="char-detail-desc">${c.desc}</div>
+    </div>
+  `;
+}
+function initChars() {
+  const grid = document.getElementById('charGrid');
+  CHARS.forEach((c, i) => {
+    const item = document.createElement('div');
+    item.className = 'char-item' + (i===0 ? ' active' : '');
+    item.innerHTML = `
+      <div class="char-img-wrap"><img src="${c.img}" alt="${c.name}" loading="lazy"></div>
+      <div class="char-fruit-label">${c.fruit}</div>
+    `;
+    item.onclick = () => {
+      document.querySelectorAll('.char-item').forEach(el=>el.classList.remove('active'));
+      item.classList.add('active');
+      renderCharDetail(i);
+    };
+    grid.appendChild(item);
+  });
+  renderCharDetail(0);
+}
+/* ── FRUIT ROLLING BANNER ── */
+(function() {
+  const track   = document.getElementById('fruitTrack');
+  const slides  = track.querySelectorAll('.fruit-banner-slide');
+  const dotsWrap = document.getElementById('fruitDots');
+  let idx = 0;
+  // 도트 생성
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'fruit-dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goFruit(i);
+    dotsWrap.appendChild(d);
+  });
+  function goFruit(i) {
+    idx = (i + slides.length) % slides.length;
+    track.style.transform = `translateX(-${idx * 100}%)`;
+    dotsWrap.querySelectorAll('.fruit-dot').forEach((d, j) =>
+      d.classList.toggle('active', j === idx)
+    );
+  }
+  document.getElementById('fruitPrev').onclick = () => goFruit(idx - 1);
+  document.getElementById('fruitNext').onclick = () => goFruit(idx + 1);
+  // 터치 스와이프
+  let tx = 0;
+  track.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
+  track.addEventListener('touchend', e => {
+    const dx = tx - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 40) goFruit(dx > 0 ? idx + 1 : idx - 1);
+  });
+  // 자동 롤링 4.5초
+  let timer = setInterval(() => goFruit(idx + 1), 4500);
+  track.addEventListener('touchstart', () => clearInterval(timer));
+  track.addEventListener('touchend',   () => { timer = setInterval(() => goFruit(idx + 1), 4500); });
+  document.getElementById('fruitPrev').addEventListener('click', () => { clearInterval(timer); timer = setInterval(() => goFruit(idx + 1), 4500); });
+  document.getElementById('fruitNext').addEventListener('click', () => { clearInterval(timer); timer = setInterval(() => goFruit(idx + 1), 4500); });
+})();
+initChars();
+</script>
+<footer style="background:var(--color-bg-sub);border-top:1px solid var(--color-border-light);padding:28px 16px 32px;text-align:center;">
+  <p style="font-family:var(--font-en);font-size:13px;font-weight:800;color:var(--color-text-primary);letter-spacing:0.06em;margin-bottom:10px;">TRUZ FRUIT FARM</p>
+  <p style="font-family:var(--font-ko);font-size:10px;color:var(--color-text-muted);line-height:1.8;">본 페이지는 트루즈 과일 코스튬 시리즈의 프리오더 이벤트 페이지입니다.<br>실제 과일을 판매하지 않습니다. 상품 수령까지 약 2~3주 소요될 수 있습니다.</p>
+  <p style="font-family:var(--font-ko);font-size:10px;color:var(--color-text-muted);margin-top:6px;">고객센터 <a href="mailto:linefriends_square@linefriends.com" style="color:var(--color-pink);text-decoration:none;">linefriends_square@linefriends.com</a></p>
+  <p style="font-family:var(--font-en);font-size:9px;color:var(--color-text-muted);margin-top:10px;letter-spacing:0.04em;">© 2026 LINE FRIENDS SQUARE. All rights reserved.</p>
+</footer>
+</body>
+</html>
