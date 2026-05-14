@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI로 일합니다 — 마케팅팀 AI 업무 자동화 현황</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Hahmlet:wght@700;900&family=Nanum+Gothic:wght@400;700;800&family=DM+Mono:wght@300;400&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #111;
+    color: #111;
+    font-family: 'Nanum Gothic', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    cursor: default;
+  }
+
+  /* ── PRESENTATION CONTAINER ── */
+  .pres-wrap {
+    position: fixed; inset: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #111;
+  }
+
+  /* 고정 16:9 캔버스 — CSS scale로 뷰포트에 맞춤 */
+  #slides-outer {
+    width: 1280px;
+    height: 720px;
+    flex-shrink: 0;
+    transform-origin: center center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .slides-track {
+    display: flex;
+    height: 720px;
+    transition: transform .7s cubic-bezier(.77,0,.18,1);
+    will-change: transform;
+  }
+
+  .slide {
+    flex-shrink: 0;
+    width: 1280px;
+    height: 720px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* ── NAV BAR ── */
+  .pres-nav {
+    position: absolute; top: 0; left: 0; right: 0;
+    z-index: 200;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 36px;
+    pointer-events: none;
+  }
+  .pres-nav-r {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: .22em; text-transform: uppercase; color: rgba(255,255,255,.5);
+    text-shadow: 0 1px 4px rgba(0,0,0,.5);
+    transition: color .3s, text-shadow .3s;
+  }
+  /* light slide nav */
+  .pres-nav.on-light .pres-nav-r {
+    color: rgba(0,0,0,.5);
+    text-shadow: none;
+  }
+
+  /* ── DOTS ── */
+  .pres-dots {
+    position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
+    z-index: 200;
+    display: flex; gap: 8px; align-items: center;
+  }
+  .pres-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(120,120,120,.4);
+    transition: background .3s, width .3s;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,.3);
+  }
+  .pres-dot.active {
+    background: #E8440A;
+    width: 22px; border-radius: 3px;
+  }
+
+  /* ── ARROW BUTTONS ── */
+  .pres-arrow {
+    position: absolute; top: 50%; z-index: 200;
+    transform: translateY(-50%);
+    width: 52px; height: 52px;
+    border: none;
+    border-radius: 50%;
+    background: #FFF;
+    box-shadow: 0 4px 20px rgba(0,0,0,.28), 0 1px 4px rgba(0,0,0,.15);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background .2s, box-shadow .2s, transform .2s;
+  }
+  .pres-arrow:hover {
+    background: #E8440A;
+    box-shadow: 0 6px 24px rgba(232,68,10,.4), 0 2px 6px rgba(232,68,10,.2);
+    transform: translateY(-50%) scale(1.08);
+  }
+  .pres-arrow.disabled {
+    opacity: .25; pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  .pres-arrow svg { fill: none; stroke: #111; stroke-width: 2; width: 18px; height: 18px; flex-shrink: 0; }
+  .pres-arrow:hover svg { stroke: #FFF; }
+  #arr-prev { left: 20px; }
+  #arr-next { right: 20px; }
+
+  /* ── SLIDE THEMES ── */
+  .s-dark { background: #111; }
+  .s-white { background: #FFF; }
+  .s-light { background: #F7F7F7; }
+
+  /* ── COMMON ELEMENTS ── */
+  .eyebrow {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: .25em; text-transform: uppercase;
+    margin-bottom: 20px; display: block;
+  }
+  .eyebrow.dim { color: rgba(255,255,255,.28); }
+  .eyebrow.gray { color: #BBB; }
+
+  .big-title {
+    font-family: 'Hahmlet', serif; font-weight: 900;
+    line-height: .92; letter-spacing: 0;
+  }
+  em { font-style: normal; color: #E8440A; }
+
+  .s-inner {
+    width: 100%; max-width: 1160px;
+    padding: 0 80px;
+  }
+
+  /* ════════════════════════════════
+     SLIDE 01 — COVER
+  ════════════════════════════════ */
+  .cover-center {
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .cover-eyebrow {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    letter-spacing: .25em; text-transform: uppercase;
+    color: rgba(255,255,255,.28); margin-bottom: 36px;
+  }
+  .cover-title {
+    font-size: 196px;
+    color: #FFF;
+    margin-bottom: 44px;
+  }
+  .cover-meta {
+    display: flex; gap: 20px; align-items: center;
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    letter-spacing: .18em; text-transform: uppercase;
+    color: rgba(255,255,255,.2);
+  }
+  .cover-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,.15); }
+
+  /* ════════════════════════════════
+     SLIDE 02 — IMAGE
+  ════════════════════════════════ */
+  .img-slide-wrap {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+  }
+  .img-slide-wrap img {
+    max-width: 100%; max-height: 720px;
+    object-fit: contain; display: block;
+  }
+
+  /* ════════════════════════════════
+     SLIDE 03 — 목차
+  ════════════════════════════════ */
+  .s2-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 100px;
+    align-items: center;
+  }
+  .s2-title {
+    font-size: 72px;
+    color: #111; margin-bottom: 24px;
+  }
+  .s2-sub { font-size: 14px; line-height: 1.85; color: #888; }
+  .s2-list { display: flex; flex-direction: column; gap: 2px; }
+  .s2-item {
+    display: flex; align-items: center; gap: 20px;
+    padding: 18px 24px;
+    border: 1px solid #EBEBEB;
+    border-radius: 3px;
+    transition: background .2s, border-color .2s;
+  }
+  .s2-item:hover { background: #F7F7F7; border-color: #DDD; }
+  .s2-num {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: .15em; color: #CCC; flex-shrink: 0; width: 24px;
+  }
+  .s2-label {
+    font-family: 'Hahmlet', serif; font-weight: 900; font-size: 18px; color: #111;
+    flex: 1;
+  }
+  .s2-tag {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: 3px 9px; border: 1px solid #E2E2E2; border-radius: 2px; color: #BBB;
+  }
+
+  /* ════════════════════════════════
+     SLIDE 04 — 운영 서비스
+  ════════════════════════════════ */
+  .s3-title {
+    font-size: 58px;
+    color: #111; margin-bottom: 36px;
+  }
+  .s3-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+  .sc {
+    background: #F0F0F0; border-radius: 4px;
+    padding: 24px 18px;
+    display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+    transition: transform .25s, box-shadow .25s, background .2s;
+    cursor: pointer;
+  }
+  .sc::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 2px; background: #E8440A;
+    transform: scaleX(0); transition: transform .3s;
+  }
+  .sc:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,.1); background: #FFF; }
+  .sc:hover::after { transform: scaleX(1); }
+  .sc-num { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .2em; color: #CCC; margin-bottom: 12px; }
+  .sc-ico { font-size: 28px; margin-bottom: 12px; }
+  .sc-title { font-family: 'Hahmlet', serif; font-weight: 900; font-size: 17px; color: #111; margin-bottom: 8px; line-height: 1.15; }
+  .sc-desc { font-size: 11px; color: #999; line-height: 1.6; margin-bottom: 10px; flex: 1; }
+  .sc-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+  .sc-tag { font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: .07em; text-transform: uppercase; padding: 2px 7px; border: 1px solid #DCDCDC; border-radius: 2px; color: #BBB; }
+  .sc-result { font-family: 'DM Mono', monospace; font-size: 10px; color: #E8440A; letter-spacing: .03em; }
+  .sc-open-hint {
+    position: absolute; top: 12px; right: 12px;
+    font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .08em;
+    color: #CCC; opacity: 0; transition: opacity .2s;
+  }
+  .sc:hover .sc-open-hint { opacity: 1; }
+
+  /* ════════════════════════════════
+     SLIDE 05 — 제작 중
+  ════════════════════════════════ */
+  .s4-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .s4-title {
+    font-size: 54px;
+    color: #111; margin-bottom: 16px;
+  }
+  .s4-sub { font-size: 14px; line-height: 1.8; color: #888; }
+  .s4-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .sw {
+    background: #F0F0F0; border-radius: 4px;
+    padding: 28px 22px;
+    opacity: .75;
+    transition: opacity .2s, transform .2s, background .2s;
+    position: relative; overflow: hidden;
+    cursor: pointer;
+  }
+  .sw::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 2px; background: #CCC;
+    transform: scaleX(0); transition: transform .3s;
+  }
+  .sw:hover { opacity: 1; transform: translateY(-2px); background: #FFF; }
+  .sw:hover::after { transform: scaleX(1); }
+  .sw-num { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .2em; color: #CCC; margin-bottom: 10px; }
+  .sw-ico { font-size: 26px; margin-bottom: 10px; }
+  .sw-title { font-family: 'Hahmlet', serif; font-weight: 900; font-size: 19px; color: #111; margin-bottom: 7px; line-height: 1.1; }
+  .sw-desc { font-size: 11px; color: #999; line-height: 1.6; margin-bottom: 10px; }
+  .sw-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+  .sw-tag { font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: .07em; text-transform: uppercase; padding: 2px 7px; border: 1px solid #DCDCDC; border-radius: 2px; color: #BBB; }
+  .sw-wip { font-family: 'DM Mono', monospace; font-size: 10px; color: #CCC; letter-spacing: .04em; }
+  .sw-open-hint {
+    position: absolute; top: 12px; right: 12px;
+    font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .08em;
+    color: #CCC; opacity: 0; transition: opacity .2s;
+  }
+  .sw:hover .sw-open-hint { opacity: 1; }
+
+  /* ════════════════════════════════
+     SLIDE 06 — HOW WE BUILD
+  ════════════════════════════════ */
+  .s5-inner { text-align: center; }
+  .s5-title {
+    font-size: 120px;
+    color: #FFF; margin-bottom: 28px;
+  }
+  .s5-sub { font-size: 15px; color: rgba(255,255,255,.35); margin-bottom: 52px; }
+  .s5-steps {
+    display: flex; gap: 10px; justify-content: center;
+  }
+  .s5-step {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: .14em; text-transform: uppercase;
+    padding: 9px 20px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 2px; color: rgba(255,255,255,.35);
+  }
+
+  /* ════════════════════════════════
+     SLIDES 07-09 — STEPS
+  ════════════════════════════════ */
+  .step-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .step-label {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: .25em; text-transform: uppercase;
+    margin-bottom: 14px; display: block;
+  }
+  .step-num {
+    font-family: 'Hahmlet', serif; font-weight: 900;
+    font-size: 156px;
+    line-height: .85;
+    margin-bottom: -12px;
+  }
+  .step-title {
+    font-family: 'Hahmlet', serif; font-weight: 900;
+    font-size: 52px;
+    line-height: 1.05;
+    margin-bottom: 22px;
+  }
+  .step-desc {
+    font-size: 15px; line-height: 1.9;
+    margin-bottom: 28px;
+  }
+  .step-quote {
+    padding: 18px 22px;
+    border-left: 2px solid #E8440A;
+    font-size: 13px; line-height: 1.75;
+    font-style: italic;
+  }
+  .step-visual {
+    border-radius: 4px;
+    padding: 36px 32px;
+    display: flex; flex-direction: column; gap: 0;
+  }
+  .sv-item {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid;
+  }
+  .sv-item:last-child { border-bottom: none; }
+  .sv-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+  .sv-t { font-family: 'Hahmlet', serif; font-weight: 900; font-size: 15px; margin-bottom: 4px; }
+  .sv-d { font-size: 12px; line-height: 1.6; }
+
+  .step-label.gray { color: #BBB; }
+  .step-num.ghost { color: #EBEBEB; }
+  .step-title.dark { color: #111; }
+  .step-desc.mid { color: #666; }
+  .step-quote.light-q { background: #FFF; color: #444; }
+  .step-visual.light-v { background: #F2F2F2; }
+  .sv-item.lv { border-bottom-color: #E8E8E8; }
+  .sv-t.dark { color: #111; }
+  .sv-d.mid { color: #999; }
+
+  .step-label.pale { color: rgba(255,255,255,.28); }
+  .step-num.d-ghost { color: rgba(255,255,255,.05); }
+  .step-title.white { color: #FFF; }
+  .step-desc.pale-d { color: rgba(255,255,255,.45); }
+  .step-quote.dark-q { background: rgba(255,255,255,.04); color: rgba(255,255,255,.45); border-left-color: #E8440A; }
+  .step-visual.dark-v { background: rgba(255,255,255,.04); }
+  .sv-item.dv { border-bottom-color: rgba(255,255,255,.07); }
+  .sv-t.white { color: #FFF; }
+  .sv-d.pale-d { color: rgba(255,255,255,.35); }
+
+  /* ════════════════════════════════
+     SLIDE 10 — CLOSING
+  ════════════════════════════════ */
+  .s9-inner { text-align: center; }
+  .s9-title {
+    font-size: 108px;
+    color: #FFF; margin-bottom: 32px;
+  }
+  .s9-msg {
+    font-size: 16px; line-height: 1.9; color: rgba(255,255,255,.45);
+    max-width: 600px; margin: 0 auto 56px;
+  }
+  .s9-msg strong { color: rgba(255,255,255,.85); font-weight: 700; }
+  .s9-line { width: 40px; height: 1px; background: rgba(255,255,255,.15); margin: 0 auto; }
+
+  /* ── SLIDE ENTER ANIMATION ── */
+  .slide .s-inner,
+  .slide .s5-inner,
+  .slide .s9-inner,
+  .slide .cover-center {
+    opacity: 0; transform: translateX(40px);
+    transition: opacity .6s ease .15s, transform .6s ease .15s;
+  }
+  .slide .img-slide-wrap {
+    opacity: 0; transform: scale(.97);
+    transition: opacity .6s ease .1s, transform .6s ease .1s;
+  }
+  .slide.active .s-inner,
+  .slide.active .s5-inner,
+  .slide.active .s9-inner,
+  .slide.active .cover-center {
+    opacity: 1; transform: translateX(0);
+  }
+  .slide.active .img-slide-wrap {
+    opacity: 1; transform: scale(1);
+  }
+  .slide.prev .s-inner,
+  .slide.prev .s5-inner,
+  .slide.prev .s9-inner,
+  .slide.prev .cover-center {
+    opacity: 0; transform: translateX(-40px);
+    transition: opacity .3s ease, transform .3s ease;
+  }
+
+  /* ── TICKER ── */
+  .ticker-wrap { overflow: hidden; white-space: nowrap; margin-top: 0; }
+  .ticker-inner { display: inline-flex; animation: tick 22s linear infinite; }
+  .ti {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: .16em; text-transform: uppercase;
+    color: rgba(255,255,255,.18); padding: 0 24px;
+  }
+  .ti b { color: #E8440A; font-weight: 400; }
+  @keyframes tick { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  /* ════════════════════════════════
+     MODAL
+  ════════════════════════════════ */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.75);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    backdrop-filter: blur(6px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: #FFF;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 1280px;
+    max-height: calc(100vh - 64px);
+  }
+  .modal-box.mobile-size {
+    max-width: 390px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 32px 80px rgba(0,0,0,.5);
+    animation: modalIn .3s cubic-bezier(.34,1.26,.64,1);
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(.95) translateY(10px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-close {
+    position: absolute; top: 14px; right: 14px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(0,0,0,.08); border: none;
+    font-size: 20px; cursor: pointer; z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+    transition: background .2s, color .2s;
+    color: #555;
+  }
+  .modal-close:hover { background: #E8440A; color: #FFF; }
+  .modal-body { flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; }
+  .modal-body iframe { width: 100%; height: calc(100vh - 128px); border: none; display: block; }
+  .modal-body img { max-width: 100%; max-height: calc(100vh - 128px); display: block; object-fit: contain; }
+
+
+  /* ── PDF 버튼 ── */
+  .pdf-btn {
+    pointer-events: auto;
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: .18em; text-transform: uppercase;
+    padding: 6px 14px;
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 3px;
+    background: transparent;
+    color: rgba(255,255,255,.45);
+    cursor: pointer;
+    transition: border-color .2s, color .2s;
+    flex-shrink: 0;
+  }
+  .pdf-btn:hover { border-color: #E8440A; color: #E8440A; }
+  .pres-nav.on-light .pdf-btn { border-color: rgba(0,0,0,.18); color: rgba(0,0,0,.4); }
+  .pres-nav.on-light .pdf-btn:hover { border-color: #E8440A; color: #E8440A; }
+
+  /* ── PRINT / PDF ── */
+  /* 16:9 고정: 13.33in × 7.5in = 1280×720px @ 96dpi */
+  @page { size: 13.33in 7.5in; margin: 0; }
+
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    html, body {
+      overflow: visible !important;
+      height: auto !important;
+      background: #000 !important;
+      margin: 0 !important; padding: 0 !important;
+    }
+    .pres-wrap {
+      position: static !important;
+      display: block !important;
+      overflow: visible !important;
+      height: auto !important;
+      background: none !important;
+    }
+    #slides-outer {
+      transform: none !important;
+      width: 1280px !important;
+      height: auto !important;
+      overflow: visible !important;
+      position: static !important;
+    }
+    /* block 레이아웃으로 전환 — flex에서는 page-break가 불안정 */
+    .slides-track {
+      display: block !important;
+      transform: none !important;
+      transition: none !important;
+      height: auto !important;
+    }
+    .slide {
+      display: block !important;
+      width: 1280px !important;
+      height: 720px !important;
+      page-break-after: always !important;
+      break-after: page !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+      overflow: hidden !important;
+      position: relative !important;
+    }
+    .slide:last-child { page-break-after: avoid !important; break-after: avoid !important; }
+    .pres-nav, .pres-dots, #arr-prev, #arr-next, .modal-overlay { display: none !important; }
+    .slide .s-inner, .slide .s5-inner, .slide .s9-inner,
+    .slide .cover-center, .slide .img-slide-wrap {
+      opacity: 1 !important; transform: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- MODAL (뷰포트 전체 덮어야 해서 캔버스 밖에 유지) -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-close">&#215;</button>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- SLIDES TRACK -->
+<div class="pres-wrap">
+<div id="slides-outer">
+
+<!-- NAV / ARROWS / DOTS — 캔버스 안에서 absolute 포지셔닝 -->
+<nav class="pres-nav">
+  <button class="pdf-btn" onclick="window.print()">PDF 저장</button>
+  <span class="pres-nav-r" id="pres-counter">01 / 10</span>
+</nav>
+<button class="pres-arrow disabled" id="arr-prev" aria-label="이전">
+  <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+</button>
+<button class="pres-arrow" id="arr-next" aria-label="다음">
+  <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+</button>
+<div class="pres-dots" id="pres-dots"></div>
+
+<div class="slides-track" id="track">
+
+  <!-- ═══════ SLIDE 01 · COVER ═══════ -->
+  <div class="slide s-dark active" data-idx="0">
+    <div class="cover-center">
+      <span class="cover-eyebrow">마케팅팀 · AI 업무 자동화 현황 보고 · 2026.03</span>
+      <div class="big-title cover-title">AI로<br><em>일합니다</em></div>
+      <div class="cover-meta">
+        <span>2026.03</span>
+        <span class="cover-meta-dot"></span>
+        <span>마케팅팀</span>
+        <span class="cover-meta-dot"></span>
+        <span>운영 중 5개 서비스</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 02 · IMAGE ═══════ -->
+  <div class="slide s-white" data-idx="1">
+    <div class="img-slide-wrap">
+      <img
+        src="https://blog.kakaocdn.net/dna/xIVbV/btrLYj6H7LV/AAAAAAAAAAAAAAAAAAAAABcW19poY3RlFGcOpPNpm2jqfQy7wNRkIVpdWRu-xfwT/img.jpg?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1774969199&allow_ip=&allow_referer=&signature=Oln%2FR0V0P9Sp%2FCvj%2Bp6lrtyHOuY%3D"
+        alt="마케팅팀 AI 자동화"
+      >
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 03 · 목차 ═══════ -->
+  <div class="slide s-white" data-idx="2">
+    <div class="s-inner">
+      <div class="s2-layout">
+        <div>
+          <span class="eyebrow gray">Index · 목차</span>
+          <div class="big-title s2-title">이런<br>내용을<br>담았습니다</div>
+          <p class="s2-sub">운영 중인 서비스부터 제작 방식까지,<br>마케팅팀이 AI와 함께 일하는 방법을 소개합니다.</p>
+        </div>
+        <div class="s2-list">
+          <div class="s2-item"><span class="s2-num">01</span><span class="s2-label">어떻게 만드나요</span><span class="s2-tag">How We Build</span></div>
+          <div class="s2-item"><span class="s2-num">02</span><span class="s2-label">Step 01 · 문제 정의</span><span class="s2-tag">Problem</span></div>
+          <div class="s2-item"><span class="s2-num">03</span><span class="s2-label">Step 02 · AI와 설계</span><span class="s2-tag">Design</span></div>
+          <div class="s2-item"><span class="s2-num">04</span><span class="s2-label">Step 03 · 운영 및 수정</span><span class="s2-tag">Iterate</span></div>
+          <div class="s2-item"><span class="s2-num">05</span><span class="s2-label">운영 중인 서비스</span><span class="s2-tag">Live · 5개</span></div>
+          <div class="s2-item"><span class="s2-num">06</span><span class="s2-label">제작 중인 서비스</span><span class="s2-tag">WIP · 4개</span></div>
+          <div class="s2-item"><span class="s2-num">07</span><span class="s2-label">앞으로의 방향</span><span class="s2-tag">Direction</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 04 · HOW WE BUILD ═══════ -->
+  <div class="slide s-dark" data-idx="3">
+    <div class="s5-inner">
+      <span class="eyebrow dim">How We Build · 어떻게 만드나요</span>
+      <div class="big-title s5-title">마케터가<br><em>직접</em><br>만드는 방법</div>
+      <p class="s5-sub">기획 → 설계 → 구현 → 운영까지 혼자서</p>
+      <div class="s5-steps">
+        <span class="s5-step">01 · 문제 정의</span>
+        <span class="s5-step">02 · AI와 설계</span>
+        <span class="s5-step">03 · 운영 및 수정</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 05 · STEP 01 ═══════ -->
+  <div class="slide s-light" data-idx="4">
+    <div class="s-inner">
+      <div class="step-layout">
+        <div>
+          <span class="step-label gray">Step 01 · 문제 정의</span>
+          <div class="step-num ghost">01</div>
+          <h2 class="step-title dark">불편함을<br>포착한다</h2>
+          <p class="step-desc mid">
+            자동화는 기술에서 시작하지 않습니다.<br>
+            "이걸 매번 손으로 해야 하나?" 싶은 순간,
+            그 불편함이 곧 프로젝트의 씨앗이 됩니다.<br><br>
+            기능 목록을 먼저 쓰지 않습니다.
+            <strong style="color:#111">"이게 없어지면 얼마나 편해질까?"</strong>를 먼저 묻습니다.
+          </p>
+          <div class="step-quote light-q">
+            "인스타 데이터 매주 복붙하는 데 30분씩 쓰고 있었는데,<br>
+            이게 자동화 1순위라는 걸 알았습니다."
+          </div>
+        </div>
+        <div>
+          <div class="step-visual light-v">
+            <div class="sv-item lv">
+              <div class="sv-icon">😤</div>
+              <div><div class="sv-t dark">반복 작업 발견</div><div class="sv-d mid">매주 같은 데이터를 같은 시트에 복붙하고 있다면, 그건 자동화 신호</div></div>
+            </div>
+            <div class="sv-item lv">
+              <div class="sv-icon">🎯</div>
+              <div><div class="sv-t dark">해결 범위 정의</div><div class="sv-d mid">완벽한 시스템 말고, 지금 당장 고통을 줄이는 최소 기능부터</div></div>
+            </div>
+            <div class="sv-item lv">
+              <div class="sv-icon">📝</div>
+              <div><div class="sv-t dark">한 문장으로 요약</div><div class="sv-d mid">"○○를 하면 ○○가 자동으로 된다" — 이게 명확해야 시작할 수 있다</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 06 · STEP 02 ═══════ -->
+  <div class="slide s-white" data-idx="5">
+    <div class="s-inner">
+      <div class="step-layout">
+        <div>
+          <span class="step-label gray">Step 02 · AI와 설계</span>
+          <div class="step-num ghost">02</div>
+          <h2 class="step-title dark">AI (LLM)에게<br><em>말을</em><br>건다</h2>
+          <p class="step-desc mid">
+            코드를 몰라도 됩니다. 마케터의 언어로
+            문제를 설명하면 AI (LLM)이 구조를 잡아줍니다.<br><br>
+            어떤 기술 스택이 맞는지, 어떻게 데이터가
+            흘러야 하는지 — 함께 설계하면서 나도 이해합니다.
+          </p>
+          <div class="step-quote light-q">
+            "인스타 API로 팔로워 수 뽑아서 구글 시트에 자동으로
+            넣고 싶어" — 이 한 마디로 시작했습니다.
+          </div>
+        </div>
+        <div>
+          <div class="step-visual light-v">
+            <div class="sv-item lv">
+              <div class="sv-icon">🧠</div>
+              <div><div class="sv-t dark">AI (LLM) 활용</div><div class="sv-d mid">기획 의도 설명 → 구조 설계 → 코드 초안 생성. 마케터 언어를 개발 언어로 번역</div></div>
+            </div>
+            <div class="sv-item lv">
+              <div class="sv-icon">🏗️</div>
+              <div><div class="sv-t dark">아키텍처 결정</div><div class="sv-d mid">Firebase냐 Sheets냐, Apps Script냐 Python이냐 — 상황에 맞는 스택을 같이 고릅니다</div></div>
+            </div>
+            <div class="sv-item lv">
+              <div class="sv-icon">⚡</div>
+              <div><div class="sv-t dark">빠른 프로토타입</div><div class="sv-d mid">설계 → 코드 초안까지 보통 1시간 이내. 일단 돌아가는 것부터 만들고 다듬는다</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 07 · STEP 03 ═══════ -->
+  <div class="slide s-dark" data-idx="6">
+    <div class="s-inner">
+      <div class="step-layout">
+        <div>
+          <span class="step-label pale">Step 03 · 운영 및 수정</span>
+          <div class="step-num d-ghost">03</div>
+          <h2 class="step-title white">만들고<br><em>부딪히고</em><br>고친다</h2>
+          <p class="step-desc pale-d">
+            완성된 코드를 실무에 바로 투입합니다.
+            오류가 나면 에러 메시지를 그대로 Claude에 붙여넣고,
+            함께 고칩니다.<br><br>
+            코드를 이해하는 만큼 더 잘 고칩니다.
+            그래서 복붙이 아니라 이해하면서 씁니다.
+          </p>
+          <div class="step-quote dark-q">
+            "돌아가는 게 완벽한 것보다 낫다. 부서지면 그때 고치면 된다."
+          </div>
+        </div>
+        <div>
+          <div class="step-visual dark-v">
+            <div class="sv-item dv">
+              <div class="sv-icon">🚀</div>
+              <div><div class="sv-t white">실무 즉시 투입</div><div class="sv-d pale-d">완성도 70%여도 일단 씁니다. 현장 피드백이 가장 빠른 테스트</div></div>
+            </div>
+            <div class="sv-item dv">
+              <div class="sv-icon">🔧</div>
+              <div><div class="sv-t white">오류 = 다음 질문</div><div class="sv-d pale-d">에러 메시지 복붙 → Claude와 디버깅. 고칠 때마다 코드를 더 이해하게 됨</div></div>
+            </div>
+            <div class="sv-item dv">
+              <div class="sv-icon">🔁</div>
+              <div><div class="sv-t white">반복 개선</div><div class="sv-d pale-d">쓰면서 불편한 점이 보입니다. 그게 다음 버전의 요구사항이 됩니다</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 08 · 운영 서비스 ═══════ -->
+  <div class="slide s-light" data-idx="7">
+    <div class="s-inner">
+      <span class="eyebrow gray">Live · 운영 중</span>
+      <div class="big-title s3-title">서비스 목록</div>
+      <div class="s3-grid">
+
+        <div class="sc" data-src="stock-front-first.html">
+          <span class="sc-open-hint">열기 →</span>
+          <div class="sc-num">01</div>
+          <div class="sc-ico">📦</div>
+          <div class="sc-title">재고 현황 페이지</div>
+          <div class="sc-desc">스태프 입력 → 고객 화면 Firebase 실시간 반영. GA4 이벤트 트래킹 내장</div>
+          <div class="sc-tags"><span class="sc-tag">Firebase</span><span class="sc-tag">JS</span><span class="sc-tag">GA4</span></div>
+          <div class="sc-result">→ 현장 재고 문의 제로화</div>
+        </div>
+
+        <div class="sc" data-src="kakao.html">
+          <span class="sc-open-hint">열기 →</span>
+          <div class="sc-num">02</div>
+          <div class="sc-ico">💛</div>
+          <div class="sc-title">카카오 배너 제작 메이커</div>
+          <div class="sc-desc">카카오 선물하기 배너 17종 체크리스트 + 카피 입력 → 엑셀 요청서 자동 출력</div>
+          <div class="sc-tags"><span class="sc-tag">React</span><span class="sc-tag">SheetJS</span><span class="sc-tag">Tailwind</span></div>
+          <div class="sc-result">→ 디자이너 요청 프로세스 표준화</div>
+        </div>
+
+        <div class="sc" data-src="img/linebot.jpg">
+          <span class="sc-open-hint">열기 →</span>
+          <div class="sc-num">03</div>
+          <div class="sc-ico">🤖</div>
+          <div class="sc-title">팀 업무 매니지먼트 라인 봇</div>
+          <div class="sc-desc">LINE Messaging API 연동. 업무 알림·공지·일정 리마인더를 팀 채널에 자동 발송</div>
+          <div class="sc-tags"><span class="sc-tag">LINE API</span><span class="sc-tag">Apps Script</span></div>
+          <div class="sc-result">→ 팀 커뮤니케이션 자동화</div>
+        </div>
+
+        <div class="sc" data-src="img/ad.jpg">
+          <span class="sc-open-hint">열기 →</span>
+          <div class="sc-num">04</div>
+          <div class="sc-ico">📊</div>
+          <div class="sc-title">AI 마케팅 자동보고</div>
+          <div class="sc-desc">GA4 데이터 자동 수집 → Claude 분석 → 주간 보고서 자동 생성·발행</div>
+          <div class="sc-tags"><span class="sc-tag">Claude API</span><span class="sc-tag">GA4</span></div>
+          <div class="sc-result">→ 보고 작성 시간 90% 단축</div>
+        </div>
+
+        <div class="sc" data-src="img/content.jpg">
+          <span class="sc-open-hint">열기 →</span>
+          <div class="sc-num">05</div>
+          <div class="sc-ico">📈</div>
+          <div class="sc-title">데이터 기입 자동화</div>
+          <div class="sc-desc">인스타그램 API 연동 → 게시물별 콘텐츠 데이터 + 팔로워 수 구글 시트 자동 기록</div>
+          <div class="sc-tags"><span class="sc-tag">Instagram API</span><span class="sc-tag">Sheets</span></div>
+          <div class="sc-result">→ 수동 집계 완전 제거</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 09 · 제작 중 ═══════ -->
+  <div class="slide s-white" data-idx="8">
+    <div class="s-inner">
+      <div class="s4-layout">
+        <div>
+          <span class="eyebrow gray">In Progress · 제작 중</span>
+          <div class="big-title s4-title">다음<br>서비스</div>
+          <p class="s4-sub">현재 기획·개발 중인 5개 서비스입니다.<br>모두 현장 필요에서 시작했습니다.</p>
+        </div>
+        <div class="s4-grid">
+
+          <div class="sw" data-src="sally-run.html">
+            <span class="sw-open-hint">열기 →</span>
+            <div class="sw-num">06</div>
+            <div class="sw-ico">🎮</div>
+            <div class="sw-title">팝업 대기 게임</div>
+            <div class="sw-desc">팝업 방문객이 대기 중 플레이하는 미니게임. 브랜드 경험 강화</div>
+            <div class="sw-tags"><span class="sw-tag">HTML/CSS/JS</span><span class="sw-tag">Canvas</span></div>
+            <div class="sw-wip">— 제작 중</div>
+          </div>
+
+          <div class="sw" data-src="memo.html">
+            <span class="sw-open-hint">열기 →</span>
+            <div class="sw-num">07</div>
+            <div class="sw-ico">🧮</div>
+            <div class="sw-title">팝업 메모장 (계산기)</div>
+            <div class="sw-desc">팝업 현장 스태프용 메모·계산 복합 툴. 빠른 금액 계산과 메모 동시 처리</div>
+            <div class="sw-tags"><span class="sw-tag">HTML/CSS/JS</span></div>
+            <div class="sw-wip">— 제작 중</div>
+          </div>
+
+          <div class="sw" data-src="discovery-front.html">
+            <span class="sw-open-hint">열기 →</span>
+            <div class="sw-num">08</div>
+            <div class="sw-ico">🛍️</div>
+            <div class="sw-title">이달의 발굴템 기획전 + 어드민</div>
+            <div class="sw-desc">월별 추천 상품 기획전 페이지 + 상품 등록·관리 어드민 페이지 세트</div>
+            <div class="sw-tags"><span class="sw-tag">Firebase</span><span class="sw-tag">JS</span></div>
+            <div class="sw-wip">— 제작 중</div>
+          </div>
+
+          <div class="sw" data-src="img/dashboard.jpg">
+            <span class="sw-open-hint">열기 →</span>
+            <div class="sw-num">09</div>
+            <div class="sw-ico">📉</div>
+            <div class="sw-title">광고 데이터 대시보드</div>
+            <div class="sw-desc">매체별 광고 성과를 한 화면에서 비교·분석. 리포팅 자동화 목표</div>
+            <div class="sw-tags"><span class="sw-tag">GA4</span><span class="sw-tag">Meta API</span></div>
+            <div class="sw-wip">— 제작 중</div>
+          </div>
+
+          <div class="sw" data-src="https://magenta-horse-5e4af4.netlify.app/" data-popup-mobile>
+            <span class="sw-open-hint">열기 →</span>
+            <div class="sw-num">10</div>
+            <div class="sw-ico">🍎</div>
+            <div class="sw-title">과일 게임</div>
+            <div class="sw-desc">TRUZ 과일 테마 프리오더 홍보를 위해 제작</div>
+            <div class="sw-tags"><span class="sw-tag">HTML/CSS/JS</span></div>
+            <div class="sw-wip">— 제작 중</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 10 · MOCKUP 1 ═══════ -->
+  <div class="slide s-dark" data-idx="9">
+    <div class="img-slide-wrap">
+      <img src="img/mockup1.jpg" alt="Mockup 1">
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 11 · MOCKUP 2 ═══════ -->
+  <div class="slide s-dark" data-idx="10">
+    <div class="img-slide-wrap">
+      <img src="img/mockup2.jpg" alt="Mockup 2">
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 12 · MOCKUP 3 ═══════ -->
+  <div class="slide s-dark" data-idx="11">
+    <div class="img-slide-wrap">
+      <img src="img/mockup3.jpg" alt="Mockup 3">
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 13 · CLOSING ═══════ -->
+  <div class="slide s-dark" data-idx="9">
+    <div class="s9-inner">
+      <span class="eyebrow dim" style="margin-bottom:32px;">앞으로의 방향 · Direction</span>
+      <div class="big-title s9-title">계속<br><em>만들겠습니다</em></div>
+      <p class="s9-msg">
+        지금까지 만든 서비스는 모두 <strong>업무 현장의 필요에서 시작</strong>했습니다.
+        앞으로도 반복을 제거하고, 데이터를 자동화하고,
+        <strong>마케터가 창의적인 일에만 집중</strong>할 수 있는 환경을 만들어 가겠습니다.
+      </p>
+      <div class="s9-line"></div>
+    </div>
+  </div>
+
+</div><!-- /track -->
+
+</div><!-- /slides-outer -->
+</div><!-- /pres-wrap -->
+
+<script>
+  // ── 고정 캔버스 스케일 ──
+  const SLIDE_W = 1280, SLIDE_H = 720;
+  const slidesOuter = document.getElementById('slides-outer');
+  function scalePresentation() {
+    const scale = Math.min(window.innerWidth / SLIDE_W, window.innerHeight / SLIDE_H);
+    slidesOuter.style.transform = `scale(${scale})`;
+  }
+  window.addEventListener('resize', scalePresentation);
+  scalePresentation();
+
+  // ── PRESENTATION ──
+  const TOTAL = document.querySelectorAll('.slide').length;
+  const track = document.getElementById('track');
+  const slides = document.querySelectorAll('.slide');
+  const counter = document.getElementById('pres-counter');
+  const arrPrev = document.getElementById('arr-prev');
+  const arrNext = document.getElementById('arr-next');
+  const dotsWrap = document.getElementById('pres-dots');
+
+  // build dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'pres-dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    dotsWrap.appendChild(d);
+  });
+
+  let current = 0;
+  let isAnimating = false;
+
+  function goTo(idx) {
+    if (idx === current || isAnimating) return;
+    if (idx < 0 || idx >= TOTAL) return;
+    isAnimating = true;
+
+    slides[current].classList.remove('active');
+    slides[current].classList.add('prev');
+    current = idx;
+    track.style.transform = `translateX(-${current * SLIDE_W}px)`;
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      slides.forEach(s => s.classList.remove('prev'));
+      slides[current].classList.add('active');
+      updateUI();
+    }));
+
+    setTimeout(() => { isAnimating = false; }, 750);
+  }
+
+  const nav = document.querySelector('.pres-nav');
+
+  function updateUI() {
+    counter.textContent = String(current + 1).padStart(2,'0') + ' / ' + String(TOTAL).padStart(2,'0');
+    arrPrev.classList.toggle('disabled', current === 0);
+    arrNext.classList.toggle('disabled', current === TOTAL - 1);
+    document.querySelectorAll('.pres-dot').forEach((d, i) => d.classList.toggle('active', i === current));
+    const isLight = slides[current].classList.contains('s-white') || slides[current].classList.contains('s-light');
+    nav.classList.toggle('on-light', isLight);
+  }
+
+  arrPrev.addEventListener('click', () => goTo(current - 1));
+  arrNext.addEventListener('click', () => goTo(current + 1));
+
+  // keyboard
+  document.addEventListener('keydown', e => {
+    if (modal.classList.contains('open')) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(current - 1); }
+  });
+
+  // touch swipe
+  let txStart = 0, tyStart = 0;
+  document.addEventListener('touchstart', e => { txStart = e.touches[0].clientX; tyStart = e.touches[0].clientY; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (modal.classList.contains('open')) return;
+    const dx = txStart - e.changedTouches[0].clientX;
+    const dy = Math.abs(tyStart - e.changedTouches[0].clientY);
+    if (Math.abs(dx) > 50 && Math.abs(dx) > dy) { dx > 0 ? goTo(current + 1) : goTo(current - 1); }
+  }, { passive: true });
+
+  // ── MODAL ──
+  const modal = document.getElementById('modal');
+  const modalBody = document.getElementById('modal-body');
+
+  const modalBox = document.querySelector('.modal-box');
+
+  function openModal(src, isMobile) {
+    const isImage = /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(src);
+    modalBody.innerHTML = isImage
+      ? `<img src="${src}" alt="">`
+      : `<iframe src="${src}" allowfullscreen></iframe>`;
+    modalBox.classList.toggle('mobile-size', !!isMobile);
+    modal.classList.add('open');
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    setTimeout(() => { modalBody.innerHTML = ''; }, 300);
+  }
+
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // service card click handlers
+  document.querySelectorAll('.sc[data-src], .sw[data-src]').forEach(card => {
+    card.addEventListener('click', () => openModal(card.dataset.src, 'popupMobile' in card.dataset));
+  });
+
+  // init
+  updateUI();
+
+</script>
+</body>
+</html>
