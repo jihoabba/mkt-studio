@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Weekly MKT Report — Card Generator</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -11,17 +12,29 @@
   --bg: #f5f5f7;
   --surface: #ffffff;
   --text: #1d1d1f;
-  --muted: rgba(0,0,0,0.45);
+  --muted: rgba(0,0,0,0.55);
   --subtle: rgba(0,0,0,0.06);
-  --divider: rgba(0,0,0,0.08);
-  --accent: #0071e3;
-  --up: #1a7f4b;
-  --down: #c0392b;
-  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --divider: rgba(0,0,0,0.1);
+  --accent: #ff7849;
+
+  /* Card (dark) theme */
+  --c-bg: #0e1015;
+  --c-surface: #1a1d26;
+  --c-text: #f5f5f7;
+  --c-muted: rgba(255,255,255,0.55);
+  --c-faint: rgba(255,255,255,0.1);
+  --c-divider: rgba(255,255,255,0.08);
+  --c-accent: #ff7849;
+  --c-accent-soft: rgba(255,120,73,0.15);
+  --c-up: #22c55e;
+  --c-up-soft: rgba(34,197,94,0.15);
+  --c-down: #ef4444;
+  --c-down-soft: rgba(239,68,68,0.15);
+  --c-blue: #60a5fa;
 }
 html, body {
   background: var(--bg);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Apple SD Gothic Neo", sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   font-size: 14px;
@@ -29,6 +42,7 @@ html, body {
   min-height: 100vh;
 }
 
+/* ── Top bar ─────────────────── */
 .topbar {
   height: 56px;
   background: rgba(245,245,247,0.9);
@@ -59,9 +73,10 @@ html, body {
 }
 .btn:hover { background: var(--subtle); }
 .btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
-.btn.primary:hover { background: #0058b8; }
+.btn.primary:hover { background: #e85e2f; }
 .btn.ghost { background: transparent; }
 
+/* ── Layout ─────── */
 .layout {
   display: grid;
   grid-template-columns: 380px 1fr;
@@ -105,115 +120,293 @@ textarea { min-height: 320px; line-height: 1.5; flex: 1; }
 }
 
 .panel-right {
-  padding: 32px;
+  padding: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 32px;
+  gap: 36px;
+  background: #ececef;
 }
 .cards-stack { display: flex; flex-direction: column; gap: 32px; align-items: center; width: 100%; }
-.card-wrap { display: flex; flex-direction: column; gap: 10px; align-items: center; }
-.card-meta-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+.card-wrap { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.card-meta-row { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--muted); }
 .card-num { font-weight: 700; color: var(--text); }
 
-/* CARD 9:16 (540x960) */
+/* ============================================
+   CARD (3:4 — 540 × 720)
+   ============================================ */
 .card {
   width: 540px;
-  height: 960px;
-  background: var(--surface);
-  border-radius: 20px;
-  box-shadow: var(--shadow);
+  height: 720px;
+  background: var(--c-bg);
+  color: var(--c-text);
+  border-radius: 22px;
   overflow: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 60px 56px 50px;
-  color: var(--text);
+  padding: 30px 30px 28px;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
 }
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 28px;
-}
-.card-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
-.card-date { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.04em; }
-.card-section-label { font-size: 13px; font-weight: 700; letter-spacing: 0.04em; color: var(--accent); margin-bottom: 6px; }
-.card-section-title { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 32px; }
-.card-body { flex: 1; display: flex; flex-direction: column; }
-.card-footer {
-  position: absolute;
-  bottom: 28px; left: 56px; right: 56px;
+
+/* Top brand strip */
+.c-brand {
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 11px;
-  color: var(--muted);
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.c-brand-left { display: flex; align-items: center; gap: 8px; color: var(--c-text); }
+.c-brand-dot { width: 7px; height: 7px; background: var(--c-accent); border-radius: 50%; }
+.c-brand-right { color: var(--c-muted); }
+
+/* Body content */
+.c-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 6px 0;
+  overflow: hidden;
 }
 
-/* Cover */
-.cover-emblem {
-  width: 56px; height: 56px;
-  background: var(--text);
-  color: white;
-  border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 800; font-size: 22px; letter-spacing: -0.02em;
-  margin-bottom: 24px;
-}
-.cover-title { font-size: 38px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 12px; }
-.cover-period { font-size: 16px; color: var(--muted); font-weight: 500; margin-bottom: auto; }
-.cover-divider { width: 48px; height: 3px; background: var(--text); margin-bottom: 20px; }
-.cover-insight { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.4; margin-bottom: 16px; }
-
-/* Metric */
-.metric-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-.metric-number { font-size: 76px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; font-feature-settings: "tnum" 1; margin-bottom: 8px; }
-.metric-unit { font-size: 18px; color: var(--muted); font-weight: 600; margin-bottom: 28px; }
-.metric-spacer { height: 28px; }
-.metric-trend {
+/* Chip tag */
+.c-chip {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 22px;
-  font-weight: 700;
-  padding: 6px 14px;
-  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 6px 10px;
+  border-radius: 7px;
+  background: var(--c-faint);
+  color: var(--c-text);
+  align-self: flex-start;
   margin-bottom: 12px;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+}
+.c-chip.accent { background: var(--c-accent-soft); color: var(--c-accent); }
+
+/* Big headline (with accent words) */
+.c-headline {
+  font-size: 36px;
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  color: var(--c-text);
+  margin-bottom: 10px;
+}
+.c-headline .hl { color: var(--c-accent); }
+.c-headline .hl-up { color: var(--c-up); }
+.c-headline .hl-down { color: var(--c-down); }
+
+.c-subhead {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--c-muted);
+  line-height: 1.55;
+  margin-bottom: 18px;
+}
+
+/* Bottom strip: dots + handle */
+.c-foot {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 14px;
+}
+.c-dots { display: flex; gap: 6px; }
+.c-dot {
+  width: 6px; height: 6px;
+  background: var(--c-faint);
+  border-radius: 50%;
+}
+.c-dot.active { background: var(--c-accent); }
+.c-handle { font-size: 11px; font-weight: 600; color: var(--c-muted); letter-spacing: 0.04em; }
+
+/* === Mac window mockup === */
+.c-window {
+  background: var(--c-surface);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--c-divider);
+  margin-top: 8px;
+}
+.c-window-bar {
+  height: 32px;
+  background: rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  position: relative;
+  border-bottom: 1px solid var(--c-divider);
+}
+.c-window-lights { display: flex; gap: 6px; }
+.c-light { width: 11px; height: 11px; border-radius: 50%; }
+.c-light.r { background: #ff5f57; }
+.c-light.y { background: #febc2e; }
+.c-light.g { background: #28c840; }
+.c-window-title {
+  position: absolute;
+  left: 0; right: 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-muted);
+  letter-spacing: 0.02em;
+}
+.c-window-body {
+  padding: 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Number display inside window */
+.c-num-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.c-num {
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--c-text);
+  font-feature-settings: "tnum" 1;
+}
+.c-unit {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--c-muted);
+}
+.c-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 800;
+  padding: 5px 11px;
+  border-radius: 100px;
   align-self: flex-start;
 }
-.metric-trend.up { background: rgba(26,127,75,0.1); color: var(--up); }
-.metric-trend.down { background: rgba(192,57,43,0.1); color: var(--down); }
-.metric-trend.flat { background: var(--subtle); color: var(--muted); }
-.metric-trend-label { font-size: 13px; color: var(--muted); font-weight: 600; margin-bottom: 36px; }
-.metric-context { padding-top: 20px; border-top: 1px solid var(--divider); font-size: 14px; color: var(--muted); font-weight: 500; }
+.c-trend.up { background: var(--c-up-soft); color: var(--c-up); }
+.c-trend.down { background: var(--c-down-soft); color: var(--c-down); }
+.c-trend.flat { background: var(--c-faint); color: var(--c-muted); }
+.c-ctx {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--c-muted);
+  margin-top: 4px;
+}
+.c-ctx-label {
+  font-weight: 700;
+  color: var(--c-text);
+  background: var(--c-faint);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
 
-/* Ranking */
-.rank-list { display: flex; flex-direction: column; gap: 22px; flex: 1; justify-content: center; }
-.rank-item { display: flex; flex-direction: column; gap: 8px; }
-.rank-row { display: flex; align-items: baseline; gap: 12px; }
-.rank-num { font-size: 14px; font-weight: 800; color: var(--muted); width: 18px; }
-.rank-name { flex: 1; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
-.rank-pct { font-size: 22px; font-weight: 800; color: var(--text); font-feature-settings: "tnum" 1; }
-.rank-bar { height: 8px; background: var(--subtle); border-radius: 100px; overflow: hidden; margin-left: 30px; }
-.rank-fill { height: 100%; background: var(--text); border-radius: 100px; }
-.rank-item:nth-child(1) .rank-fill { background: var(--text); }
-.rank-item:nth-child(2) .rank-fill { background: rgba(0,0,0,0.55); }
-.rank-item:nth-child(3) .rank-fill { background: rgba(0,0,0,0.35); }
+/* === Ranking list === */
+.c-rank { display: flex; flex-direction: column; gap: 14px; }
+.c-rank-item { display: flex; flex-direction: column; gap: 6px; }
+.c-rank-row { display: flex; align-items: center; gap: 10px; }
+.c-rank-num {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--c-muted);
+  width: 22px;
+  font-feature-settings: "tnum" 1;
+}
+.c-rank-name { flex: 1; font-size: 18px; font-weight: 800; letter-spacing: -0.015em; color: var(--c-text); }
+.c-rank-pct { font-size: 20px; font-weight: 900; color: var(--c-text); font-feature-settings: "tnum" 1; }
+.c-rank-bar { height: 5px; background: var(--c-faint); border-radius: 100px; overflow: hidden; margin-left: 32px; }
+.c-rank-fill { height: 100%; background: var(--c-accent); border-radius: 100px; }
+.c-rank-item:nth-child(n+2) .c-rank-fill { background: var(--c-text); opacity: 0.7; }
+.c-rank-item:nth-child(n+3) .c-rank-fill { opacity: 0.4; }
+.c-rank-item:nth-child(1) .c-rank-num { color: var(--c-accent); }
 
-/* Summary / Notes */
-.list-items { display: flex; flex-direction: column; gap: 22px; }
-.list-item { display: flex; flex-direction: column; gap: 4px; }
-.list-item-label { font-size: 13px; font-weight: 800; color: var(--accent); letter-spacing: 0.02em; }
-.list-item-body { font-size: 16px; font-weight: 500; line-height: 1.5; color: var(--text); letter-spacing: -0.005em; }
-.notes-group { display: flex; flex-direction: column; gap: 20px; }
-.notes-item { display: flex; flex-direction: column; gap: 4px; }
-.notes-label { font-size: 13px; font-weight: 800; letter-spacing: 0.02em; color: var(--accent); }
-.notes-body { font-size: 14px; line-height: 1.55; color: var(--text); }
-.notes-body.sub { color: var(--muted); }
+/* === Summary list (boxed items) === */
+.c-summary { display: flex; flex-direction: column; gap: 10px; }
+.c-summary-item {
+  background: var(--c-surface);
+  border: 1px solid var(--c-divider);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.c-summary-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--c-accent);
+  letter-spacing: 0.02em;
+}
+.c-summary-body {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--c-text);
+}
 
+/* === Notes (grouped) === */
+.c-notes { display: flex; flex-direction: column; gap: 10px; }
+.c-note {
+  background: var(--c-surface);
+  border-left: 3px solid var(--c-accent);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.c-note-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--c-text);
+  letter-spacing: 0.02em;
+}
+.c-note-body {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--c-muted);
+}
+
+/* === Cover (special) === */
+.card.cover {
+  background: var(--c-accent);
+  color: #1a0d05;
+}
+.card.cover .c-brand-left { color: #1a0d05; }
+.card.cover .c-brand-dot { background: #1a0d05; }
+.card.cover .c-brand-right { color: rgba(26,13,5,0.6); }
+.card.cover .c-chip { background: rgba(26,13,5,0.12); color: #1a0d05; }
+.card.cover .c-headline { color: #1a0d05; font-size: 46px; }
+.card.cover .c-headline .hl { color: #ffffff; }
+.card.cover .c-subhead { color: rgba(26,13,5,0.7); font-size: 16px; }
+.card.cover .c-foot { color: #1a0d05; }
+.card.cover .c-dot { background: rgba(26,13,5,0.2); }
+.card.cover .c-dot.active { background: #1a0d05; }
+.card.cover .c-handle { color: rgba(26,13,5,0.65); }
+.cover-emblem {
+  position: absolute;
+  bottom: 72px;
+  right: 30px;
+  font-size: 84px;
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  color: rgba(26,13,5,0.1);
+  line-height: 1;
+}
+
+/* === Empty state === */
 .empty {
   width: 100%;
   max-width: 540px;
@@ -226,8 +419,6 @@ textarea { min-height: 320px; line-height: 1.5; flex: 1; }
   font-size: 14px;
 }
 .empty strong { display: block; font-size: 16px; color: var(--text); margin-bottom: 6px; }
-
-.brand-mark { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; color: var(--muted); }
 
 @media (max-width: 980px) {
   .layout { grid-template-columns: 1fr; }
@@ -258,6 +449,11 @@ textarea { min-height: 320px; line-height: 1.5; flex: 1; }
       </div>
     </div>
 
+    <div class="field-group">
+      <span class="label">하단 핸들 (선택)</span>
+      <input type="text" class="input" id="reportHandle" placeholder="@square.weekly">
+    </div>
+
     <div class="field-group" style="flex:1; display:flex;">
       <span class="label">원본 텍스트 (Weekly MKT Report)</span>
       <textarea id="rawInput" placeholder="[WEEKLY MKT REPORT] 형태로 붙여넣으세요"></textarea>
@@ -266,7 +462,7 @@ textarea { min-height: 320px; line-height: 1.5; flex: 1; }
     <button class="btn primary" id="generate">카드 생성</button>
 
     <div class="help">
-      💡 팁: '모든 카드 다운로드'는 PNG 파일을 순차적으로 받아옵니다. 라인 단체방에는 받은 PNG들 묶어서 한번에 전송하세요.
+      💡 다크 테마 + Pretendard 폰트로 디자인. 폰트 로딩 후 다운로드하니 첫 다운로드가 조금 느릴 수 있어요.
     </div>
   </aside>
 
@@ -286,28 +482,17 @@ function el(tag, opts, ...children) {
     if (opts.cls) node.className = opts.cls;
     if (opts.text != null) node.textContent = String(opts.text);
     if (opts.style) node.setAttribute('style', opts.style);
-    if (opts.attrs) {
-      for (const k of Object.keys(opts.attrs)) {
-        if (opts.attrs[k] != null) node.setAttribute(k, opts.attrs[k]);
-      }
-    }
-    if (opts.on) {
-      for (const k of Object.keys(opts.on)) node.addEventListener(k, opts.on[k]);
-    }
+    if (opts.attrs) for (const k of Object.keys(opts.attrs)) if (opts.attrs[k] != null) node.setAttribute(k, opts.attrs[k]);
+    if (opts.on) for (const k of Object.keys(opts.on)) node.addEventListener(k, opts.on[k]);
   }
   for (const c of children) {
     if (c == null || c === false) continue;
-    if (typeof c === 'string' || typeof c === 'number') {
-      node.appendChild(document.createTextNode(String(c)));
-    } else {
-      node.appendChild(c);
-    }
+    if (typeof c === 'string' || typeof c === 'number') node.appendChild(document.createTextNode(String(c)));
+    else node.appendChild(c);
   }
   return node;
 }
-function clearNode(node) {
-  while (node.firstChild) node.removeChild(node.firstChild);
-}
+function clearNode(node) { while (node.firstChild) node.removeChild(node.firstChild); }
 
 /* ============================================
    Sample
@@ -335,7 +520,7 @@ const SAMPLE = `[WEEKLY MKT REPORT]
   삐돌이 (바이럴): 아기 카피바라 숏폼 인게이지 6.9% 달성하며 유저 자발적 공유 확인`;
 
 /* ============================================
-   Parser
+   Parser (unchanged from v1)
    ============================================ */
 function parseReport(text) {
   const data = { uv: null, sales: null, topIPs: [], topCountries: [], summary: [], notes: [] };
@@ -344,51 +529,38 @@ function parseReport(text) {
   let currentSection = null;
   for (const line of lines) {
     const sectionMatch = line.match(/^\s*\[([^\]]+)\]\s*$/);
-    if (sectionMatch) {
-      currentSection = sectionMatch[1].trim();
-      sectionMap[currentSection] = [];
-      continue;
-    }
+    if (sectionMatch) { currentSection = sectionMatch[1].trim(); sectionMap[currentSection] = []; continue; }
     if (currentSection) sectionMap[currentSection].push(line);
   }
-
   const metricsLines = (sectionMap['주요 지표'] || []).join('\n');
   data.uv = parseMetric(metricsLines, 'UV');
   data.sales = parseMetric(metricsLines, 'Sales');
   data.topIPs = parseTopList(metricsLines, 'Top IP');
   data.topCountries = parseTopList(metricsLines, 'UV Top 국가');
-
   data.summary = parseBulletList(sectionMap['요약'] || []);
   data.notes = parseNotesGroup(sectionMap['마케팅 특이사항'] || []);
-
   return data;
 }
-
 function parseMetric(text, key) {
   const re = new RegExp('-?\\s*' + key + '\\s*:\\s*(.+)', 'i');
   const m = text.match(re);
   if (!m) return null;
   const line = m[1].trim();
-
   let mainPart = line.split(/[\(\/]/)[0].trim();
   let unit = '';
   if (mainPart.endsWith('명')) { unit = '명'; mainPart = mainPart.slice(0, -1).trim(); }
   else if (mainPart.endsWith('원')) { unit = '원'; mainPart = mainPart.slice(0, -1).trim(); }
-
   let woWPct = null, woWDir = null;
   const woWMatch = line.match(/전주\s*比\s*([+\-])?([\d.]+)%/);
   if (woWMatch) { woWDir = woWMatch[1] || '+'; woWPct = parseFloat(woWMatch[2]); }
-
   let mtd = null;
   const mtdMatch = line.match(/MTD\s+([^()\n\/]+?)(?:\s*\(|$)/);
-  if (mtdMatch) mtd = 'MTD ' + mtdMatch[1].trim();
+  if (mtdMatch) mtd = mtdMatch[1].trim();
   let mtdSub = null;
   const mtdPctMatch = line.match(/MTD[^()]*\(([^)]+)\)/);
   if (mtdPctMatch) mtdSub = mtdPctMatch[1].trim();
-
   return { mainNumber: mainPart, unit, woWDir, woWPct, mtd, mtdSub, raw: line };
 }
-
 function parseTopList(text, key) {
   const re = new RegExp('-?\\s*' + escapeRegex(key) + '\\s*:\\s*(.+)', 'i');
   const m = text.match(re);
@@ -400,7 +572,6 @@ function parseTopList(text, key) {
     return { name, pct: pctMatch ? parseFloat(pctMatch[1]) : null };
   }).filter(x => x.name);
 }
-
 function parseBulletList(rawLines) {
   const items = [];
   let current = null;
@@ -410,11 +581,8 @@ function parseBulletList(rawLines) {
       if (current) items.push(current);
       const content = trimmed.replace(/^[-•]\s+/, '');
       const colonIdx = content.indexOf(':');
-      if (colonIdx > 0 && colonIdx < 20) {
-        current = { label: content.slice(0, colonIdx).trim(), body: content.slice(colonIdx + 1).trim() };
-      } else {
-        current = { label: '', body: content };
-      }
+      if (colonIdx > 0 && colonIdx < 20) current = { label: content.slice(0, colonIdx).trim(), body: content.slice(colonIdx + 1).trim() };
+      else current = { label: '', body: content };
     } else if (trimmed && current) {
       current.body = (current.body + ' ' + trimmed).trim();
     }
@@ -422,7 +590,6 @@ function parseBulletList(rawLines) {
   if (current) items.push(current);
   return items;
 }
-
 function parseNotesGroup(rawLines) {
   const groups = [];
   let current = null;
@@ -447,145 +614,200 @@ function parseNotesGroup(rawLines) {
   if (current) groups.push(current);
   return groups;
 }
-
 function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
 /* ============================================
-   Card builders (DOM-only)
+   Common card scaffolds
    ============================================ */
-function makeHeader(meta, tag) {
-  return el('div', { cls: 'card-header' },
-    el('span', { cls: 'card-tag', text: tag || 'WEEKLY MKT REPORT' }),
-    el('span', { cls: 'card-date', text: meta.dateDisplay || '' })
-  );
+function makeBrand(meta, rightTag) {
+  const wrap = el('div', { cls: 'c-brand' });
+  const left = el('div', { cls: 'c-brand-left' });
+  left.appendChild(el('span', { cls: 'c-brand-dot' }));
+  left.appendChild(document.createTextNode('WEEKLY MKT REPORT'));
+  wrap.appendChild(left);
+  wrap.appendChild(el('div', { cls: 'c-brand-right', text: rightTag || (meta.week || '') }));
+  return wrap;
+}
+function makeFooter(meta, idx, total, handle) {
+  const foot = el('div', { cls: 'c-foot' });
+  const dots = el('div', { cls: 'c-dots' });
+  for (let i = 0; i < total; i++) {
+    dots.appendChild(el('div', { cls: 'c-dot' + (i === idx ? ' active' : '') }));
+  }
+  foot.appendChild(dots);
+  foot.appendChild(el('div', { cls: 'c-handle', text: handle || (meta.dateDisplay ? meta.dateDisplay : '') }));
+  return foot;
+}
+function makeChip(text, accent) {
+  return el('div', { cls: 'c-chip' + (accent ? ' accent' : ''), text });
+}
+function makeHeadlineParts(parts) {
+  // parts: array of { text, hl?: 'orange'|'up'|'down' }
+  const headline = el('div', { cls: 'c-headline' });
+  parts.forEach(p => {
+    if (p.hl) {
+      const cls = p.hl === 'up' ? 'hl-up' : (p.hl === 'down' ? 'hl-down' : 'hl');
+      headline.appendChild(el('span', { cls, text: p.text }));
+    } else {
+      headline.appendChild(document.createTextNode(p.text));
+    }
+  });
+  return headline;
 }
 
-function makeFooter() {
-  return el('div', { cls: 'card-footer' }); // filled in later with page count
-}
+/* ============================================
+   Card builders
+   ============================================ */
+function coverCard(meta, insightLabel, insightBody) {
+  const card = el('div', { cls: 'card cover' });
+  card.appendChild(makeBrand(meta, meta.week || 'INTRO'));
 
-function coverCard(meta, insight) {
-  const card = el('div', { cls: 'card' });
-  card.appendChild(makeHeader(meta, meta.week || 'WEEKLY'));
+  const body = el('div', { cls: 'c-body' });
+  body.appendChild(makeChip('weekly-mkt-report'));
 
-  const body = el('div', { cls: 'card-body', style: 'justify-content:flex-start;' });
-  body.appendChild(el('div', { cls: 'cover-emblem', text: 'W' }));
+  const headline = el('div', { cls: 'c-headline' });
+  const titleLines = [
+    { text: '이번 주 마케팅,' },
+    { text: '\n' },
+    { text: '한눈에 봅니다', hl: 'orange' }
+  ];
+  titleLines.forEach(t => {
+    if (t.text === '\n') headline.appendChild(el('br'));
+    else if (t.hl) headline.appendChild(el('span', { cls: 'hl', text: t.text }));
+    else headline.appendChild(document.createTextNode(t.text));
+  });
+  body.appendChild(headline);
 
-  const title = el('div', { cls: 'cover-title' });
-  title.appendChild(document.createTextNode('주간 마케팅'));
-  title.appendChild(el('br'));
-  title.appendChild(document.createTextNode('리포트'));
-  body.appendChild(title);
-
-  const period = (meta.dateDisplay || '') + (meta.week ? ' · ' + meta.week : '');
-  body.appendChild(el('div', { cls: 'cover-period', text: period }));
-  body.appendChild(el('div', { cls: 'cover-divider' }));
-  body.appendChild(el('div', { cls: 'cover-insight', text: insight }));
+  body.appendChild(el('div', { cls: 'c-subhead', text: insightBody || '주간 핵심 지표·인사이트 요약' }));
 
   card.appendChild(body);
-  card.appendChild(makeFooter());
+  card.appendChild(el('div', { cls: 'cover-emblem', text: 'W' }));
   return card;
 }
 
-function metricCard(tag, title, metric, meta) {
+function metricCard(meta, tagName, sectionLabel, label, metric, opts) {
   const card = el('div', { cls: 'card' });
-  card.appendChild(makeHeader(meta, tag));
-  card.appendChild(el('div', { cls: 'card-section-label', text: tag.toUpperCase() }));
-  card.appendChild(el('div', { cls: 'card-section-title', text: title }));
+  card.appendChild(makeBrand(meta, sectionLabel));
 
-  const body = el('div', { cls: 'card-body metric-wrap' });
-  body.appendChild(el('div', { cls: 'metric-number', text: metric.mainNumber }));
-  if (metric.unit) {
-    body.appendChild(el('div', { cls: 'metric-unit', text: metric.unit }));
-  } else {
-    body.appendChild(el('div', { cls: 'metric-spacer' }));
-  }
+  const body = el('div', { cls: 'c-body' });
+  body.appendChild(makeChip(tagName));
+
+  // Headline with highlighted trend
+  const dirHl = metric.woWPct == null ? null : (metric.woWDir === '-' ? 'down' : 'up');
+  const dirSign = metric.woWPct == null ? '' : (metric.woWDir === '-' ? '-' : '+');
+  const trendText = metric.woWPct != null ? dirSign + metric.woWPct + '%' : '—';
+
+  const headline = el('div', { cls: 'c-headline' });
+  headline.appendChild(document.createTextNode(label + ', '));
+  headline.appendChild(el('br'));
+  headline.appendChild(el('span', { cls: dirHl === 'up' ? 'hl-up' : (dirHl === 'down' ? 'hl-down' : 'hl'), text: '전주 比 ' + trendText }));
+  body.appendChild(headline);
+
+  // Window mockup with data
+  const win = el('div', { cls: 'c-window' });
+  const bar = el('div', { cls: 'c-window-bar' });
+  const lights = el('div', { cls: 'c-window-lights' });
+  lights.appendChild(el('div', { cls: 'c-light r' }));
+  lights.appendChild(el('div', { cls: 'c-light y' }));
+  lights.appendChild(el('div', { cls: 'c-light g' }));
+  bar.appendChild(lights);
+  bar.appendChild(el('div', { cls: 'c-window-title', text: 'Weekly Report · ' + tagName }));
+  win.appendChild(bar);
+
+  const winBody = el('div', { cls: 'c-window-body' });
+  const numRow = el('div', { cls: 'c-num-row' });
+  numRow.appendChild(el('div', { cls: 'c-num', text: metric.mainNumber }));
+  if (metric.unit) numRow.appendChild(el('div', { cls: 'c-unit', text: metric.unit }));
+  winBody.appendChild(numRow);
 
   const trendCls = metric.woWPct == null ? 'flat' : (metric.woWDir === '-' ? 'down' : 'up');
   const trendArrow = metric.woWPct == null ? '·' : (metric.woWDir === '-' ? '↓' : '↑');
-  const trendPct = metric.woWPct != null
-    ? ((metric.woWDir === '-' ? '-' : '+') + metric.woWPct + '%')
-    : '—';
-  body.appendChild(el('div', { cls: 'metric-trend ' + trendCls, text: trendArrow + ' ' + trendPct }));
-  body.appendChild(el('div', { cls: 'metric-trend-label', text: '전주 대비' }));
+  winBody.appendChild(el('div', { cls: 'c-trend ' + trendCls, text: trendArrow + ' ' + trendText + ' (전주 대비)' }));
 
-  const contextText = [metric.mtd, metric.mtdSub ? '(' + metric.mtdSub + ')' : null].filter(Boolean).join(' ');
-  if (contextText) body.appendChild(el('div', { cls: 'metric-context', text: contextText }));
+  if (metric.mtd) {
+    const ctx = el('div', { cls: 'c-ctx' });
+    ctx.appendChild(el('span', { cls: 'c-ctx-label', text: 'MTD' }));
+    const ctxBody = metric.mtdSub ? metric.mtd + ' (' + metric.mtdSub + ')' : metric.mtd;
+    ctx.appendChild(el('span', { text: ctxBody }));
+    winBody.appendChild(ctx);
+  }
+  win.appendChild(winBody);
+  body.appendChild(win);
+
+  body.appendChild(el('div', { cls: 'c-subhead', text: opts && opts.sub ? opts.sub : '' }));
 
   card.appendChild(body);
-  card.appendChild(makeFooter());
   return card;
 }
 
-function rankCard(tag, title, items, meta) {
+function rankCard(meta, tagName, sectionLabel, headlineParts, items) {
   const card = el('div', { cls: 'card' });
-  card.appendChild(makeHeader(meta, tag));
-  card.appendChild(el('div', { cls: 'card-section-label', text: tag.toUpperCase() }));
-  card.appendChild(el('div', { cls: 'card-section-title', text: title }));
+  card.appendChild(makeBrand(meta, sectionLabel));
 
-  const body = el('div', { cls: 'card-body' });
-  const list = el('div', { cls: 'rank-list' });
+  const body = el('div', { cls: 'c-body' });
+  body.appendChild(makeChip(tagName));
+  body.appendChild(makeHeadlineParts(headlineParts));
+
+  const rank = el('div', { cls: 'c-rank' });
   const max = Math.max(...items.map(i => i.pct || 0), 1);
   items.slice(0, 5).forEach((item, i) => {
-    const itemEl = el('div', { cls: 'rank-item' });
-    const row = el('div', { cls: 'rank-row' });
-    row.appendChild(el('span', { cls: 'rank-num', text: String(i + 1) }));
-    row.appendChild(el('span', { cls: 'rank-name', text: item.name }));
-    row.appendChild(el('span', { cls: 'rank-pct', text: item.pct != null ? item.pct + '%' : '' }));
-    itemEl.appendChild(row);
-
+    const wrap = el('div', { cls: 'c-rank-item' });
+    const row = el('div', { cls: 'c-rank-row' });
+    row.appendChild(el('span', { cls: 'c-rank-num', text: String(i + 1).padStart(2, '0') }));
+    row.appendChild(el('span', { cls: 'c-rank-name', text: item.name }));
+    row.appendChild(el('span', { cls: 'c-rank-pct', text: item.pct != null ? item.pct + '%' : '' }));
+    wrap.appendChild(row);
+    const bar = el('div', { cls: 'c-rank-bar' });
     const fillWidth = item.pct != null ? (item.pct / max * 100) : 0;
-    const bar = el('div', { cls: 'rank-bar' });
-    bar.appendChild(el('div', { cls: 'rank-fill', style: 'width:' + fillWidth + '%;' }));
-    itemEl.appendChild(bar);
-
-    list.appendChild(itemEl);
+    bar.appendChild(el('div', { cls: 'c-rank-fill', style: 'width:' + fillWidth + '%;' }));
+    wrap.appendChild(bar);
+    rank.appendChild(wrap);
   });
-  body.appendChild(list);
+  body.appendChild(rank);
+
   card.appendChild(body);
-  card.appendChild(makeFooter());
   return card;
 }
 
-function summaryCard(tag, title, items, meta) {
+function summaryCard(meta, tagName, sectionLabel, headlineParts, items) {
   const card = el('div', { cls: 'card' });
-  card.appendChild(makeHeader(meta, tag));
-  card.appendChild(el('div', { cls: 'card-section-label', text: tag.toUpperCase() }));
-  card.appendChild(el('div', { cls: 'card-section-title', text: title }));
+  card.appendChild(makeBrand(meta, sectionLabel));
 
-  const body = el('div', { cls: 'card-body' });
-  const list = el('div', { cls: 'list-items' });
+  const body = el('div', { cls: 'c-body' });
+  body.appendChild(makeChip(tagName));
+  body.appendChild(makeHeadlineParts(headlineParts));
+
+  const list = el('div', { cls: 'c-summary' });
   items.forEach(item => {
-    const wrap = el('div', { cls: 'list-item' });
-    if (item.label) wrap.appendChild(el('div', { cls: 'list-item-label', text: item.label }));
-    wrap.appendChild(el('div', { cls: 'list-item-body', text: item.body }));
+    const wrap = el('div', { cls: 'c-summary-item' });
+    if (item.label) wrap.appendChild(el('div', { cls: 'c-summary-label', text: item.label }));
+    wrap.appendChild(el('div', { cls: 'c-summary-body', text: item.body }));
     list.appendChild(wrap);
   });
   body.appendChild(list);
+
   card.appendChild(body);
-  card.appendChild(makeFooter());
   return card;
 }
 
-function notesCard(tag, title, groups, meta) {
+function notesCard(meta, tagName, sectionLabel, headlineParts, groups) {
   const card = el('div', { cls: 'card' });
-  card.appendChild(makeHeader(meta, tag));
-  card.appendChild(el('div', { cls: 'card-section-label', text: tag.toUpperCase() }));
-  card.appendChild(el('div', { cls: 'card-section-title', text: title }));
+  card.appendChild(makeBrand(meta, sectionLabel));
 
-  const body = el('div', { cls: 'card-body' });
-  const groupWrap = el('div', { cls: 'notes-group' });
+  const body = el('div', { cls: 'c-body' });
+  body.appendChild(makeChip(tagName));
+  body.appendChild(makeHeadlineParts(headlineParts));
+
+  const list = el('div', { cls: 'c-notes' });
   groups.forEach(g => {
-    const itemEl = el('div', { cls: 'notes-item' });
-    if (g.label) itemEl.appendChild(el('div', { cls: 'notes-label', text: g.label }));
-    g.body.forEach((b, i) => {
-      itemEl.appendChild(el('div', { cls: 'notes-body' + (i > 0 ? ' sub' : ''), text: b }));
-    });
-    groupWrap.appendChild(itemEl);
+    const wrap = el('div', { cls: 'c-note' });
+    if (g.label) wrap.appendChild(el('div', { cls: 'c-note-label', text: g.label }));
+    g.body.forEach(b => wrap.appendChild(el('div', { cls: 'c-note-body', text: b })));
+    list.appendChild(wrap);
   });
-  body.appendChild(groupWrap);
+  body.appendChild(list);
+
   card.appendChild(body);
-  card.appendChild(makeFooter());
   return card;
 }
 
@@ -595,30 +817,41 @@ function notesCard(tag, title, groups, meta) {
 function renderCards(data, meta) {
   const cards = [];
 
-  const insight = data.summary.length > 0
-    ? (data.summary[0].label ? data.summary[0].label + ' · ' : '') + data.summary[0].body
-    : '주간 마케팅 리포트';
-  cards.push(coverCard(meta, insight));
+  const insightLabel = data.summary[0] ? data.summary[0].label : '';
+  const insightBody = data.summary[0] ? data.summary[0].body : '주간 핵심 지표·인사이트';
 
-  if (data.uv) cards.push(metricCard('Users', '주간 유저 (UV)', data.uv, meta));
-  if (data.sales) cards.push(metricCard('Sales', '주간 매출', data.sales, meta));
-  if (data.topIPs.length > 0) cards.push(rankCard('Top IP', 'IP별 매출 점유율', data.topIPs, meta));
-  if (data.topCountries.length > 0) cards.push(rankCard('Top Country', 'UV Top 국가', data.topCountries, meta));
-  if (data.summary.length > 0) cards.push(summaryCard('Summary', '이번 주 요약', data.summary, meta));
+  cards.push(coverCard(meta, insightLabel, insightBody));
 
+  if (data.uv) cards.push(metricCard(meta, 'users', 'USERS', '주간 유저', data.uv, { sub: '한 주간 사이트를 방문한 순 방문자 수' }));
+  if (data.sales) cards.push(metricCard(meta, 'sales', 'SALES', '주간 매출', data.sales, { sub: '한 주간 발생한 총 매출액' }));
+
+  if (data.topIPs.length > 0) {
+    cards.push(rankCard(meta, 'top-ip', 'TOP IP',
+      [{ text: '이번 주 ' }, { text: 'IP 순위', hl: 'orange' }],
+      data.topIPs));
+  }
+  if (data.topCountries.length > 0) {
+    cards.push(rankCard(meta, 'top-country', 'COUNTRY',
+      [{ text: '유저는 ' }, { text: '어디서', hl: 'orange' }, { text: ' 왔나' }],
+      data.topCountries));
+  }
+  if (data.summary.length > 0) {
+    cards.push(summaryCard(meta, 'summary', 'SUMMARY',
+      [{ text: '이번 주 ' }, { text: '요약', hl: 'orange' }],
+      data.summary));
+  }
   if (data.notes.length > 0) {
     const chunks = chunkArray(data.notes, 3);
     chunks.forEach((chunk, i) => {
-      const title = chunks.length > 1 ? '마케팅 특이사항 (' + (i + 1) + '/' + chunks.length + ')' : '마케팅 특이사항';
-      cards.push(notesCard('Notes', title, chunk, meta));
+      const sectionLabel = chunks.length > 1 ? 'NOTES ' + (i + 1) + '/' + chunks.length : 'NOTES';
+      cards.push(notesCard(meta, 'notes', sectionLabel,
+        [{ text: '마케팅 ' }, { text: '특이사항', hl: 'orange' }],
+        chunk));
     });
   }
 
   cards.forEach((cardEl, idx) => {
-    const footer = cardEl.querySelector('.card-footer');
-    clearNode(footer);
-    footer.appendChild(el('span', { cls: 'brand-mark', text: 'SQUARE · WEEKLY' }));
-    footer.appendChild(el('span', { text: (idx + 1) + ' / ' + cards.length }));
+    cardEl.appendChild(makeFooter(meta, idx, cards.length, meta.handle));
   });
 
   return cards;
@@ -647,7 +880,11 @@ function generate() {
     const d = new Date(dateStr);
     dateDisplay = d.getFullYear() + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' + String(d.getDate()).padStart(2, '0');
   }
-  const meta = { dateDisplay, week: $('reportWeek').value.trim() };
+  const meta = {
+    dateDisplay,
+    week: $('reportWeek').value.trim(),
+    handle: $('reportHandle').value.trim()
+  };
 
   const cards = renderCards(data, meta);
   currentCards = cards;
@@ -671,7 +908,8 @@ function generate() {
 }
 
 async function downloadCard(cardEl, idx) {
-  const canvas = await html2canvas(cardEl, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  const canvas = await html2canvas(cardEl, { scale: 2, backgroundColor: null, useCORS: true });
   const dateStr = $('reportDate').value || formatToday();
   const link = document.createElement('a');
   link.download = 'mkt-card-' + dateStr + '-' + String(idx).padStart(2, '0') + '.png';
@@ -681,6 +919,7 @@ async function downloadCard(cardEl, idx) {
 
 async function downloadAll() {
   if (currentCards.length === 0) { alert('먼저 카드를 생성하세요'); return; }
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
   for (let i = 0; i < currentCards.length; i++) {
     await downloadCard(currentCards[i], i + 1);
     await new Promise(r => setTimeout(r, 200));
