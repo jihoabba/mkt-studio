@@ -3,187 +3,303 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>부부의 날 · 우리는 어떤 부부상?</title>
+<title>우리는 어떤 부부상? · 미니홈피</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2107@1.1/Galmuri11.css" rel="stylesheet" type="text/css"/>
 <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 <style>
+  /* Galmuri11 fallback declaration (in case CSS above fails) */
+  @font-face {
+    font-family: 'Galmuri11Local';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2107@1.1/Galmuri11.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
   :root {
-    /* Brand */
-    --primary: #e60023;
-    --primary-pressed: #cc001f;
-    --on-primary: #ffffff;
+    /* Cyworld palette */
+    --cy-orange: #ff6600;
+    --cy-orange-soft: #ffe5d0;
+    --cy-orange-dark: #cc5200;
+    --cy-blue: #a3c9e2;
+    --cy-blue-dark: #87b5d3;
+    --cy-blue-soft: #d8eaf5;
+    --cy-paper: #ffffff;
+    --cy-cream: #fffaf2;
+    --cy-bg: #eef4f9;
+    --cy-outline: #cccccc;
+    --cy-outline-dark: #999999;
+    --cy-ink: #333333;
+    --cy-soft: #666666;
+    --cy-mute: #999999;
+    --cy-pink: #ff66aa;
+    --cy-pink-soft: #ffd6e8;
+    --cy-yellow: #fff2a8;
+    --cy-green: #66bb44;
 
-    /* Surface */
-    --canvas: #ffffff;
-    --surface-soft: #fbfbf9;
-    --surface-card: #f6f6f3;
-    --secondary-bg: #e5e5e0;
-    --secondary-pressed: #c8c8c1;
-    --surface-dark: #262622;
+    /* Shadows */
+    --sh-1: 2px 2px 0 rgba(0,0,0,0.08);
+    --sh-2: 3px 3px 0 #444;
+    --sh-pink: 2px 2px 0 var(--cy-pink-soft);
 
-    /* Lines */
-    --hairline: #dadad3;
-    --hairline-soft: #e5e5e0;
-
-    /* Text */
-    --ink: #000000;
-    --ink-soft: #211922;
-    --body: #33332e;
-    --charcoal: #262622;
-    --mute: #62625b;
-    --ash: #91918c;
-    --stone: #c8c8c1;
-    --on-dark: #ffffff;
-
-    /* Semantic */
-    --error: #9e0a0a;
-    --error-deep: #cc001f;
-    --success-deep: #103c25;
-    --success-pale: #c7f0da;
-    --focus-outer: #435ee5;
-
-    /* Type */
-    --font: 'Pretendard', 'Inter', -apple-system, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
-
-    /* Radius */
-    --r-md: 16px;
-    --r-lg: 32px;
-    --r-full: 9999px;
-
-    /* Spacing */
-    --s-xxs: 4px;
-    --s-xs: 6px;
-    --s-sm: 8px;
-    --s-md: 12px;
-    --s-lg: 16px;
-    --s-xl: 24px;
-    --s-xxl: 32px;
-    --s-section: 64px;
+    /* Fonts */
+    --font-pixel: 'Galmuri11', 'Galmuri11Local', 'DungGeunMo', 'Pretendard', sans-serif;
+    --font-body: 'Pretendard', sans-serif;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
   *:focus-visible {
-    outline: 2px solid var(--focus-outer);
+    outline: 2px dotted var(--cy-orange);
     outline-offset: 2px;
   }
-  html, body { background: var(--surface-soft); }
-  body {
-    color: var(--body);
-    font-family: var(--font);
-    font-size: 16px;
-    line-height: 1.4;
+  html, body {
+    background: var(--cy-bg);
+    background-image:
+      linear-gradient(rgba(163,201,226,0.15) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(163,201,226,0.15) 1px, transparent 1px);
+    background-size: 16px 16px;
+    font-family: var(--font-body);
+    color: var(--cy-ink);
+    font-size: 14px;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
+    image-rendering: pixelated;
   }
+  body { min-height: 100vh; }
   img { display: block; max-width: 100%; }
   button { font-family: inherit; }
+  ::selection { background: var(--cy-orange); color: white; }
 
-  /* ---------- Primary nav ---------- */
+  /* ---------- Top nav (pixel header) ---------- */
   .primary-nav {
     position: sticky; top: 0; z-index: 50;
-    background: var(--canvas);
-    border-bottom: 1px solid var(--hairline);
-    height: 64px;
+    background: var(--cy-paper);
+    border-bottom: 1px dotted var(--cy-outline);
+    height: 48px;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 24px;
+    padding: 0 14px;
   }
   .primary-nav .wordmark {
-    font-size: 16px; font-weight: 700; letter-spacing: -.01em;
-    color: var(--ink);
+    font-family: var(--font-pixel);
+    font-size: 13px;
+    color: var(--cy-ink);
     text-decoration: none;
+    letter-spacing: 0;
   }
-  .primary-nav .wordmark .accent { color: var(--primary); }
-  .primary-nav .nav-meta { font-size: 12px; color: var(--mute); }
+  .primary-nav .wordmark .accent { color: var(--cy-orange); }
+  .primary-nav .nav-meta {
+    font-family: var(--font-pixel);
+    font-size: 11px;
+    color: var(--cy-orange);
+    letter-spacing: 0.05em;
+  }
 
-  /* ---------- Stage ---------- */
+  /* ---------- Stage / Binder frame (mobile-first) ---------- */
   .stage {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: var(--s-section) 24px;
+    max-width: 480px;
+    margin: 14px auto;
+    padding: 0 10px;
+    position: relative;
+    z-index: 1;
+  }
+  .binder {
+    background: var(--cy-blue);
+    border: 1px solid var(--cy-blue-dark);
+    border-radius: 8px;
+    padding: 10px 8px 10px 22px;
+    position: relative;
+    box-shadow: var(--sh-1);
+  }
+  /* Silver rings (left) */
+  .binder::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 12px;
+    bottom: 12px;
+    width: 10px;
+    background-image:
+      radial-gradient(ellipse 4px 3px at center, #fff 30%, #aaa 60%, transparent 70%);
+    background-size: 12px 22px;
+    background-repeat: repeat-y;
+    background-position: center top;
+    z-index: 1;
   }
 
-  /* ---------- Screen ---------- */
-  .screen { display: none; }
-  .screen.active {
-    display: block;
-    animation: fadeUp .35s cubic-bezier(.2,.7,.2,1) both;
+  .paper {
+    background: var(--cy-paper);
+    border: 1px dotted var(--cy-outline);
+    border-radius: 4px;
+    padding: 16px 14px;
+    position: relative;
+    z-index: 2;
   }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+
+  /* ---------- Mini-hompy header ---------- */
+  .mh-header {
+    border-bottom: 1px dotted var(--cy-outline);
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .mh-title-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px;
+  }
+  .mh-title {
+    font-family: var(--font-pixel);
+    font-size: 14px;
+    color: var(--cy-orange);
+  }
+  .mh-title .heart {
+    color: var(--cy-pink);
+    margin: 0 2px;
+  }
+  .mh-counter {
+    font-family: var(--font-pixel);
+    font-size: 11px;
+    color: var(--cy-soft);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .mh-counter .label {
+    color: var(--cy-orange);
+    background: var(--cy-orange-soft);
+    padding: 1px 5px;
+    margin-right: 3px;
+  }
+
+  /* ---------- BGM widget (decorative, full strip on mobile) ---------- */
+  .bgm-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--cy-blue-soft);
+    border: 1px solid var(--cy-outline);
+    padding: 4px 8px;
+    font-family: var(--font-pixel);
+    font-size: 11px;
+    color: var(--cy-soft);
+    box-shadow: var(--sh-1);
+    width: 100%;
+  }
+  .bgm-bar .marquee {
+    display: inline-block;
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .bgm-bar .marquee span {
+    display: inline-block;
+    animation: marquee 16s linear infinite;
+    padding-left: 100%;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-200%); }
   }
 
   /* ---------- Hero ---------- */
   .hero {
     text-align: center;
-    max-width: 760px;
-    margin: 0 auto var(--s-section);
+    margin: 0 auto 18px;
   }
   .hero-kicker {
     display: inline-block;
-    font-size: 14px; font-weight: 700;
-    color: var(--primary);
-    letter-spacing: -.01em;
-    margin-bottom: 24px;
+    font-family: var(--font-pixel);
+    background: var(--cy-orange);
+    color: white;
+    padding: 4px 12px;
+    font-size: 12px;
+    margin-bottom: 14px;
+    letter-spacing: 0.06em;
+    box-shadow: var(--sh-1);
   }
   .display-xl {
-    font-size: clamp(40px, 7vw, 70px);
-    line-height: 1.05;
-    font-weight: 600;
-    letter-spacing: -1.5px;
-    color: var(--ink);
-    margin-bottom: 24px;
+    font-family: var(--font-pixel);
+    font-size: clamp(22px, 6vw, 28px);
+    line-height: 1.35;
+    color: var(--cy-ink);
+    margin-bottom: 10px;
+    font-weight: normal;
+  }
+  .display-xl .heart {
+    color: var(--cy-pink);
+    display: inline-block;
+    animation: heartbeat 1.2s ease-in-out infinite;
+  }
+  .display-xl .accent { color: var(--cy-orange); }
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
   }
   .hero-sub {
-    font-size: 16px; color: var(--mute);
-    max-width: 480px; margin: 0 auto;
-    line-height: 1.5;
+    font-size: 13px;
+    color: var(--cy-soft);
+    line-height: 1.55;
   }
 
-  /* ---------- Upload grid ---------- */
+  /* ---------- Upload polaroid grid (mobile = single column) ---------- */
   .upload-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    max-width: 880px;
-    margin: 0 auto var(--s-xxl);
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 0 auto 16px;
   }
   .upload-card {
-    background: var(--canvas);
-    border-radius: var(--r-md);
-    padding: 24px;
-    display: flex; flex-direction: column; gap: 16px;
+    background: var(--cy-cream);
+    border: 1px solid var(--cy-outline);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: var(--sh-1);
+    position: relative;
   }
   .upload-label {
-    font-size: 12px; font-weight: 700; color: var(--mute);
-    letter-spacing: .04em; text-transform: uppercase;
+    font-family: var(--font-pixel);
+    font-size: 12px;
+    color: var(--cy-orange);
+    letter-spacing: 0.06em;
+    text-align: center;
+    background: var(--cy-orange-soft);
+    padding: 4px;
+    border: 1px solid var(--cy-orange);
   }
 
   .drop-zone {
     aspect-ratio: 1;
-    background: var(--surface-card);
-    border-radius: var(--r-md);
-    display: flex; align-items: center; justify-content: center;
+    background: white;
+    border: 1px dashed var(--cy-outline);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    position: relative; overflow: hidden;
-    transition: background .15s ease;
+    position: relative;
+    overflow: hidden;
+    transition: background .15s;
   }
-  .drop-zone:hover { background: var(--hairline-soft); }
-  .drop-zone.has-image { background: var(--ink); }
+  .drop-zone:hover { background: var(--cy-yellow); }
+  .drop-zone.has-image { background: var(--cy-ink); border-style: solid; }
   .drop-zone img { width: 100%; height: 100%; object-fit: cover; }
   .drop-zone .placeholder {
-    display: flex; flex-direction: column; align-items: center; gap: 12px;
-    color: var(--mute);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    color: var(--cy-soft);
     pointer-events: none;
+    text-align: center;
   }
   .drop-zone .placeholder svg {
-    width: 32px; height: 32px; opacity: .6;
+    width: 36px; height: 36px; opacity: .55;
   }
   .drop-zone .placeholder span {
-    font-size: 14px; font-weight: 600;
-    letter-spacing: -.01em;
+    font-family: var(--font-pixel);
+    font-size: 12px;
   }
   .drop-zone input[type=file] {
     position: absolute; inset: 0; opacity: 0; cursor: pointer;
@@ -191,232 +307,260 @@
 
   .nickname-input {
     width: 100%;
-    background: var(--canvas);
-    border: 1px solid var(--ash);
-    border-radius: var(--r-md);
-    padding: 11px 15px;
-    font: inherit; font-size: 16px; font-weight: 500;
-    color: var(--ink);
+    background: white;
+    border: 1px solid var(--cy-outline);
+    padding: 11px 12px;
+    font-family: var(--font-pixel);
+    font-size: 14px;
+    color: var(--cy-ink);
     outline: none;
-    transition: border-color .15s, padding .15s;
+    text-align: center;
   }
   .nickname-input:focus {
-    border: 2px solid var(--ink);
-    padding: 10px 14px;
+    border-color: var(--cy-orange);
+    background: var(--cy-cream);
   }
-  .nickname-input::placeholder { color: var(--ash); font-weight: 400; }
+  .nickname-input::placeholder { color: var(--cy-mute); }
 
-  /* Filter-chip-style gender pills */
-  .gender-pills { display: flex; gap: 8px; }
+  .gender-pills { display: flex; gap: 6px; }
   .gender-pills button {
     flex: 1;
-    background: var(--surface-card);
-    color: var(--ink);
-    border: none;
-    padding: 10px 16px;
-    border-radius: var(--r-full);
-    font-size: 14px; font-weight: 700;
-    letter-spacing: -.01em;
+    background: white;
+    color: var(--cy-soft);
+    border: 1px solid var(--cy-outline);
+    padding: 11px 8px;
+    font-family: var(--font-pixel);
+    font-size: 13px;
     cursor: pointer;
-    transition: background .15s, color .15s;
-    min-height: 40px;
+    transition: 0.1s;
+    min-height: 44px;
   }
-  .gender-pills button:hover { background: var(--hairline-soft); }
+  .gender-pills button:hover { background: var(--cy-yellow); }
   .gender-pills button.active {
-    background: var(--ink);
-    color: var(--on-dark);
+    background: var(--cy-orange);
+    color: white;
+    border-color: var(--cy-orange-dark);
+    box-shadow: var(--sh-1);
   }
 
   /* ---------- CTA row ---------- */
   .cta-row {
-    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    display: flex; flex-direction: column; align-items: stretch; gap: 10px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dotted var(--cy-outline);
   }
-
   .btn-primary {
-    background: var(--primary);
-    color: var(--on-primary);
-    border: none;
-    padding: 0 24px;
-    height: 48px;
-    border-radius: var(--r-md);
-    font-size: 14px; font-weight: 700; letter-spacing: -.01em;
+    background: var(--cy-orange);
+    color: white;
+    border: 1px solid var(--cy-orange-dark);
+    padding: 14px 28px;
+    font-family: var(--font-pixel);
+    font-size: 15px;
     cursor: pointer;
-    transition: background .15s;
-    min-width: 160px;
+    box-shadow: var(--sh-2);
+    transition: 0.08s;
+    width: 100%;
+    min-height: 48px;
   }
-  .btn-primary:not(:disabled):active { background: var(--primary-pressed); }
+  .btn-primary:not(:disabled):hover {
+    background: #ff7a1f;
+  }
+  .btn-primary:not(:disabled):active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 #444;
+  }
   .btn-primary:disabled {
-    background: var(--surface-card);
-    color: var(--ash);
+    background: #d4d4d4;
+    border-color: #aaa;
+    color: #888;
+    box-shadow: 1px 1px 0 #aaa;
     cursor: not-allowed;
   }
-
   .btn-secondary {
-    background: var(--secondary-bg);
-    color: var(--ink);
-    border: none;
-    padding: 0 24px;
-    height: 48px;
-    border-radius: var(--r-md);
-    font-size: 14px; font-weight: 700; letter-spacing: -.01em;
+    background: white;
+    color: var(--cy-ink);
+    border: 1px solid var(--cy-outline-dark);
+    padding: 12px 22px;
+    font-family: var(--font-pixel);
+    font-size: 14px;
     cursor: pointer;
-    transition: background .15s;
-    min-width: 160px;
+    box-shadow: var(--sh-1);
+    transition: 0.08s;
+    width: 100%;
+    min-height: 44px;
   }
-  .btn-secondary:active { background: var(--secondary-pressed); }
+  .btn-secondary:hover { background: var(--cy-yellow); }
+  .btn-secondary:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+  }
 
   .model-status {
-    font-size: 12px; color: var(--mute);
-    letter-spacing: -.01em;
-    min-height: 18px;
+    font-family: var(--font-pixel);
+    font-size: 12px; color: var(--cy-soft);
+    min-height: 16px;
+    text-align: center;
   }
-  .model-status.ready { color: var(--success-deep); }
-  .model-status.error { color: var(--primary); }
+  .model-status.ready { color: var(--cy-green); }
+  .model-status.ready::before { content: '◆ '; }
+  .model-status.error { color: var(--cy-orange); }
 
   .error-box {
     display: none;
-    background: #fff0f0;
-    color: var(--error);
-    border-radius: var(--r-md);
-    padding: 12px 16px;
-    font-size: 14px; font-weight: 600;
+    background: #ffe5e0;
+    color: #c4001f;
+    border: 1px solid #ffaaa0;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-family: var(--font-pixel);
   }
   .error-box.show { display: block; }
 
-  /* ---------- Loading screen ---------- */
+  /* ---------- Loading ---------- */
   .loading-stage {
-    display: flex; flex-direction: column; align-items: center; gap: 24px;
-    padding: 120px 24px;
+    display: flex; flex-direction: column; align-items: center; gap: 18px;
+    padding: 50px 16px;
     text-align: center;
   }
-  .loading-dots { display: flex; gap: 8px; }
+  .loading-dots { display: flex; gap: 6px; font-size: 26px; }
   .loading-dots span {
-    width: 10px; height: 10px;
-    background: var(--primary);
-    border-radius: var(--r-full);
     animation: dotPulse 1.2s ease-in-out infinite;
   }
-  .loading-dots span:nth-child(2) { animation-delay: .15s; }
-  .loading-dots span:nth-child(3) { animation-delay: .3s; }
+  .loading-dots span:nth-child(1) { color: var(--cy-pink); }
+  .loading-dots span:nth-child(2) { color: var(--cy-orange); animation-delay: .2s; }
+  .loading-dots span:nth-child(3) { color: var(--cy-pink); animation-delay: .4s; }
   @keyframes dotPulse {
-    0%, 100% { transform: scale(.5); opacity: .35; }
-    50% { transform: scale(1); opacity: 1; }
+    0%, 100% { transform: scale(.7) rotate(0deg); opacity: .5; }
+    50% { transform: scale(1.2) rotate(15deg); opacity: 1; }
   }
   .loading-stage h2 {
-    font-size: 28px; font-weight: 700;
-    letter-spacing: -1.2px;
-    color: var(--ink);
-    line-height: 1.2;
+    font-family: var(--font-pixel);
+    font-size: 17px;
+    color: var(--cy-ink);
+    line-height: 1.5;
+    font-weight: normal;
   }
   .loading-step {
-    font-size: 14px; color: var(--mute);
+    font-family: var(--font-pixel);
+    font-size: 12px; color: var(--cy-soft);
     transition: opacity .2s;
   }
 
   /* ---------- Result ---------- */
   .result-header {
     text-align: center;
-    margin: 0 auto var(--s-xxl);
-    max-width: 760px;
+    margin: 0 auto 16px;
+    border-bottom: 1px dotted var(--cy-outline);
+    padding-bottom: 14px;
   }
-  .result-header + .result-header { margin-top: var(--s-section); }
+  .result-header + .result-header { margin-top: 24px; }
   .result-kicker {
-    font-size: 12px; font-weight: 700;
-    color: var(--mute);
-    text-transform: uppercase; letter-spacing: .04em;
-    margin-bottom: 12px;
+    font-family: var(--font-pixel);
+    display: inline-block;
+    background: var(--cy-orange-soft);
+    color: var(--cy-orange);
+    padding: 3px 10px;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+    border: 1px solid var(--cy-orange);
   }
   .heading-xl {
-    font-size: clamp(28px, 4vw, 44px);
-    line-height: 1.15;
-    font-weight: 700;
-    letter-spacing: -1.2px;
-    color: var(--ink);
-    margin-bottom: 8px;
+    font-family: var(--font-pixel);
+    font-size: clamp(20px, 5vw, 26px);
+    line-height: 1.4;
+    color: var(--cy-ink);
+    margin-bottom: 6px;
+    font-weight: normal;
   }
   .heading-xl .amp {
-    color: var(--mute); font-weight: 400;
-    margin: 0 8px;
+    color: var(--cy-pink);
+    margin: 0 4px;
     font-style: normal;
   }
+  .heading-xl .accent { color: var(--cy-orange); }
   .result-date, .result-sub {
-    font-size: 14px; color: var(--mute);
+    font-family: var(--font-pixel);
+    font-size: 12px; color: var(--cy-soft);
   }
-  .result-sub { margin-top: 8px; }
+  .result-sub { margin-top: 4px; }
 
-  /* Two-up grid for pin cards and product cards */
+  /* Result grid — single column on mobile */
   .result-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    max-width: 880px;
-    margin: 0 auto var(--s-section);
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin: 0 auto 20px;
   }
 
-  /* Pin card — image full-bleed, no padding, overlay pill */
+  /* Polaroid pin card */
   .pin-card {
-    background: var(--surface-card);
-    border-radius: var(--r-md);
-    overflow: hidden;
+    background: white;
+    padding: 10px 10px 16px;
+    border: 1px solid var(--cy-outline);
+    box-shadow: var(--sh-1);
     display: flex; flex-direction: column;
   }
   .pin-image {
-    aspect-ratio: 4/5;
+    aspect-ratio: 1;
     position: relative;
     overflow: hidden;
-    background: var(--hairline-soft);
+    background: var(--cy-bg);
+    border: 1px solid var(--cy-outline);
   }
   .pin-image img {
     width: 100%; height: 100%; object-fit: cover;
     position: relative; z-index: 1;
   }
-  .pin-image .char-svg { display: none; } /* legacy mounting node, hidden */
+  .pin-image .char-svg { display: none; }
   .pin-overlay-pill {
     position: absolute;
-    bottom: 12px; left: 12px;
-    background: var(--canvas);
-    color: var(--ink);
-    font-size: 12px; font-weight: 700;
-    padding: 6px 12px 6px 8px;
-    border-radius: var(--r-full);
+    bottom: 8px; left: 8px;
+    background: var(--cy-orange);
+    color: white;
+    font-family: var(--font-pixel);
+    font-size: 12px;
+    padding: 3px 8px;
     z-index: 2;
-    letter-spacing: -.01em;
     display: inline-flex; align-items: center; gap: 4px;
-    line-height: 1.4;
+    box-shadow: var(--sh-1);
   }
   .pin-overlay-pill .emoji { font-size: 14px; line-height: 1; }
   .pin-meta {
-    padding: 16px;
-    display: flex; flex-direction: column; gap: 4px;
+    padding: 10px 4px 0;
+    display: flex; flex-direction: column; gap: 3px;
+    font-family: var(--font-pixel);
   }
   .pin-who {
-    font-size: 12px; font-weight: 700;
-    color: var(--mute);
-    text-transform: uppercase; letter-spacing: .04em;
+    font-size: 13px;
+    color: var(--cy-orange);
   }
   .pin-vibe {
-    font-size: 12px; color: var(--mute);
-    font-style: italic;
-    letter-spacing: -.01em;
+    font-size: 11px;
+    color: var(--cy-mute);
+    letter-spacing: 0.04em;
   }
   .pin-desc {
-    font-size: 14px; color: var(--body);
-    line-height: 1.4;
-    margin-top: 4px;
+    font-size: 12px;
+    color: var(--cy-soft);
+    line-height: 1.55;
+    margin-top: 5px;
   }
 
-  /* Product card (.product is the class used by JS in makeProductCard) */
+  /* Product card */
   .product {
-    background: var(--surface-card);
-    border-radius: var(--r-md);
-    overflow: hidden;
+    background: white;
+    border: 1px solid var(--cy-outline);
     display: flex; flex-direction: column;
     position: relative;
+    box-shadow: var(--sh-1);
   }
   .product .product-img {
     aspect-ratio: 1;
-    background: var(--canvas);
+    background: var(--cy-cream);
     overflow: hidden;
+    border-bottom: 1px dotted var(--cy-outline);
     position: relative;
   }
   .product .product-img img {
@@ -424,209 +568,293 @@
   }
   .product .product-tag {
     position: absolute;
-    top: 12px; left: 12px;
-    background: var(--canvas);
-    color: var(--ink);
-    font-size: 12px; font-weight: 700;
-    padding: 6px 12px;
-    border-radius: var(--r-full);
+    top: 8px; left: 8px;
+    background: var(--cy-pink);
+    color: white;
+    font-family: var(--font-pixel);
+    font-size: 11px;
+    padding: 3px 8px;
     z-index: 2;
-    letter-spacing: -.01em;
+    box-shadow: var(--sh-1);
   }
   .product .product-name {
-    padding: 16px 16px 4px;
-    font-size: 14px; font-weight: 600;
-    color: var(--ink);
+    padding: 10px 12px 4px;
+    font-size: 13px;
+    color: var(--cy-ink);
     line-height: 1.4;
+    font-family: var(--font-pixel);
   }
   .product .product-price {
-    padding: 0 16px 16px;
-    font-size: 14px; font-weight: 700;
-    letter-spacing: -.01em;
+    padding: 0 12px 12px;
+    font-family: var(--font-pixel);
+    font-size: 13px;
   }
   .product .product-price .strike {
     text-decoration: line-through;
-    color: var(--ash);
-    font-weight: 400;
-    margin-right: 8px;
+    color: var(--cy-mute);
+    margin-right: 6px;
   }
   .product .product-price .now {
-    color: var(--primary);
+    color: var(--cy-orange);
   }
 
-  /* Result CTA row — horizontal */
   .result-cta {
-    display: flex; gap: 12px; justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: var(--s-xl);
+    display: flex; flex-direction: column; gap: 8px;
+    margin-bottom: 14px;
   }
 
   .footnote {
     text-align: center;
-    font-size: 12px; color: var(--mute);
-    margin-top: var(--s-xl);
+    font-family: var(--font-pixel);
+    font-size: 11px; color: var(--cy-mute);
+    margin-top: 14px;
+    border-top: 1px dotted var(--cy-outline);
+    padding-top: 12px;
   }
 
-  /* Site footer */
+  /* ---------- Site footer ---------- */
   .site-footer {
-    border-top: 1px solid var(--hairline);
-    background: var(--canvas);
-    padding: 32px 24px;
-    margin-top: var(--s-section);
+    text-align: center;
+    padding: 20px 16px 32px;
+    font-family: var(--font-pixel);
+    font-size: 11px;
+    color: var(--cy-mute);
   }
-  .site-footer .footer-inner {
-    max-width: 1280px;
-    margin: 0 auto;
-    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-    font-size: 12px; color: var(--mute);
+  .site-footer .wordmark { color: var(--cy-orange); }
+  .site-footer .accent { color: var(--cy-ink); }
+  .site-footer .copy {
+    margin-top: 4px;
   }
-  .site-footer .wordmark { font-weight: 700; color: var(--ink); }
-  .site-footer .accent { color: var(--primary); }
 
-  /* Responsive */
-  @media (max-width: 720px) {
-    .stage { padding: 32px 16px; }
-    .upload-grid { grid-template-columns: 1fr; }
-    .result-grid { grid-template-columns: 1fr; }
-    .display-xl { font-size: 40px; letter-spacing: -1px; }
-    .heading-xl { font-size: 28px; }
-    .site-footer .footer-inner { flex-direction: column; align-items: flex-start; }
+  /* ---------- Decorative floating elements ---------- */
+  .deco {
+    position: fixed;
+    font-size: 18px;
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+    user-select: none;
   }
+  .deco-1 { top: 14%; left: 4%; color: var(--cy-pink); animation: floatY 4s ease-in-out infinite; }
+  .deco-2 { top: 32%; right: 6%; color: var(--cy-orange); animation: floatY 5s ease-in-out infinite 0.5s; }
+  .deco-3 { bottom: 28%; left: 6%; color: var(--cy-pink); animation: floatY 5.5s ease-in-out infinite 1s; }
+  .deco-4 { bottom: 16%; right: 4%; color: var(--cy-orange); animation: floatY 4.5s ease-in-out infinite 1.5s; }
+  @keyframes floatY {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-14px); }
+  }
+
+  /* Cute pixel-style dot underline for emphasis */
+  .dot-underline {
+    background-image: linear-gradient(to right, var(--cy-orange) 33%, transparent 0%);
+    background-position: bottom;
+    background-size: 6px 2px;
+    background-repeat: repeat-x;
+    padding-bottom: 4px;
+  }
+
+  /* Screen animations */
+  .screen { display: none; }
+  .screen.active {
+    display: block;
+    animation: blink-in .35s steps(3) both;
+  }
+  @keyframes blink-in {
+    0% { opacity: 0; }
+    33% { opacity: 0.4; }
+    66% { opacity: 0.8; }
+    100% { opacity: 1; }
+  }
+
+  /* ---------- Desktop enhancements (mobile-first) ---------- */
+  @media (min-width: 720px) {
+    .stage { max-width: 720px; margin: 24px auto; padding: 0 16px; }
+    .binder { padding: 18px 16px 18px 34px; border-radius: 10px; }
+    .binder::before { left: 10px; width: 12px; }
+    .paper { padding: 24px 22px; }
+
+    .upload-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+    .upload-card { transform: rotate(-0.6deg); }
+    .upload-card:nth-child(2) { transform: rotate(0.6deg); }
+
+    .result-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+    .pin-card:nth-child(1) { transform: rotate(-1deg); }
+    .pin-card:nth-child(2) { transform: rotate(1deg); }
+    .pin-card { transition: transform .2s; }
+    .pin-card:hover { transform: rotate(0) scale(1.02); }
+
+    .cta-row { flex-direction: row; justify-content: center; }
+    .btn-primary { width: auto; min-width: 200px; }
+    .btn-secondary { width: auto; min-width: 160px; }
+
+    .result-cta { flex-direction: row; justify-content: center; }
+
+    .display-xl { font-size: clamp(26px, 4vw, 32px); }
+  }
+
 </style>
 </head>
 <body>
+
+  <div class="deco deco-1">♡</div>
+  <div class="deco deco-2">★</div>
+  <div class="deco deco-3">♪</div>
+  <div class="deco deco-4">♥</div>
+
   <nav class="primary-nav">
-    <a href="#" class="wordmark">LINE FRIENDS <span class="accent">SQUARE</span></a>
-    <span class="nav-meta">부부의 날 · 2026.05.21</span>
+    <a href="#" class="wordmark">♡ LINE FRIENDS <span class="accent">SQUARE</span></a>
+    <span class="nav-meta">2026.05.21 부부의날</span>
   </nav>
 
   <main class="stage">
-    <!-- UPLOAD -->
-    <section class="screen active" id="screen-upload">
-      <header class="hero">
-        <div class="hero-kicker">MAY 21 · 부부의 날</div>
-        <h1 class="display-xl">우리는 어떤<br>부부상일까요?</h1>
-        <p class="hero-sub">사진 두 장을 올리면 AI가 어울리는 캐릭터상과 굿즈를 골라드려요.</p>
-      </header>
+    <div class="binder">
+      <div class="paper">
 
-      <div class="upload-grid">
-        <div class="upload-card">
-          <span class="upload-label">한 사람</span>
-          <div class="drop-zone" id="dz1">
-            <div class="placeholder">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <rect x="3" y="5" width="18" height="14" rx="1"/>
-                <circle cx="12" cy="12" r="3.5"/>
-                <path d="M8 5l1.5-2h5L16 5"/>
-              </svg>
-              <span>사진 업로드</span>
+        <div class="mh-header">
+          <div class="mh-title-row">
+            <div class="mh-title">
+              오늘은… <span class="heart">♥</span> 부부의 날
             </div>
-            <input type="file" id="photo1" accept="image/*" />
           </div>
-          <input type="text" class="nickname-input" id="name1" placeholder="이름 또는 별명" maxlength="10" />
-          <div class="gender-pills" data-slot="1">
-            <button type="button" data-gender="male">남자</button>
-            <button type="button" data-gender="female">여자</button>
+          <div class="bgm-bar">
+            ♪ <span class="marquee"><span>BGM · CONY 「LOVE IS…」 ─ MOON 「난 오늘 네가 킹받으면 좋겠어」 ─ BROWN 「벌써..일 년」 ─ SALLY 「우리가 헤어진 진짜 이유」 ─</span></span>
+          </div>
+          <div class="mh-counter">
+            <span><span class="label">TODAY</span> 486 · <span class="label">TOTAL</span> 1,010,235</span>
+            <span></span>
           </div>
         </div>
 
-        <div class="upload-card">
-          <span class="upload-label">또 한 사람</span>
-          <div class="drop-zone" id="dz2">
-            <div class="placeholder">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <rect x="3" y="5" width="18" height="14" rx="1"/>
-                <circle cx="12" cy="12" r="3.5"/>
-                <path d="M8 5l1.5-2h5L16 5"/>
-              </svg>
-              <span>사진 업로드</span>
+        <!-- UPLOAD -->
+        <section class="screen active" id="screen-upload">
+          <header class="hero">
+            <div class="hero-kicker">★ MAY 21 · 부부의 날 한정 ★</div>
+            <h1 class="display-xl">
+              우리는 <span class="accent">어떤</span><br>
+              부부상일까요? <span class="heart">♥</span>
+            </h1>
+            <p class="hero-sub">사진 두 장을 올리면<br>어울리는 캐릭터상과 굿즈를 골라드려요</p>
+          </header>
+
+          <div class="upload-grid">
+            <div class="upload-card">
+              <span class="upload-label">★ 한 사람 ★</span>
+              <div class="drop-zone" id="dz1">
+                <div class="placeholder">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="5" width="18" height="14" rx="1"/>
+                    <circle cx="12" cy="12" r="3.5"/>
+                    <path d="M8 5l1.5-2h5L16 5"/>
+                  </svg>
+                  <span>사진 업로드</span>
+                </div>
+                <input type="file" id="photo1" accept="image/*" />
+              </div>
+              <input type="text" class="nickname-input" id="name1" placeholder="이름 또는 별명" maxlength="10" />
+              <div class="gender-pills" data-slot="1">
+                <button type="button" data-gender="male">남자</button>
+                <button type="button" data-gender="female">여자</button>
+              </div>
             </div>
-            <input type="file" id="photo2" accept="image/*" />
+
+            <div class="upload-card">
+              <span class="upload-label">★ 또 한 사람 ★</span>
+              <div class="drop-zone" id="dz2">
+                <div class="placeholder">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="5" width="18" height="14" rx="1"/>
+                    <circle cx="12" cy="12" r="3.5"/>
+                    <path d="M8 5l1.5-2h5L16 5"/>
+                  </svg>
+                  <span>사진 업로드</span>
+                </div>
+                <input type="file" id="photo2" accept="image/*" />
+              </div>
+              <input type="text" class="nickname-input" id="name2" placeholder="이름 또는 별명" maxlength="10" />
+              <div class="gender-pills" data-slot="2">
+                <button type="button" data-gender="male">남자</button>
+                <button type="button" data-gender="female">여자</button>
+              </div>
+            </div>
           </div>
-          <input type="text" class="nickname-input" id="name2" placeholder="이름 또는 별명" maxlength="10" />
-          <div class="gender-pills" data-slot="2">
-            <button type="button" data-gender="male">남자</button>
-            <button type="button" data-gender="female">여자</button>
+
+          <div class="cta-row">
+            <button class="btn-primary" id="analyze-btn" disabled>▶ 분석 시작</button>
+            <div class="model-status" id="model-status">AI 모델 로딩 중…</div>
+            <div class="error-box" id="error-box"></div>
           </div>
-        </div>
+        </section>
+
+        <!-- LOADING -->
+        <section class="screen" id="screen-loading">
+          <div class="loading-stage">
+            <div class="loading-dots"><span>♥</span><span>★</span><span>♥</span></div>
+            <h2>두 분의 분위기를<br>읽고 있어요...</h2>
+            <div class="loading-step" id="loading-step">잠시만요…</div>
+          </div>
+        </section>
+
+        <!-- RESULT -->
+        <section class="screen" id="screen-result">
+          <header class="result-header">
+            <div class="result-kicker">★ 두 분의 결과 ★</div>
+            <h2 class="heading-xl">
+              <span id="r-char1">·</span>상<span class="amp">♥</span><span id="r-char2">·</span>상
+            </h2>
+            <p class="result-date" id="r-date">— 2026년 5월 21일 —</p>
+          </header>
+
+          <div class="result-grid">
+            <article class="pin-card">
+              <div class="pin-image" id="r-frame1">
+                <div class="char-svg" id="r-svg1"></div>
+                <img id="r-photo1" alt="" />
+                <div class="pin-overlay-pill"><span class="emoji" id="r-emoji1"></span><span id="r-name1-char">·</span></div>
+              </div>
+              <div class="pin-meta">
+                <div class="pin-who" id="r-who1">한 사람</div>
+                <div class="pin-vibe" id="r-vibe1">vibe</div>
+                <div class="pin-desc" id="r-desc1">설명</div>
+              </div>
+            </article>
+
+            <article class="pin-card">
+              <div class="pin-image" id="r-frame2">
+                <div class="char-svg" id="r-svg2"></div>
+                <img id="r-photo2" alt="" />
+                <div class="pin-overlay-pill"><span class="emoji" id="r-emoji2"></span><span id="r-name2-char">·</span></div>
+              </div>
+              <div class="pin-meta">
+                <div class="pin-who" id="r-who2">또 한 사람</div>
+                <div class="pin-vibe" id="r-vibe2">vibe</div>
+                <div class="pin-desc" id="r-desc2">설명</div>
+              </div>
+            </article>
+          </div>
+
+          <header class="result-header">
+            <div class="result-kicker">★ 두 분께 어울리는 굿즈 ★</div>
+            <h2 class="heading-xl">함께 담으면 <span class="accent">20% 자동할인</span></h2>
+            <p class="result-sub">♥ 5월 21일 한정 · 코드 입력 없이 적용 ♥</p>
+          </header>
+
+          <div class="result-grid" id="r-products"></div>
+
+          <div class="result-cta">
+            <button class="btn-primary" id="checkout-btn">♥ 두 굿즈 함께 담기</button>
+            <button class="btn-secondary" id="retry-btn">↻ 다시 해보기</button>
+          </div>
+
+          <p class="footnote">No. <span id="r-cert-no">000-000</span> · 본 결과는 재미를 위한 분석이에요</p>
+        </section>
+
       </div>
-
-      <div class="cta-row">
-        <button class="btn-primary" id="analyze-btn" disabled>분석 시작</button>
-        <div class="model-status" id="model-status">AI 모델 로딩 중…</div>
-        <div class="error-box" id="error-box"></div>
-      </div>
-    </section>
-
-    <!-- LOADING -->
-    <section class="screen" id="screen-loading">
-      <div class="loading-stage">
-        <div class="loading-dots"><span></span><span></span><span></span></div>
-        <h2>두 분의 분위기를 읽고 있어요</h2>
-        <div class="loading-step" id="loading-step">잠시만요…</div>
-      </div>
-    </section>
-
-    <!-- RESULT -->
-    <section class="screen" id="screen-result">
-      <header class="result-header">
-        <div class="result-kicker">두 분의 결과</div>
-        <h2 class="heading-xl">
-          <span id="r-char1">·</span>상<span class="amp">×</span><span id="r-char2">·</span>상
-        </h2>
-        <p class="result-date" id="r-date">— 2026년 5월 21일 —</p>
-      </header>
-
-      <div class="result-grid">
-        <article class="pin-card">
-          <div class="pin-image" id="r-frame1">
-            <div class="char-svg" id="r-svg1"></div>
-            <img id="r-photo1" alt="" />
-            <div class="pin-overlay-pill"><span class="emoji" id="r-emoji1"></span><span id="r-name1-char">·</span></div>
-          </div>
-          <div class="pin-meta">
-            <div class="pin-who" id="r-who1">한 사람</div>
-            <div class="pin-vibe" id="r-vibe1">vibe</div>
-            <div class="pin-desc" id="r-desc1">설명</div>
-          </div>
-        </article>
-
-        <article class="pin-card">
-          <div class="pin-image" id="r-frame2">
-            <div class="char-svg" id="r-svg2"></div>
-            <img id="r-photo2" alt="" />
-            <div class="pin-overlay-pill"><span class="emoji" id="r-emoji2"></span><span id="r-name2-char">·</span></div>
-          </div>
-          <div class="pin-meta">
-            <div class="pin-who" id="r-who2">또 한 사람</div>
-            <div class="pin-vibe" id="r-vibe2">vibe</div>
-            <div class="pin-desc" id="r-desc2">설명</div>
-          </div>
-        </article>
-      </div>
-
-      <header class="result-header">
-        <div class="result-kicker">두 분께 어울리는 굿즈</div>
-        <h2 class="heading-xl">함께 담으면 <span style="color: var(--primary);">20% 자동할인</span></h2>
-        <p class="result-sub">5월 21일 한정 · 코드 입력 없이 적용</p>
-      </header>
-
-      <div class="result-grid" id="r-products"></div>
-
-      <div class="result-cta">
-        <button class="btn-primary" id="checkout-btn">두 굿즈 함께 담기</button>
-        <button class="btn-secondary" id="retry-btn">다시 해보기</button>
-      </div>
-
-      <p class="footnote">No. <span id="r-cert-no">000-000</span> · 본 결과는 재미를 위한 분석이에요</p>
-    </section>
+    </div>
   </main>
 
   <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="wordmark">LINE FRIENDS <span class="accent">SQUARE</span></div>
-      <div>© 2026 · AX TF · couple day mvp</div>
-    </div>
+    <div class="wordmark">♡ LINE FRIENDS <span class="accent">SQUARE</span> ♡</div>
+    <div class="copy">© 2026 · AX TF · couple day mvp</div>
   </footer>
 
 <script>
@@ -691,7 +919,6 @@ function setupDropZone(zoneId, inputId, slot) {
       zone.classList.add('has-image');
 
       while (zone.firstChild) zone.removeChild(zone.firstChild);
-
       const img = document.createElement('img');
       img.src = reader.result;
       img.alt = '';
@@ -741,21 +968,21 @@ async function loadModels() {
   const statusEl = $('model-status');
   try {
     await Promise.all([
-      faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-      faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+      faceapi.nets.tinyFaceDetector.loadFromUri('./models'),
+      faceapi.nets.faceLandmark68Net.loadFromUri('./models'),
     ]);
     modelsReady = true;
-    statusEl.textContent = '✓ AI 모델 준비 완료';
+    statusEl.textContent = 'AI 모델 준비 완료';
     statusEl.className = 'model-status ready';
   } catch (err) {
     console.error(err);
-    statusEl.textContent = '⚠️ 모델 로딩 실패';
+    statusEl.textContent = '⚠ 모델 로딩 실패';
     statusEl.className = 'model-status error';
   }
 }
 window.addEventListener('load', () => {
   if (typeof faceapi === 'undefined') {
-    $('model-status').textContent = '⚠️ face-api.js 로드 실패';
+    $('model-status').textContent = '⚠ face-api.js 로드 실패';
     $('model-status').className = 'model-status error';
     return;
   }
@@ -898,56 +1125,167 @@ async function extractFaceFeatures(dataUrl) {
   };
 }
 
+/* 일반적인 한국인 얼굴 특성 분포 (face-api landmark 기준 baseline) */
+const BASELINE = {
+  roundness:     { mean: 0.92, std: 0.05 },   // faceW / faceH
+  length:        { mean: 1.08, std: 0.06 },   // faceH / faceW
+  jawWidth:      { mean: 0.76, std: 0.05 },
+  cheekFullness: { mean: 0.80, std: 0.04 },
+  chinSharpness: { mean: 1.65, std: 0.15 },   // 각도 (rad). 클수록 둥글/뭉툭
+  eyeSize:       { mean: 0.010, std: 0.003 },
+  eyeRoundness:  { mean: 0.32, std: 0.05 },
+  mouthWidth:    { mean: 0.37, std: 0.04 },
+  lipFullness:   { mean: 0.065, std: 0.015 },
+  noseLength:    { mean: 0.32, std: 0.04 },
+};
+
+/* 각 캐릭터의 z-score 프로필
+   z = +1.5: baseline 대비 1.5σ 위 (확실히 큰/긴/풍성)
+   z = -1.5: 확실히 작은/짧은/적은
+   w: 가중치 (높을수록 시그니처 피처) */
+const Z_PROFILES = {
+  male: {
+    BROWN: {
+      roundness:     { z: +1.5, w: 4.0 },   // 매우 둥근 얼굴
+      cheekFullness: { z: +1.0, w: 2.5 },   // 통통한 볼
+      chinSharpness: { z: +1.0, w: 1.5 },   // 부드러운 턱선
+      length:        { z: -1.5, w: 2.5 },   // 짧은 얼굴 (안티)
+      eyeSize:       { z: -0.3, w: 0.8 },
+    },
+    BRACHIO: {
+      length:        { z: +1.5, w: 4.0 },   // 길쭉한 얼굴
+      chinSharpness: { z: -1.2, w: 2.5 },   // 뾰족한 턱
+      noseLength:    { z: +1.0, w: 2.0 },   // 긴 코
+      cheekFullness: { z: -1.0, w: 1.5 },   // 적은 볼
+      roundness:     { z: -1.5, w: 2.5 },   // 안 둥글다 (안티)
+    },
+    QUOKKA: {
+      cheekFullness: { z: +1.8, w: 4.0 },   // 빵빵한 볼 (시그니처)
+      mouthWidth:    { z: +1.0, w: 2.5 },   // 미소 베이스 넓은 입
+      eyeSize:       { z: -1.2, w: 2.0 },   // 작은 눈
+      roundness:     { z: +0.7, w: 1.5 },
+      lipFullness:   { z: -0.5, w: 0.8 },
+    },
+    RENINI: {
+      eyeSize:       { z: +1.8, w: 4.0 },   // 큰 눈 (시그니처)
+      eyeRoundness:  { z: +1.2, w: 2.5 },   // 둥근 눈
+      mouthWidth:    { z: +1.2, w: 2.0 },   // 넓은 입
+      jawWidth:      { z: +0.5, w: 1.0 },
+      cheekFullness: { z: -0.3, w: 0.8 },
+    },
+  },
+  female: {
+    CONY: {
+      eyeSize:       { z: +1.8, w: 4.0 },   // 큰 눈 (시그니처)
+      eyeRoundness:  { z: +1.2, w: 2.5 },   // 동그란 눈
+      mouthWidth:    { z: -1.0, w: 2.0 },   // 작은 입
+      cheekFullness: { z: -0.5, w: 1.2 },
+      lipFullness:   { z: -0.3, w: 0.8 },
+    },
+    SALLY: {
+      roundness:     { z: +1.8, w: 4.0 },   // 동글동글 (시그니처)
+      mouthWidth:    { z: -1.5, w: 2.5 },   // 작은 입
+      eyeSize:       { z: -1.0, w: 2.0 },   // 작은 눈
+      cheekFullness: { z: +1.2, w: 2.0 },   // 통통한 볼
+      length:        { z: -1.5, w: 2.0 },   // 안 길다 (안티)
+    },
+    DOOGI: {
+      lipFullness:   { z: +1.8, w: 4.0 },   // 도톰한 입술 (시그니처)
+      mouthWidth:    { z: +0.8, w: 2.0 },
+      length:        { z: +0.8, w: 1.5 },
+      eyeRoundness:  { z: -0.5, w: 1.0 },
+      cheekFullness: { z: -0.3, w: 0.8 },
+    },
+    OLIVERPANG: {
+      /* 균형형 — 모든 피처가 평균보다 약간 따뜻한 방향 */
+      mouthWidth:    { z: +0.5, w: 2.0 },
+      cheekFullness: { z: +0.5, w: 1.8 },
+      lipFullness:   { z: +0.6, w: 1.5 },
+      eyeRoundness:  { z: +0.6, w: 1.5 },
+      roundness:     { z: +0.3, w: 1.0 },
+    },
+  },
+};
+
+/* 캐릭터별 멘트 (3개씩 랜덤) */
+const REASON_VARIANTS = {
+  BROWN: [
+    '둥글고 듬직한 얼굴 라인이 브라운을 닮았어요',
+    '부드러운 곡선의 얼굴, 영락없는 브라운상',
+    '안정감 있는 둥근 인상 — 브라운 그 자체',
+  ],
+  BRACHIO: [
+    '길쭉하고 또렷한 얼굴선이 브라키오상',
+    '시원하게 뻗은 얼굴 비율, 든든한 브라키오',
+    '곧고 단정한 라인이 브라키오를 닮았어요',
+  ],
+  QUOKKA: [
+    '볼이 통통하고 미소 짓는 듯한 쿼카상',
+    '늘 웃는 듯한 빵빵한 볼 — 쿼카 그 자체',
+    '환한 분위기의 볼살 — 영락없는 쿼카',
+  ],
+  RENINI: [
+    '시원한 눈매와 넓은 입이 레니니 같아요',
+    '큼직한 눈과 시원한 입가 — 레니니상',
+    '독특한 매력의 큰 눈, 레니니 그대로',
+  ],
+  CONY: [
+    '동그란 큰 눈이 코니를 닮았어요',
+    '맑고 큰 눈망울 — 영락없는 코니상',
+    '장난기 가득한 동그란 눈매, 코니 그 자체',
+  ],
+  SALLY: [
+    '동글동글 귀여운 분위기가 샐리 같아요',
+    '오목조목 작은 이목구비 — 샐리상',
+    '동그란 얼굴과 아담한 입매, 영락없는 샐리',
+  ],
+  DOOGI: [
+    '도톰한 입술과 부드러운 라인이 두기상',
+    '풍성한 입술 라인 — 두기 그대로',
+    '오리 같은 도톰한 입가가 두기를 닮았어요',
+  ],
+  OLIVERPANG: [
+    '친근하고 따뜻한 분위기의 올리버팡상',
+    '균형 잡힌 따뜻한 인상 — 올리버팡 그 자체',
+    '한결같이 다정한 라인, 영락없는 올리버팡',
+  ],
+};
+
+function zscore(feature, val) {
+  const b = BASELINE[feature];
+  if (!b || val == null) return 0;
+  return (val - b.mean) / b.std;
+}
+
 function classifyByRules(f, gender) {
+  const profiles = Z_PROFILES[gender];
   const scores = {};
-  const reasons = {};
 
-  if (gender === 'male') {
-    scores.BROWN = (f.roundness > 0.92 ? 2.5 : f.roundness > 0.85 ? 1 : 0)
-                 + (f.cheekFullness > 0.78 ? 1.5 : 0)
-                 + (f.chinSharpness > 1.7 ? 1 : 0);
-    reasons.BROWN = '둥글고 듬직한 얼굴 라인이 브라운을 닮았어요';
+  for (const [char, profile] of Object.entries(profiles)) {
+    let weighted = 0;
+    let totalWeight = 0;
+    for (const [feature, { z: targetZ, w }] of Object.entries(profile)) {
+      const actualZ = zscore(feature, f[feature]);
+      const delta = actualZ - targetZ;
+      // 가우시안 유사도: delta 0이면 1, ±2σ 차이나면 ~0.14, ±3σ 거의 0
+      const similarity = Math.exp(-(delta * delta) / 2);
+      weighted += similarity * w;
+      totalWeight += w;
+    }
+    scores[char] = totalWeight > 0 ? weighted / totalWeight : 0;
+  }
 
-    scores.BRACHIO = (f.length > 1.05 ? 2.5 : f.length > 0.98 ? 1 : 0)
-                   + (f.chinSharpness < 1.55 ? 1.5 : 0)
-                   + (f.noseLength > 0.34 ? 1 : 0);
-    reasons.BRACHIO = '길쭉하고 또렷한 얼굴선이 브라키오상';
-
-    scores.QUOKKA = (f.cheekFullness > 0.82 ? 2 : 0)
-                  + (f.eyeSize < 0.009 ? 1.5 : 0)
-                  + (f.mouthWidth > 0.36 ? 1 : 0);
-    reasons.QUOKKA = '볼이 통통하고 미소 짓는 듯한 쿼카상';
-
-    scores.RENINI = (f.eyeSize > 0.011 ? 2 : 0)
-                  + (f.eyeRoundness > 0.34 ? 1.5 : 0)
-                  + (f.mouthWidth > 0.4 ? 1.5 : 0);
-    reasons.RENINI = '시원한 눈매와 넓은 입이 레니니 같아요';
-  } else {
-    scores.CONY = (f.eyeSize > 0.011 ? 2.5 : f.eyeSize > 0.009 ? 1 : 0)
-                + (f.eyeRoundness > 0.34 ? 1.5 : 0)
-                + (f.mouthWidth < 0.35 ? 1 : 0);
-    reasons.CONY = '동그란 큰 눈이 코니를 닮았어요';
-
-    scores.SALLY = (f.roundness > 0.95 ? 2.5 : f.roundness > 0.9 ? 1.2 : 0)
-                 + (f.eyeSize < 0.009 ? 1.5 : 0)
-                 + (f.mouthWidth < 0.32 ? 1 : 0);
-    reasons.SALLY = '동글동글 귀여운 분위기가 샐리 같아요';
-
-    scores.DOOGI = (f.length > 1.0 ? 1.5 : 0)
-                 + (f.lipFullness > 0.07 ? 2 : f.lipFullness > 0.055 ? 1 : 0)
-                 + (f.mouthWidth > 0.36 ? 1 : 0);
-    reasons.DOOGI = '도톰한 입술과 부드러운 라인이 두기상';
-
-    scores.OLIVERPANG = (Math.abs(f.roundness - 0.92) < 0.08 ? 1.5 : 0)
-                      + (f.mouthWidth > 0.34 ? 1.5 : 0)
-                      + (f.eyeRoundness > 0.30 ? 1 : 0)
-                      + 0.5;
-    reasons.OLIVERPANG = '친근하고 따뜻한 분위기의 올리버팡상';
+  // 동점일 때 다양성 (±3% 노이즈)
+  for (const char of Object.keys(scores)) {
+    scores[char] *= 1 + (Math.random() - 0.5) * 0.03;
   }
 
   const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
   const winner = sorted[0][0];
-  return { character: winner, reason: reasons[winner] };
+  const variants = REASON_VARIANTS[winner];
+  const reason = variants[Math.floor(Math.random() * variants.length)];
+
+  return { character: winner, reason };
 }
 
 /* =========================================================
@@ -1001,7 +1339,7 @@ function makeProductCard(product, charName) {
 
   const tag = document.createElement('div');
   tag.className = 'product-tag';
-  tag.textContent = charName + '상 PICK';
+  tag.textContent = '♥ ' + charName + '상 PICK';
   imgWrap.appendChild(tag);
 
   const name = document.createElement('div');
