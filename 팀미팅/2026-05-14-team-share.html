@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- ── 문서 메타
+  type:       "meeting"
+  id:         "2026-05-14-team-share"
+  title:      "마케팅 팀 공유 미팅"
+  desc:       "마케팅 먼슬리·IP 동향·에스파 꼴레 프리오더·꼴레 브랜드 정책·리빈느 PB 등 공유"
+  file:       "팀미팅/2026-05-14-team-share.html"
+  date:       "2026-05-14"
+  tags:       ["meeting", "team-share", "ip", "collab"]
+  attendees:  ["마케팅팀"]
+  meetingNum: "001"
+── -->
+<title>마케팅 팀 공유 미팅 — 2026.05.14</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f5f5f7; --surface: #ffffff; --text: #1d1d1f;
+  --muted: rgba(0,0,0,0.45); --accent: #0071e3;
+  --green: #1a7f4b; --orange: #b95000; --red: #c0392b;
+  --divider: rgba(0,0,0,0.08); --shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+html { background: var(--bg); font-family: -apple-system,"SF Pro Text","Helvetica Neue",sans-serif; color: var(--text); -webkit-font-smoothing: antialiased; font-size: 15px; line-height: 1.6; }
+body { min-height: 100vh; }
+
+.topnav { height: 52px; background: rgba(245,245,247,0.88); backdrop-filter: blur(20px); border-bottom: 1px solid var(--divider); position: sticky; top: 0; z-index: 100; display: flex; align-items: center; padding: 0 40px; gap: 12px; }
+.nav-title { font-size: 13px; font-weight: 500; color: var(--muted); }
+
+.container { max-width: 760px; margin: 0 auto; padding: 56px 40px 96px; }
+
+.doc-type { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--green); background: rgba(26,127,75,0.08); padding: 4px 10px; border-radius: 100px; margin-bottom: 20px; }
+.doc-title { font-size: 34px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 20px; }
+.doc-meta { display: flex; flex-wrap: wrap; gap: 20px; padding: 16px 0; border-top: 1px solid var(--divider); border-bottom: 1px solid var(--divider); margin-bottom: 48px; }
+.meta-item { display: flex; flex-direction: column; gap: 3px; }
+.meta-label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.meta-value { font-size: 14px; font-weight: 500; color: var(--text); }
+
+.doc-body { display: flex; flex-direction: column; gap: 40px; }
+.section { display: flex; flex-direction: column; gap: 12px; }
+.section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--divider); }
+.section-title { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+
+.item-list { display: flex; flex-direction: column; gap: 8px; }
+.item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 18px; background: var(--surface); border: 1px solid var(--divider); border-radius: 10px; font-size: 14px; color: var(--text); line-height: 1.6; box-shadow: var(--shadow); }
+.item-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.item-text { flex: 1; }
+.item-text strong { font-weight: 700; }
+.item-text .sub { color: var(--muted); display: block; margin-top: 2px; font-size: 13px; }
+
+.quote { background: var(--surface); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; padding: 16px 20px; font-size: 14px; color: var(--text); line-height: 1.7; box-shadow: var(--shadow); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { padding: 4px 10px; border-radius: 100px; font-size: 12px; font-weight: 600; border: 1px solid var(--divider); color: var(--muted); background: var(--bg); }
+.chip.blue   { background: rgba(0,113,227,0.07);  color: var(--accent); border-color: rgba(0,113,227,0.15); }
+.chip.orange { background: rgba(185,80,0,0.07);   color: var(--orange); border-color: rgba(185,80,0,0.15); }
+.chip.red    { background: rgba(192,57,43,0.07);  color: var(--red);    border-color: rgba(192,57,43,0.15); }
+
+@media (max-width: 640px) {
+  .container { padding: 40px 20px 80px; }
+  .topnav { padding: 0 20px; }
+  .doc-title { font-size: 26px; }
+  .doc-meta { gap: 16px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <span class="nav-title">Team Meeting Notes #001</span>
+</nav>
+
+<div class="container">
+  <div class="doc-type">📋 Meeting Notes</div>
+  <h1 class="doc-title">마케팅 팀 공유 미팅</h1>
+  <div class="doc-meta">
+    <div class="meta-item">
+      <span class="meta-label">날짜</span>
+      <span class="meta-value">2026년 05월 14일</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">참석</span>
+      <span class="meta-value">마케팅팀</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">형태</span>
+      <span class="meta-value">정기 팀 공유</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">문서 번호</span>
+      <span class="meta-value">#001</span>
+    </div>
+  </div>
+
+  <div class="doc-body">
+
+    <div class="section">
+      <div class="section-label">01 · 예정 일정</div>
+      <div class="section-title">다가오는 보고·출근·이벤트</div>
+      <div class="item-list">
+        <div class="item">
+          <div class="item-icon">📊</div>
+          <div class="item-text">
+            <strong>마지막 주 마케팅 먼슬리</strong>
+            <span class="sub">교철님 보고 예정</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">🏢</div>
+          <div class="item-text">
+            <strong>부님 20일 IPX 출근</strong>
+            <span class="sub">과천 IPX로 출근 예정</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">🎉</div>
+          <div class="item-text">
+            <strong>브라운 데이 (8월 8일)</strong>
+            <span class="sub">메가 브라운 설치 등 다양한 운영안 논의 중</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">02 · IP 동향</div>
+      <div class="section-title">총판·신규 IP·진행 이슈</div>
+      <div class="item-list">
+        <div class="item">
+          <div class="item-icon">⚠️</div>
+          <div class="item-text">
+            <strong>누가사 총판 가능성 — 내부 전담</strong>
+            <span class="sub">우리가 총판할 가능성 큼. 내부에서 모든 것을 다 해야 한다고 함. 업무에 큰 변수가 될 수 있음</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">🏪</div>
+          <div class="item-text">
+            <strong>성수점 곧 폐점 예정</strong>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">🆕</div>
+          <div class="item-text">
+            <strong>NBA, 세일러문 IP 입점 예정</strong>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">🛑</div>
+          <div class="item-text">
+            <strong>원신 팝업 — 진행 난항</strong>
+            <span class="sub">소속사와의 커뮤니케이션 등 문제가 많다고 함</span>
+          </div>
+        </div>
+      </div>
+      <div class="chips">
+        <span class="chip orange">누가사</span>
+        <span class="chip">성수점</span>
+        <span class="chip orange">NBA</span>
+        <span class="chip orange">세일러문</span>
+        <span class="chip red">원신</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">03 · 에스파 꼴레 프리오더</div>
+      <div class="section-title">29cm 우선 → 통합몰 순차 진행</div>
+      <div class="item-list">
+        <div class="item">
+          <div class="item-icon">🛍️</div>
+          <div class="item-text">
+            <strong>판매 채널 순서</strong>
+            <span class="sub">29cm에서 일주일 정도 우선 진행, 이후 통합몰에서 3일 정도 진행 예정</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">🍋</div>
+          <div class="item-text">
+            <strong>컨셉 — 레모네이드 콜라보</strong>
+            <span class="sub">에스파 앨범 컨셉인 레모네이드를 콜라보한 꼴레</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">04 · 통합몰 운영 변화 가능성</div>
+      <div class="section-title">물류 비용 → 한국향 컨버팅 시그널</div>
+      <div class="item-list">
+        <div class="item">
+          <div class="item-icon">📦</div>
+          <div class="item-text">
+            <strong>특송사 운송 비용 급증</strong>
+            <span class="sub">해외 배송 비용이 너무 늘어난 이슈</span>
+          </div>
+        </div>
+      </div>
+      <div class="quote">
+        앞으로 이런 느낌이면 통합몰이 뭔가 한국향으로 컨버팅 할거 같다고 함.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">05 · 꼴레 브랜드 정책</div>
+      <div class="section-title">의류·가방 카테고리 → 꼴레 브랜드 일괄 적용</div>
+      <div class="item-list">
+        <div class="item">
+          <div class="item-icon">👕</div>
+          <div class="item-text">
+            <strong>의류·가방 카테고리 — 꼴레 브랜드 적용</strong>
+            <span class="sub">앞으로 의류와 가방 카테고리는 꼴레 브랜드가 붙는다고 함</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">🅱️</div>
+          <div class="item-text">
+            <strong>BT21 티셔츠도 꼴레 적용</strong>
+            <span class="sub">이번에 BT21 티셔츠도 꼴레 붙어서 나옴</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">❓</div>
+          <div class="item-text">
+            <strong>온라인 카테고리 분류 어려움</strong>
+            <span class="sub">꼴레가 IP는 아니고 메이커 혹은 브랜드 성격에 가깝다고 함 — 어떻게 분류할지 모호함</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">06 · 리빈느 (PB 방향제)</div>
+      <div class="section-title">출시 일정 지연 가능성</div>
+      <div class="item-list">
+        <div class="item">
+          <div class="item-icon">⏳</div>
+          <div class="item-text">
+            <strong>일정 지연 가능성</strong>
+            <span class="sub">출시 일정이 늦어질 것 같다고 함</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-icon">✂️</div>
+          <div class="item-text">
+            <strong>MD 욕심 컷팅 필요</strong>
+            <span class="sub">초기 출시라 MD 욕심이 큼. 적절히 컷트할 필요가 있다고 함</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
