@@ -258,14 +258,12 @@ window.fetch = function(url) {
   <!-- OWNED MEDIA 사이드 메뉴 -->
   <div class="side-section media-pane" id="ownedSide">
     <div class="side-label">통합</div>
-    <div class="side-item active" onclick="setOwnedFilter('all','account',this)"><div class="side-dot" style="background:var(--blue)"></div>Summary</div>
-    <div class="side-label" style="margin-top:12px">기간</div>
-    <div class="side-item" onclick="setOwnedFilter(30,'range',this)"><div class="side-dot" style="background:var(--green)"></div>최근 30일</div>
-    <div class="side-item" onclick="setOwnedFilter(90,'range',this)"><div class="side-dot" style="background:#06b6d4"></div>최근 90일</div>
-    <div class="side-item" onclick="setOwnedFilter(365,'range',this)"><div class="side-dot" style="background:var(--red)"></div>최근 1년</div>
-    <div class="side-label" style="margin-top:12px">콘텐츠 형식</div>
-    <div class="side-item" onclick="setOwnedFilter('이미지','format',this)"><div class="side-dot" style="background:#f97316"></div>이미지</div>
-    <div class="side-item" onclick="setOwnedFilter('영상','format',this)"><div class="side-dot" style="background:#8b5cf6"></div>영상</div>
+    <div class="side-item active" onclick="setOwnedIpGroup('all',this)"><div class="side-dot" style="background:var(--blue)"></div>Summary</div>
+    <div class="side-label" style="margin-top:12px">IP 그룹</div>
+    <div class="side-item" onclick="setOwnedIpGroup('OWNED IP',this)"><div class="side-dot" style="background:var(--green)"></div>OWNED IP</div>
+    <div class="side-item" onclick="setOwnedIpGroup('K-POP IP',this)"><div class="side-dot" style="background:#06b6d4"></div>K-POP IP</div>
+    <div class="side-item" onclick="setOwnedIpGroup('SQUARE IP',this)"><div class="side-dot" style="background:var(--red)"></div>SQUARE IP</div>
+    <div class="side-item" onclick="setOwnedIpGroup('MULTI IP',this)"><div class="side-dot" style="background:#f97316"></div>MULTI IP</div>
   </div>
   <div class="side-footer">
     <div class="side-footer-time">Live · Google Sheets</div>
@@ -280,6 +278,28 @@ window.fetch = function(url) {
 
   <!-- SUMMARY PANE -->
   <div class="media-pane active" id="summaryMain">
+
+    <!-- 기간 선택 -->
+    <div class="filter-bar" style="margin-bottom:24px">
+      <div>
+        <div style="margin-bottom:8px"><span class="sec-title">기간 선택</span><span class="sec-tag">period</span></div>
+        <div class="msel-wrap" id="summaryMselWrap">
+          <button class="msel-btn" onclick="toggleSubMsel('summary',event)">
+            <span id="summaryMselLabel">전체</span> <span style="margin-left:6px">▼</span>
+          </button>
+          <div class="msel-drop" id="summaryMselDrop" style="display:none">
+            <div class="msel-year-tabs" id="summaryMselYearTabs"></div>
+            <div class="msel-actions">
+              <button onclick="subMselAll('summary')">전체 선택</button>
+              <button onclick="subMselClear('summary')">전체 해제</button>
+            </div>
+            <div class="msel-list" id="summaryMselList"></div>
+            <div class="msel-footer"><button class="msel-apply" onclick="subMselApply('summary')">적용</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="summaryLoading" class="sec" style="text-align:center;padding:80px 24px;color:var(--sub)">
       <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">통합 데이터 준비 중…</div>
       <div style="font-size:12px">PAID + OWNED 데이터를 불러와 월별 집계합니다</div>
@@ -429,6 +449,28 @@ window.fetch = function(url) {
 
   <!-- OWNED MEDIA PANE -->
   <div class="media-pane" id="ownedMain">
+
+    <!-- 기간 선택 -->
+    <div class="filter-bar" style="margin-bottom:24px">
+      <div>
+        <div style="margin-bottom:8px"><span class="sec-title">기간 선택</span><span class="sec-tag">period</span></div>
+        <div class="msel-wrap" id="ownedMselWrap">
+          <button class="msel-btn" onclick="toggleSubMsel('owned',event)">
+            <span id="ownedMselLabel">전체</span> <span style="margin-left:6px">▼</span>
+          </button>
+          <div class="msel-drop" id="ownedMselDrop" style="display:none">
+            <div class="msel-year-tabs" id="ownedMselYearTabs"></div>
+            <div class="msel-actions">
+              <button onclick="subMselAll('owned')">전체 선택</button>
+              <button onclick="subMselClear('owned')">전체 해제</button>
+            </div>
+            <div class="msel-list" id="ownedMselList"></div>
+            <div class="msel-footer"><button class="msel-apply" onclick="subMselApply('owned')">적용</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="sec">
       <div class="sec-head">
         <div><span class="sec-title">핵심 지표</span><span class="sec-tag">key metrics</span></div>
@@ -893,6 +935,7 @@ async function init(){
     selectedMonths=allMonths.filter(m=>m.startsWith(_latestYr));
     if(!selectedMonths.length) selectedMonths=[...allMonths];
     renderMsel();
+    subMselInit();  // OWNED + SUMMARY 멀티-월 피커 초기화
     await applyFilter();
     updateCmpLabel('A');updateCmpLabel('B');
     renderKPI();renderMonthlyTbl();renderCharts();renderCmp();renderTabs();renderBk();
@@ -904,6 +947,131 @@ async function init(){
   }
 }
 init();
+
+/* ════════════════════════════════════════════════════
+   IP 그룹 정의 (OWNED 사이드용)
+   ════════════════════════════════════════════════════ */
+const IP_GROUPS = {
+  'OWNED IP': ['BT21', 'LF', 'minini', 'COLLER', 'DOOHAMBBA', 'SSEBONG'],
+  'K-POP IP': ['I-DLE', 'ATEEZ', 'ZB1', 'NCT DREAM', 'NCT', 'IVE', 'ZONFRIENDS', 'MMMM'],
+  'SQUARE IP': ['삐돌이'],
+};
+function ipGroupOf(ip){
+  const k = (ip||'').trim();
+  if (!k) return 'MULTI IP';
+  for (const [g, list] of Object.entries(IP_GROUPS)) {
+    if (list.includes(k)) return g;
+  }
+  return 'MULTI IP';
+}
+function setOwnedIpGroup(group, el){
+  document.querySelectorAll('#ownedSide .side-item').forEach(e=>e.classList.remove('active'));
+  if (el) el.classList.add('active');
+  OWNED.filter.ipGroup = group === 'all' ? null : group;
+  renderOwned();
+}
+
+/* ════════════════════════════════════════════════════
+   공유 멀티-월 피커 (OWNED + SUMMARY)
+   ════════════════════════════════════════════════════ */
+const SUB_MSEL = {
+  owned:   { open:false, year:null, selected:[] },
+  summary: { open:false, year:null, selected:[] },
+};
+function subMselInit(){
+  if (!allMonths || allMonths.length===0) return;
+  const yrs = [...new Set(allMonths.map(m=>m.split('년')[0]))].sort();
+  ['owned','summary'].forEach(scope=>{
+    const s = SUB_MSEL[scope];
+    if (s.selected.length===0) {
+      s.selected = [...allMonths];  // 기본: 전체 선택
+      s.year = yrs[yrs.length-1];
+    }
+    renderSubMsel(scope);
+    updateSubMselLabel(scope);
+  });
+}
+function toggleSubMsel(scope, e){
+  e.stopPropagation();
+  const s = SUB_MSEL[scope];
+  s.open = !s.open;
+  document.getElementById(scope+'MselDrop').style.display = s.open?'block':'none';
+  if (s.open) renderSubMsel(scope);
+}
+function renderSubMsel(scope){
+  const s = SUB_MSEL[scope];
+  const yrs = [...new Set(allMonths.map(m=>m.split('년')[0]))].sort();
+  if (!s.year) s.year = yrs[yrs.length-1];
+
+  // Year tabs
+  const tabs = document.getElementById(scope+'MselYearTabs');
+  while (tabs.firstChild) tabs.removeChild(tabs.firstChild);
+  yrs.forEach(yr=>{
+    const b = document.createElement('button');
+    b.textContent = yr+'년';
+    b.style.cssText = 'background:'+(yr===s.year?'var(--blue)':'var(--bg)')+';color:'+(yr===s.year?'#fff':'var(--sub)')+';';
+    b.onclick = ()=>{ s.year = yr; renderSubMsel(scope); };
+    tabs.appendChild(b);
+  });
+
+  // Month list
+  const list = document.getElementById(scope+'MselList');
+  while (list.firstChild) list.removeChild(list.firstChild);
+  const yearMonths = allMonths.filter(m=>m.startsWith(s.year));
+  yearMonths.forEach(m=>{
+    const item = document.createElement('div');
+    const isSel = s.selected.includes(m);
+    item.style.cssText = 'padding:8px 12px;cursor:pointer;border-radius:6px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;background:'+(isSel?'var(--blue-light)':'transparent')+';color:'+(isSel?'var(--blue)':'var(--text)')+';';
+    const checkbox = document.createElement('span');
+    checkbox.style.cssText = 'width:14px;height:14px;border-radius:3px;border:1.5px solid '+(isSel?'var(--blue)':'var(--border)')+';background:'+(isSel?'var(--blue)':'transparent')+';display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:900';
+    if (isSel) checkbox.textContent = '✓';
+    item.appendChild(checkbox);
+    const label = document.createElement('span');
+    label.textContent = m;
+    item.appendChild(label);
+    item.onclick = ()=>{
+      if (s.selected.includes(m)) s.selected = s.selected.filter(x=>x!==m);
+      else s.selected.push(m);
+      renderSubMsel(scope);
+    };
+    list.appendChild(item);
+  });
+}
+function subMselAll(scope){
+  const s = SUB_MSEL[scope];
+  const ym = allMonths.filter(m=>m.startsWith(s.year));
+  ym.forEach(m=>{ if(!s.selected.includes(m)) s.selected.push(m); });
+  renderSubMsel(scope);
+}
+function subMselClear(scope){
+  const s = SUB_MSEL[scope];
+  const ym = allMonths.filter(m=>m.startsWith(s.year));
+  s.selected = s.selected.filter(m=>!ym.includes(m));
+  renderSubMsel(scope);
+}
+function subMselApply(scope){
+  const s = SUB_MSEL[scope];
+  s.open = false;
+  document.getElementById(scope+'MselDrop').style.display='none';
+  updateSubMselLabel(scope);
+  if (scope==='owned') renderOwned();
+  else if (scope==='summary') renderSummary();
+}
+function updateSubMselLabel(scope){
+  const s = SUB_MSEL[scope];
+  const lbl = document.getElementById(scope+'MselLabel');
+  if (!lbl) return;
+  if (s.selected.length===0) lbl.textContent='선택 없음';
+  else if (s.selected.length===allMonths.length) lbl.textContent='전체';
+  else if (s.selected.length<=3) lbl.textContent=s.selected.join(', ');
+  else lbl.textContent=s.selected.length+'개월 선택';
+}
+
+// 월 라벨 헬퍼 (OWNED 콘텐츠 row → "YY년 MM월")
+function ownedRowMonth(d){
+  const yr = String(d.getFullYear() % 100).padStart(2, '0');
+  return yr + '년 ' + String(d.getMonth()+1).padStart(2,'0') + '월';
+}
 
 /* ════════════════════════════════════════════════════
    OWNED MEDIA (IG) DASHBOARD
@@ -1051,7 +1219,12 @@ async function loadOwned() {
     OWNED.followerAccounts = Object.entries(accountsWithData)
       .sort((a,b)=>b[1]-a[1])
       .map(([name,val],i)=>({name,latestValue:val,color:OWNED_PALETTE[i%OWNED_PALETTE.length]}));
-    OWNED.selectedFollowers = new Set(OWNED.followerAccounts.slice(0,5).map(a=>a.name));
+    // 기본 선택: SQ GL · SQ TW · 스퀘어비만
+    const DEFAULT_FOLLOWER_CHANNELS = ['SQ GL', 'SQ TW', '스퀘어비'];
+    OWNED.selectedFollowers = new Set();
+    OWNED.followerAccounts.forEach(a => {
+      if (DEFAULT_FOLLOWER_CHANNELS.includes(a.name)) OWNED.selectedFollowers.add(a.name);
+    });
 
     OWNED.loaded = true;
     loadingEl.style.display = 'none';
@@ -1068,10 +1241,12 @@ async function loadOwned() {
 
 function ownedFiltered() {
   let rows = OWNED.contentRows;
-  if (OWNED.filter.range) {
-    const cutoff = Date.now() - OWNED.filter.range*86400000;
-    rows = rows.filter(r=>r.date.getTime()>=cutoff);
+  // 멀티-월 피커 선택 반영
+  const monthSel = SUB_MSEL.owned.selected;
+  if (monthSel && monthSel.length>0 && monthSel.length !== (allMonths||[]).length) {
+    rows = rows.filter(r => monthSel.includes(ownedRowMonth(r.date)));
   }
+  if (OWNED.filter.ipGroup) rows = rows.filter(r => ipGroupOf(r.ip) === OWNED.filter.ipGroup);
   if (OWNED.filter.format) rows = rows.filter(r=>r.format===OWNED.filter.format);
   if (OWNED.filter.ip) rows = rows.filter(r=>r.ip===OWNED.filter.ip);
   if (OWNED.filter.channel) rows = rows.filter(r=>r.channel===OWNED.filter.channel);
@@ -1157,9 +1332,10 @@ function renderOwnedFollowerChart() {
   if (OWNED.charts.follower) OWNED.charts.follower.destroy();
   const sorted = OWNED.followerRows.slice().sort((a,b)=>a.date-b.date);
   let rows = sorted;
-  if (OWNED.filter.range) {
-    const cutoff = Date.now() - OWNED.filter.range*86400000;
-    rows = sorted.filter(r=>r.date.getTime()>=cutoff);
+  // 멀티-월 피커 적용
+  const monthSel = SUB_MSEL.owned.selected;
+  if (monthSel && monthSel.length>0 && monthSel.length !== (allMonths||[]).length) {
+    rows = sorted.filter(r => monthSel.includes(ownedRowMonth(r.date)));
   }
   const labels = rows.map(r=>ownedFmtDate(r.date));
   const selected = OWNED.followerAccounts.filter(a=>OWNED.selectedFollowers.has(a.name));
@@ -1231,16 +1407,24 @@ function dateToMonthLabel(d){
 }
 
 function buildSummaryMonthly() {
+  // 멀티-월 피커 선택 (없으면 전체)
+  const monthSel = SUB_MSEL.summary.selected;
+  const useFilter = monthSel && monthSel.length>0 && monthSel.length !== (allMonths||[]).length;
+
   // 1) PAID 월별 (이미 OFFLINE_DATA에 집계됨)
   const paidTrend = (OFFLINE_DATA && OFFLINE_DATA.byFilter['전체__전체'])
     ? OFFLINE_DATA.byFilter['전체__전체'].trend : [];
   const paidByMonth = {};
-  paidTrend.forEach(r => { paidByMonth[r['월']] = r; });
+  paidTrend.forEach(r => {
+    if (useFilter && !monthSel.includes(r['월'])) return;
+    paidByMonth[r['월']] = r;
+  });
 
   // 2) OWNED 콘텐츠 월별
   const ownedByMonth = {};
   OWNED.contentRows.forEach(r => {
     const m = dateToMonthLabel(r.date);
+    if (useFilter && !monthSel.includes(m)) return;
     if (!ownedByMonth[m]) ownedByMonth[m] = { imp:0, eng:0, posts:0 };
     const b = ownedByMonth[m];
     b.imp += r.impressions;
@@ -1253,7 +1437,7 @@ function buildSummaryMonthly() {
   const sortedFollower = OWNED.followerRows.slice().sort((a,b)=>a.date-b.date);
   sortedFollower.forEach(snap => {
     const m = dateToMonthLabel(snap.date);
-    // 마지막 스냅샷이 그 월의 종가
+    if (useFilter && !monthSel.includes(m)) return;
     let sum = 0;
     OWNED.selectedFollowers.forEach(acc => { sum += snap.values[acc] || 0; });
     followerByMonth[m] = sum;
