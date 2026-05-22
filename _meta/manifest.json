@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-22T15:59:50",
+  "generated_at": "2026-05-22T16:17:30",
   "count": 14,
   "items": [
     {
       "type": "tool",
       "id": "media-dashboard",
       "title": "LINEFRIENDS SQUARE MEDIA DASHBOARD",
-      "desc": "PAID MEDIA(광고 성과: ROAS·매출·CPC·CTR·CVR·CPA) + OWNED MEDIA(콘텐츠 노출·참여·팔로워) 통합 대시보드. 사이드바 토글로 전환.",
+      "desc": "PAID MEDIA(광고 성과: ROAS·매출·CPC·CTR·CVR·CPA) + OWNED MEDIA(콘텐츠 노출·참여·팔로워) 통합 대시보드. 양쪽 모두 Google Sheets 라이브 fetch.",
       "file": "tools/media-dashboard.html",
       "date": "2026-05-22",
       "tags": [
