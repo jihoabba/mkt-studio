@@ -3,7 +3,7 @@
   id:    "monthly-2026-05"
   title: "2026년 5월 먼슬리 — 광고 성과 진단·전략"
   desc:  "ement 대행사 YTD 광고 성과 리포트 + 4월 이후 효율 하락 보완 분석 + 11장 발표 슬라이드. CPC↑·CVR↓ 구조적 진단, C+D+A 대응 조합."
-  file:  "projects/monthly/2026-05/README.md"
+  file:  "projects/monthly/2026-05/GUIDE.md"
   date:  "2026-05-22"
   tags:  ["project", "monthly", "ad-performance", "ement", "diagnosis"]
 ── -->

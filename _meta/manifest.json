@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T10:42:23",
+  "generated_at": "2026-05-22T11:41:41",
   "count": 14,
   "items": [
     {
@@ -7,7 +7,7 @@
       "id": "monthly-2026-05",
       "title": "2026년 5월 먼슬리 — 광고 성과 진단·전략",
       "desc": "ement 대행사 YTD 광고 성과 리포트 + 4월 이후 효율 하락 보완 분석 + 11장 발표 슬라이드. CPC↑·CVR↓ 구조적 진단, C+D+A 대응 조합.",
-      "file": "projects/monthly/2026-05/README.md",
+      "file": "projects/monthly/2026-05/GUIDE.md",
       "date": "2026-05-22",
       "tags": [
         "project",
@@ -193,7 +193,7 @@
       "id": "settlement-check",
       "title": "광고비 정산 체크 도구",
       "desc": "검수확인서.xlsx + 정산 RAW.xlsx 파싱 → 매체별 비용 합산·오차 검증 → 발주서 PDF 변환 → _체크시트.html 자동 생성. AppleScript 기반 macOS 전용.",
-      "file": "tools/settlement-check/README.md",
+      "file": "tools/settlement-check/GUIDE.md",
       "date": "2026-04-15",
       "tags": [
         "tool",

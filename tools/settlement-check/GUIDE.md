@@ -3,7 +3,7 @@
   id:    "settlement-check"
   title: "광고비 정산 체크 도구"
   desc:  "검수확인서.xlsx + 정산 RAW.xlsx 파싱 → 매체별 비용 합산·오차 검증 → 발주서 PDF 변환 → _체크시트.html 자동 생성. AppleScript 기반 macOS 전용."
-  file:  "tools/settlement-check/README.md"
+  file:  "tools/settlement-check/GUIDE.md"
   date:  "2026-04-15"
   tags:  ["tool", "settlement", "ad-budget", "automation", "python", "macos"]
 ── -->

@@ -13,7 +13,7 @@ LINE FRIENDS SQUARE 마케팅 업무 산출물 허브 + 사이드 트랙 통합 
 ```
 mkt-studio/
 ├── index.html                    ← 메인 허브 (카테고리 · 필터 · 검색)
-├── README.md                     ← 이 문서
+├── GUIDE.md                      ← 이 문서 (README.md는 사내 배포 규칙상 사용 금지)
 │
 ├── reports/                      ← 1-pager 분석 보고서
 ├── meeting-notes/                ← 회의록 (Apple 스타일 HTML)
