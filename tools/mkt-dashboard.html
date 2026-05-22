@@ -3,7 +3,7 @@
   type:  "tool"
   id:    "mkt-dashboard"
   title: "마케팅 통합 대시보드"
-  desc:  "광고 성과(광고비·매출·ROAS·CPC·CTR·CVR·CPA) + 인스타 성과 통합 뷰. 기간·스토어·매체·IP 필터. 전기 대비 자동 비교."
+  desc:  "광고 성과(광고비·매출·ROAS·CPC·CTR·CVR·CPA) + 인스타 성과(콘텐츠 노출·인게이지·팔로워) 통합 뷰. 기간·스토어·매체·IP 필터, 전기 대비 자동 비교."
   file:  "tools/mkt-dashboard.html"
   date:  "2026-05-22"
   tags:  ["tool", "dashboard", "ad-performance", "instagram", "integrated", "roas"]
@@ -33,6 +33,7 @@
   --down: #ef4444;
   --down-soft: rgba(239,68,68,0.12);
   --orange: #ff7849;
+  --orange-soft: rgba(255,120,73,0.12);
   --purple: #a78bfa;
   --pink: #f472b6;
   --yellow: #fcd34d;
@@ -74,7 +75,6 @@ html, body {
   display: inline-flex; align-items: center; gap: 6px;
 }
 .btn-icon:hover { background: var(--surface); }
-.btn-icon.primary { background: var(--accent); border-color: var(--accent); color: white; }
 
 .tabs {
   display: inline-flex;
@@ -229,6 +229,43 @@ html, body {
   .chart-wrap { height: 300px; }
 }
 
+/* ── Follower chips (IG) ───── */
+.follower-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.fchip {
+  background: var(--surface-2);
+  border: 1px solid var(--divider);
+  color: var(--muted);
+  font-size: 11px;
+  padding: 4px 9px;
+  border-radius: 100px;
+  cursor: pointer;
+  font-weight: 600;
+  user-select: none;
+  transition: 0.15s;
+}
+
+/* ── Top posts (IG) ───── */
+.top-posts { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 720px) { .top-posts { grid-template-columns: 1fr 1fr; } }
+.top-post {
+  background: var(--surface-2);
+  border: 1px solid var(--divider);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.top-post-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.top-post-rank { background: var(--accent-soft); color: var(--accent); font-weight: 800; font-size: 11px; padding: 3px 8px; border-radius: 6px; }
+.badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: var(--faint); color: var(--muted); }
+.badge.ip { background: rgba(255,120,73,0.12); color: var(--orange); }
+.badge.type { background: rgba(96,165,250,0.12); color: #60a5fa; }
+.badge.ch { background: rgba(167,139,250,0.12); color: var(--purple); }
+.top-post-cap { font-size: 13px; color: var(--text); line-height: 1.5; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.top-post-metrics { display: flex; gap: 10px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+.top-post-metrics .m-v { color: var(--text); font-weight: 700; font-feature-settings: "tnum" 1; }
+.top-post-link { font-size: 11px; color: var(--accent); text-decoration: none; font-weight: 600; }
+.top-post-link:hover { text-decoration: underline; }
+
 /* ── Table ─────────────── */
 .table-wrap { overflow-x: auto; margin: -4px; padding: 4px; }
 .table {
@@ -251,30 +288,11 @@ html, body {
   padding: 9px 10px;
   border-bottom: 1px solid var(--divider);
   font-feature-settings: "tnum" 1;
+  vertical-align: top;
 }
+.table td.cap { max-width: 220px; color: var(--muted); }
 .table .num { text-align: right; font-weight: 600; }
 .table tr:last-child td { border-bottom: none; }
-
-/* ── IG iframe ─────────── */
-.iframe-wrap {
-  border: 1px solid var(--divider);
-  border-radius: 14px;
-  overflow: hidden;
-  background: var(--surface);
-  height: calc(100vh - 120px);
-}
-.iframe-wrap iframe {
-  width: 100%; height: 100%;
-  border: 0;
-  display: block;
-}
-.iframe-note {
-  font-size: 12px; color: var(--muted);
-  margin-bottom: 12px;
-  display: flex; gap: 10px; align-items: center;
-}
-.iframe-note a { color: var(--accent); text-decoration: none; font-weight: 600; }
-.iframe-note a:hover { text-decoration: underline; }
 
 /* ── Loading / Empty ───── */
 .loading {
@@ -308,7 +326,7 @@ html, body {
     <button class="tab-btn active" data-tab="ad">📊 광고 성과</button>
     <button class="tab-btn" data-tab="ig">📷 인스타 성과</button>
   </div>
-  <button class="btn-icon" id="reloadBtn">↻</button>
+  <button class="btn-icon" id="reloadBtn" title="새로고침">↻</button>
 </header>
 
 <main class="container">
@@ -319,15 +337,13 @@ html, body {
       <strong>광고 데이터 로딩 중…</strong>
       Google Sheets에서 CSV를 fetch합니다 (~5초)
     </div>
-
     <div class="error" id="adError" style="display:none;"></div>
 
     <div id="adContent" style="display:none;">
-      <!-- Filters -->
       <div class="filters">
         <div class="filter-row">
           <span class="filter-label">기간</span>
-          <div class="filter-group" id="rangeFilter">
+          <div class="filter-group" id="adRangeFilter">
             <button class="filter-btn" data-range="30">30일</button>
             <button class="filter-btn active" data-range="90">90일</button>
             <button class="filter-btn" data-range="365">1년</button>
@@ -348,74 +364,123 @@ html, body {
         </div>
       </div>
 
-      <!-- KPI Grid 1 — Volume -->
-      <div class="kpi-grid" id="kpiMain"></div>
+      <div class="kpi-grid" id="adKpiMain"></div>
+      <div class="kpi-grid" id="adKpiRatio"></div>
 
-      <!-- KPI Grid 2 — Efficiency -->
-      <div class="kpi-grid" id="kpiRatio"></div>
-
-      <!-- Trends -->
       <section class="section">
         <div class="section-head">
           <div class="section-title">일자별 매출 · 광고비 추이</div>
-          <div class="section-meta" id="trendMeta"></div>
+          <div class="section-meta" id="adTrendMeta"></div>
         </div>
         <div class="chart-wrap">
-          <canvas id="trendChart"></canvas>
+          <canvas id="adTrendChart"></canvas>
         </div>
       </section>
 
-      <!-- Dimension breakdown -->
       <div class="grid-2">
         <section class="section">
-          <div class="section-head">
-            <div class="section-title">스토어별 매출 분포</div>
-          </div>
-          <div class="chart-wrap">
-            <canvas id="storeChart"></canvas>
-          </div>
+          <div class="section-head"><div class="section-title">스토어별 매출 분포</div></div>
+          <div class="chart-wrap"><canvas id="adStoreChart"></canvas></div>
         </section>
         <section class="section">
-          <div class="section-head">
-            <div class="section-title">매체구분별 ROAS</div>
-          </div>
-          <div class="chart-wrap">
-            <canvas id="mediaChart"></canvas>
-          </div>
+          <div class="section-head"><div class="section-title">매체구분별 ROAS</div></div>
+          <div class="chart-wrap"><canvas id="adMediaChart"></canvas></div>
         </section>
       </div>
 
-      <!-- IP breakdown -->
       <section class="section">
-        <div class="section-head">
-          <div class="section-title">IP별 성과 (매출 상위)</div>
-        </div>
-        <div class="chart-wrap" style="height:280px;">
-          <canvas id="ipChart"></canvas>
-        </div>
+        <div class="section-head"><div class="section-title">IP별 성과 (매출 상위)</div></div>
+        <div class="chart-wrap" style="height:280px;"><canvas id="adIpChart"></canvas></div>
       </section>
 
-      <!-- Top ads table -->
       <section class="section">
         <div class="section-head">
           <div class="section-title">상위 광고 (매출 기준 TOP 30)</div>
-          <div class="section-meta" id="tableMeta"></div>
+          <div class="section-meta" id="adTableMeta"></div>
         </div>
-        <div class="table-wrap">
-          <table class="table" id="adTable"></table>
-        </div>
+        <div class="table-wrap"><table class="table" id="adTable"></table></div>
       </section>
     </div>
   </section>
 
   <!-- ─────────── 인스타 성과 ─────────── -->
   <section class="pane" id="pane-ig">
-    <div class="iframe-note">
-      인스타 성과 대시보드는 별도 도구로 운영되며 본 페이지에 임베드됩니다.
-      <a href="./ig-dashboard/" target="_blank">새 탭에서 열기 ↗</a>
+    <div id="igLoading" class="loading">
+      <strong>인스타 데이터 로딩 중…</strong>
+      Google Sheets에서 콘텐츠 + 팔로워 CSV를 fetch합니다
     </div>
-    <div class="iframe-wrap">
-      <iframe id="igFrame" src="" loading="lazy" title="IG Dashboard"></iframe>
+    <div class="error" id="igError" style="display:none;"></div>
+
+    <div id="igContent" style="display:none;">
+      <div class="filters">
+        <div class="filter-row">
+          <span class="filter-label">기간</span>
+          <div class="filter-group" id="igRangeFilter">
+            <button class="filter-btn" data-range="30">30일</button>
+            <button class="filter-btn active" data-range="90">90일</button>
+            <button class="filter-btn" data-range="365">1년</button>
+            <button class="filter-btn" data-range="all">전체</button>
+          </div>
+        </div>
+        <div class="filter-row">
+          <span class="filter-label">IP</span>
+          <div class="filter-group" id="igIpFilter"></div>
+        </div>
+        <div class="filter-row">
+          <span class="filter-label">채널</span>
+          <div class="filter-group" id="igChannelFilter"></div>
+        </div>
+        <div class="filter-row">
+          <span class="filter-label">형식</span>
+          <div class="filter-group" id="igFormatFilter"></div>
+        </div>
+      </div>
+
+      <div class="kpi-grid" id="igKpiRow"></div>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="section-title">팔로워 추이</div>
+          <div class="section-meta" id="igFollowerMeta"></div>
+        </div>
+        <div class="follower-chips" id="igFollowerChips"></div>
+        <div class="chart-wrap"><canvas id="igFollowerChart"></canvas></div>
+      </section>
+
+      <div class="grid-2">
+        <section class="section">
+          <div class="section-head"><div class="section-title">IP별 노출 분포</div></div>
+          <div class="chart-wrap"><canvas id="igIpChart"></canvas></div>
+        </section>
+        <section class="section">
+          <div class="section-head"><div class="section-title">채널별 평균 참여율</div></div>
+          <div class="chart-wrap"><canvas id="igChannelChart"></canvas></div>
+        </section>
+      </div>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="section-title">일자별 노출 추이</div>
+          <div class="section-meta" id="igReachMeta"></div>
+        </div>
+        <div class="chart-wrap"><canvas id="igReachChart"></canvas></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="section-title">TOP 10 게시물</div>
+          <div class="section-meta">노출 기준</div>
+        </div>
+        <div class="top-posts" id="igTopPosts"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div class="section-title">최근 게시물</div>
+          <div class="section-meta" id="igTableMeta"></div>
+        </div>
+        <div class="table-wrap"><table class="table" id="igTable"></table></div>
+      </section>
     </div>
   </section>
 
@@ -423,225 +488,18 @@ html, body {
 
 <script>
 /* ============================================
-   Hardcoded data source
+   Hardcoded data sources
    ============================================ */
 const AD_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSj2Av7YPQL4lu2S2B50gZoDWKu1peFqPRQoaLDJr2ydtcPEgB_QYVOQtFOM-2Jpyl0Ws_XF2sd2MhU/pub?gid=1434908615&single=true&output=csv';
+const IG_CONTENT_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8Scx8b8cCv4mhL_6Xslwu17hIq3J4BstEw2SxPQg6pY3H70dTuf_gVAh07HU9xDzD9DjBagf4v67M/pub?gid=1275250485&single=true&output=csv';
+const IG_FOLLOWER_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8Scx8b8cCv4mhL_6Xslwu17hIq3J4BstEw2SxPQg6pY3H70dTuf_gVAh07HU9xDzD9DjBagf4v67M/pub?gid=790666469&single=true&output=csv';
 
 /* ============================================
-   State
+   Shared utils
    ============================================ */
-const state = {
-  rows: [],
-  storeList: [],
-  mediaList: [],
-  campaignList: [],
-  filter: { range: 90, store: 'all', media: 'all', campaign: 'all' },
-  charts: {},
-  latestDate: null,
-};
 const $ = (id) => document.getElementById(id);
-
-/* ============================================
-   Boot
-   ============================================ */
-window.addEventListener('DOMContentLoaded', () => {
-  setupTabs();
-  setupRangeFilter();
-  $('reloadBtn').addEventListener('click', loadAdData);
-  loadAdData();
-});
-
-function setupTabs() {
-  $('tabs').addEventListener('click', (e) => {
-    const btn = e.target.closest('.tab-btn');
-    if (!btn) return;
-    const tab = btn.dataset.tab;
-    $('tabs').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
-    $('pane-' + tab).classList.add('active');
-    if (tab === 'ig') {
-      const f = $('igFrame');
-      if (!f.src) f.src = './ig-dashboard/';
-    }
-  });
-}
-
-function setupRangeFilter() {
-  $('rangeFilter').addEventListener('click', (e) => {
-    const btn = e.target.closest('.filter-btn');
-    if (!btn) return;
-    $('rangeFilter').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const r = btn.dataset.range;
-    state.filter.range = r === 'all' ? null : parseInt(r, 10);
-    rerender();
-  });
-}
-
-/* ============================================
-   Load + parse
-   ============================================ */
-async function loadAdData() {
-  $('adLoading').style.display = 'block';
-  $('adContent').style.display = 'none';
-  $('adError').style.display = 'none';
-  try {
-    const text = await (await fetch(AD_CSV_URL)).text();
-    parseAd(text);
-    setupDynamicFilters();
-    rerender();
-    $('adLoading').style.display = 'none';
-    $('adContent').style.display = 'block';
-  } catch (err) {
-    console.error(err);
-    $('adLoading').style.display = 'none';
-    $('adError').style.display = 'block';
-    $('adError').textContent = '⚠ 광고 데이터 로드 실패: ' + err.message;
-  }
-}
-
-function parseAd(text) {
-  const res = Papa.parse(text.trim(), { header: true, skipEmptyLines: true });
-  const rows = (res.data || [])
-    .map(r => {
-      const dateStr = (r['기간'] || r['일자'] || '').trim();
-      const d = parseDate(dateStr);
-      if (!d) return null;
-      return {
-        store:       (r['스토어'] || '').trim(),
-        campaign:    (r['캠페인 목표'] || '').trim(),
-        adGoal:      (r['광고 목표'] || '').trim(),
-        promotion:   (r['캠페인(프로모션)'] || '').trim(),
-        country:     (r['국가'] || '').trim(),
-        date:        d,
-        ip:          (r['IP'] || '').trim(),
-        category:    (r['카테고리'] || '').trim(),
-        product:     (r['제품'] || '').trim(),
-        media:       (r['매체 구분'] || '').trim(),
-        channel:     (r['매체'] || '').trim(),
-        device:      (r['디바이스'] || '').trim(),
-        targeting:   (r['타겟팅'] || '').trim(),
-        adName:      (r['광고 이름'] || '').trim(),
-        creativeType:(r['카피 / 크리 / 어셋 구분'] || '').trim(),
-        impressions: toNum(r['노출']),
-        clicks:      toNum(r['클릭']),
-        cost:        toNum(r['광고비']),
-        signups:     toNum(r['회원가입']),
-        purchases:   toNum(r['구매 수']),
-        revenue:     toNum(r['매출']),
-      };
-    })
-    .filter(Boolean);
-  state.rows = rows;
-  state.latestDate = rows.reduce((max, r) => r.date > max ? r.date : max, rows[0]?.date || new Date());
-}
-
-function parseDate(s) {
-  if (!s) return null;
-  const cleaned = String(s).trim();
-  const m = cleaned.match(/^(\d{4})[-.\s\/]+(\d{1,2})[-.\s\/]+(\d{1,2})/);
-  if (m) {
-    const d = new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
-    return isNaN(d.getTime()) ? null : d;
-  }
-  const d = new Date(cleaned);
-  return isNaN(d.getTime()) ? null : d;
-}
-
-function toNum(v) {
-  if (v == null || v === '' || v === '-' || v === '#REF!') return 0;
-  if (typeof v === 'number') return v;
-  const n = parseFloat(String(v).replace(/[,\s]/g, '').replace(/[^\d.\-]/g, ''));
-  return isNaN(n) ? 0 : n;
-}
-
-function unique(arr) { return Array.from(new Set(arr)); }
-
-function setupDynamicFilters() {
-  state.storeList = unique(state.rows.map(r => r.store)).filter(Boolean).sort();
-  state.mediaList = unique(state.rows.map(r => r.media)).filter(Boolean).sort();
-  state.campaignList = unique(state.rows.map(r => r.campaign)).filter(Boolean).sort();
-  buildFilterButtons('storeFilter', ['all', ...state.storeList], v => { state.filter.store = v; rerender(); });
-  buildFilterButtons('mediaFilter', ['all', ...state.mediaList], v => { state.filter.media = v; rerender(); });
-  buildFilterButtons('campaignFilter', ['all', ...state.campaignList.slice(0, 6)], v => { state.filter.campaign = v; rerender(); });
-}
-
-function buildFilterButtons(containerId, values, onClick) {
-  const wrap = $(containerId);
-  clearNode(wrap);
-  values.forEach((v, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'filter-btn' + (i === 0 ? ' active' : '');
-    btn.textContent = v === 'all' ? '전체' : v;
-    btn.dataset.value = v;
-    btn.addEventListener('click', () => {
-      wrap.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      onClick(v);
-    });
-    wrap.appendChild(btn);
-  });
-}
-
 function clearNode(node) { while (node.firstChild) node.removeChild(node.firstChild); }
-
-/* ============================================
-   Filtering
-   ============================================ */
-function filtered() {
-  let rows = state.rows;
-  if (state.filter.range) {
-    const cutoff = state.latestDate.getTime() - state.filter.range * 86400000;
-    rows = rows.filter(r => r.date.getTime() >= cutoff);
-  }
-  if (state.filter.store !== 'all') rows = rows.filter(r => r.store === state.filter.store);
-  if (state.filter.media !== 'all') rows = rows.filter(r => r.media === state.filter.media);
-  if (state.filter.campaign !== 'all') rows = rows.filter(r => r.campaign === state.filter.campaign);
-  return rows;
-}
-
-function previousPeriod() {
-  if (!state.filter.range) return [];
-  const span = state.filter.range * 86400000;
-  const end = state.latestDate.getTime() - span;
-  const start = end - span;
-  let rows = state.rows.filter(r => r.date.getTime() >= start && r.date.getTime() < end);
-  if (state.filter.store !== 'all') rows = rows.filter(r => r.store === state.filter.store);
-  if (state.filter.media !== 'all') rows = rows.filter(r => r.media === state.filter.media);
-  if (state.filter.campaign !== 'all') rows = rows.filter(r => r.campaign === state.filter.campaign);
-  return rows;
-}
-
-function sumKPIs(rows) {
-  const cost = rows.reduce((s, r) => s + r.cost, 0);
-  const revenue = rows.reduce((s, r) => s + r.revenue, 0);
-  const imp = rows.reduce((s, r) => s + r.impressions, 0);
-  const clicks = rows.reduce((s, r) => s + r.clicks, 0);
-  const purchases = rows.reduce((s, r) => s + r.purchases, 0);
-  const signups = rows.reduce((s, r) => s + r.signups, 0);
-  return {
-    cost, revenue, imp, clicks, purchases, signups,
-    roas: cost > 0 ? (revenue / cost) * 100 : null,
-    cpc: clicks > 0 ? cost / clicks : null,
-    ctr: imp > 0 ? (clicks / imp) * 100 : null,
-    cvr: clicks > 0 ? (purchases / clicks) * 100 : null,
-    cpa: purchases > 0 ? cost / purchases : null,
-  };
-}
-
-/* ============================================
-   Render
-   ============================================ */
-function rerender() {
-  renderKPIs();
-  renderTrendChart();
-  renderStoreChart();
-  renderMediaChart();
-  renderIpChart();
-  renderTable();
-}
-
+function unique(arr) { return Array.from(new Set(arr)); }
 function fmtNum(n) {
   if (n == null || isNaN(n)) return '—';
   const abs = Math.abs(n);
@@ -662,14 +520,266 @@ function fmtPct(n) {
   if (n == null || isNaN(n)) return '—';
   return n.toFixed(1) + '%';
 }
+function fmtDate(d) {
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+}
+function toNum(v) {
+  if (v == null || v === '' || v === '-' || v === '#REF!') return 0;
+  if (typeof v === 'number') return v;
+  const n = parseFloat(String(v).replace(/[,\s]/g, '').replace(/[^\d.\-]/g, ''));
+  return isNaN(n) ? 0 : n;
+}
+function parseDateGeneric(s) {
+  if (!s) return null;
+  const cleaned = String(s).trim();
+  const m1 = cleaned.match(/^(\d{4})[-.\s\/]+(\d{1,2})[-.\s\/]+(\d{1,2})/);
+  if (m1) {
+    const d = new Date(parseInt(m1[1]), parseInt(m1[2]) - 1, parseInt(m1[3]));
+    return isNaN(d.getTime()) ? null : d;
+  }
+  const d = new Date(cleaned);
+  return isNaN(d.getTime()) ? null : d;
+}
+function parseEngRate(v) {
+  if (v == null || v === '') return null;
+  const s = String(v).trim();
+  if (s.endsWith('%')) { const n = parseFloat(s.replace('%', '')); return isNaN(n) ? null : n; }
+  const n = parseFloat(s);
+  if (isNaN(n)) return null;
+  return n < 1 ? n * 100 : n;
+}
+function chartOpts(o = {}) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: o.legend === false ? { display: false } : {
+        position: 'top', align: 'end',
+        labels: { color: 'rgba(255,255,255,0.7)', font: { size: 11 }, boxWidth: 10, boxHeight: 10 }
+      },
+      tooltip: {
+        backgroundColor: '#1a1d26', titleColor: '#fff', bodyColor: 'rgba(255,255,255,0.85)',
+        borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, padding: 10,
+      },
+    },
+    scales: o.scales || {
+      x: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 }, maxTicksLimit: 12 }, grid: { color: 'rgba(255,255,255,0.05)' } },
+      y: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 }, callback: v => fmtNum(v) }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
+    },
+  };
+}
+
+/* ============================================
+   AD STATE
+   ============================================ */
+const ad = {
+  rows: [],
+  storeList: [], mediaList: [], campaignList: [],
+  filter: { range: 90, store: 'all', media: 'all', campaign: 'all' },
+  charts: {},
+  latestDate: null,
+};
+
+/* ============================================
+   IG STATE
+   ============================================ */
+const ig = {
+  contentRows: [],
+  followerRows: [],
+  followerAccounts: [],
+  selectedFollowers: new Set(),
+  ipList: [], channelList: [], formatList: [],
+  filter: { range: 90, ip: 'all', channel: 'all', format: 'all' },
+  charts: {},
+};
+
+/* ============================================
+   Boot
+   ============================================ */
+window.addEventListener('DOMContentLoaded', () => {
+  setupTabs();
+  setupAdRange();
+  setupIgRange();
+  $('reloadBtn').addEventListener('click', () => {
+    loadAd();
+    if (ig.contentRows.length > 0) loadIg();
+  });
+  loadAd();
+  // Lazy load IG when tab clicked first time
+});
+
+function setupTabs() {
+  $('tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    const tab = btn.dataset.tab;
+    $('tabs').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+    $('pane-' + tab).classList.add('active');
+    if (tab === 'ig' && ig.contentRows.length === 0) loadIg();
+  });
+}
+function setupAdRange() {
+  $('adRangeFilter').addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-btn'); if (!btn) return;
+    $('adRangeFilter').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const r = btn.dataset.range;
+    ad.filter.range = r === 'all' ? null : parseInt(r, 10);
+    rerenderAd();
+  });
+}
+function setupIgRange() {
+  $('igRangeFilter').addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-btn'); if (!btn) return;
+    $('igRangeFilter').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const r = btn.dataset.range;
+    ig.filter.range = r === 'all' ? null : parseInt(r, 10);
+    rerenderIg();
+  });
+}
+
+/* ====================================================================
+   AD DASHBOARD
+   ==================================================================== */
+async function loadAd() {
+  $('adLoading').style.display = 'block';
+  $('adContent').style.display = 'none';
+  $('adError').style.display = 'none';
+  try {
+    const text = await (await fetch(AD_CSV_URL)).text();
+    parseAd(text);
+    setupAdFilters();
+    rerenderAd();
+    $('adLoading').style.display = 'none';
+    $('adContent').style.display = 'block';
+  } catch (err) {
+    console.error(err);
+    $('adLoading').style.display = 'none';
+    $('adError').style.display = 'block';
+    $('adError').textContent = '⚠ 광고 데이터 로드 실패: ' + err.message;
+  }
+}
+
+function parseAd(text) {
+  const res = Papa.parse(text.trim(), { header: true, skipEmptyLines: true });
+  const rows = (res.data || [])
+    .map(r => {
+      const d = parseDateGeneric((r['기간'] || r['일자'] || '').trim());
+      if (!d) return null;
+      return {
+        store: (r['스토어'] || '').trim(),
+        campaign: (r['캠페인 목표'] || '').trim(),
+        adGoal: (r['광고 목표'] || '').trim(),
+        promotion: (r['캠페인(프로모션)'] || '').trim(),
+        country: (r['국가'] || '').trim(),
+        date: d,
+        ip: (r['IP'] || '').trim(),
+        category: (r['카테고리'] || '').trim(),
+        product: (r['제품'] || '').trim(),
+        media: (r['매체 구분'] || '').trim(),
+        channel: (r['매체'] || '').trim(),
+        device: (r['디바이스'] || '').trim(),
+        targeting: (r['타겟팅'] || '').trim(),
+        adName: (r['광고 이름'] || '').trim(),
+        creativeType: (r['카피 / 크리 / 어셋 구분'] || '').trim(),
+        impressions: toNum(r['노출']),
+        clicks: toNum(r['클릭']),
+        cost: toNum(r['광고비']),
+        signups: toNum(r['회원가입']),
+        purchases: toNum(r['구매 수']),
+        revenue: toNum(r['매출']),
+      };
+    })
+    .filter(Boolean);
+  ad.rows = rows;
+  ad.latestDate = rows.reduce((max, r) => r.date > max ? r.date : max, rows[0]?.date || new Date());
+}
+
+function setupAdFilters() {
+  ad.storeList = unique(ad.rows.map(r => r.store)).filter(Boolean).sort();
+  ad.mediaList = unique(ad.rows.map(r => r.media)).filter(Boolean).sort();
+  ad.campaignList = unique(ad.rows.map(r => r.campaign)).filter(Boolean).sort();
+  buildFilterButtons('storeFilter', ['all', ...ad.storeList], v => { ad.filter.store = v; rerenderAd(); });
+  buildFilterButtons('mediaFilter', ['all', ...ad.mediaList], v => { ad.filter.media = v; rerenderAd(); });
+  buildFilterButtons('campaignFilter', ['all', ...ad.campaignList.slice(0, 6)], v => { ad.filter.campaign = v; rerenderAd(); });
+}
+
+function buildFilterButtons(containerId, values, onClick) {
+  const wrap = $(containerId);
+  clearNode(wrap);
+  values.forEach((v, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = v === 'all' ? '전체' : v;
+    btn.dataset.value = v;
+    btn.addEventListener('click', () => {
+      wrap.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      onClick(v);
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+function adFiltered() {
+  let rows = ad.rows;
+  if (ad.filter.range) {
+    const cutoff = ad.latestDate.getTime() - ad.filter.range * 86400000;
+    rows = rows.filter(r => r.date.getTime() >= cutoff);
+  }
+  if (ad.filter.store !== 'all') rows = rows.filter(r => r.store === ad.filter.store);
+  if (ad.filter.media !== 'all') rows = rows.filter(r => r.media === ad.filter.media);
+  if (ad.filter.campaign !== 'all') rows = rows.filter(r => r.campaign === ad.filter.campaign);
+  return rows;
+}
+
+function adPrevPeriod() {
+  if (!ad.filter.range) return [];
+  const span = ad.filter.range * 86400000;
+  const end = ad.latestDate.getTime() - span;
+  const start = end - span;
+  let rows = ad.rows.filter(r => r.date.getTime() >= start && r.date.getTime() < end);
+  if (ad.filter.store !== 'all') rows = rows.filter(r => r.store === ad.filter.store);
+  if (ad.filter.media !== 'all') rows = rows.filter(r => r.media === ad.filter.media);
+  if (ad.filter.campaign !== 'all') rows = rows.filter(r => r.campaign === ad.filter.campaign);
+  return rows;
+}
+
+function sumAdKPIs(rows) {
+  const cost = rows.reduce((s, r) => s + r.cost, 0);
+  const revenue = rows.reduce((s, r) => s + r.revenue, 0);
+  const imp = rows.reduce((s, r) => s + r.impressions, 0);
+  const clicks = rows.reduce((s, r) => s + r.clicks, 0);
+  const purchases = rows.reduce((s, r) => s + r.purchases, 0);
+  return {
+    cost, revenue, imp, clicks, purchases,
+    roas: cost > 0 ? (revenue / cost) * 100 : null,
+    cpc: clicks > 0 ? cost / clicks : null,
+    ctr: imp > 0 ? (clicks / imp) * 100 : null,
+    cvr: clicks > 0 ? (purchases / clicks) * 100 : null,
+  };
+}
+
 function delta(curr, prev) {
   if (prev == null || prev === 0 || curr == null) return null;
   return ((curr - prev) / Math.abs(prev)) * 100;
 }
 
-function renderKPIs() {
-  const cur = sumKPIs(filtered());
-  const prev = sumKPIs(previousPeriod());
+function rerenderAd() {
+  renderAdKPIs();
+  renderAdTrend();
+  renderAdStore();
+  renderAdMedia();
+  renderAdIp();
+  renderAdTable();
+}
+
+function renderAdKPIs() {
+  const cur = sumAdKPIs(adFiltered());
+  const prev = sumAdKPIs(adPrevPeriod());
   const main = [
     { label: '광고비', value: fmtWon(cur.cost), trend: delta(cur.cost, prev.cost), invert: true },
     { label: '매출', value: fmtWon(cur.revenue), trend: delta(cur.revenue, prev.revenue) },
@@ -682,11 +792,11 @@ function renderKPIs() {
     { label: 'CTR', value: fmtPct(cur.ctr), trend: delta(cur.ctr, prev.ctr) },
     { label: 'CPC', value: cur.cpc != null ? '₩' + Math.round(cur.cpc).toLocaleString('ko-KR') : '—', trend: delta(cur.cpc, prev.cpc), invert: true },
   ];
-  renderKpiGrid('kpiMain', main, prev);
-  renderKpiGrid('kpiRatio', ratio, prev);
+  renderKpiGrid('adKpiMain', main);
+  renderKpiGrid('adKpiRatio', ratio);
 }
 
-function renderKpiGrid(id, items, prev) {
+function renderKpiGrid(id, items) {
   const wrap = $(id);
   clearNode(wrap);
   items.forEach(k => {
@@ -707,10 +817,11 @@ function renderKpiGrid(id, items, prev) {
       const isUp = k.trend >= 0;
       const good = k.invert ? !isUp : isUp;
       t.className = 'kpi-trend ' + (good ? 'up' : 'down');
-      const arrow = isUp ? '↑' : '↓';
-      t.textContent = arrow + ' ' + Math.abs(k.trend).toFixed(1) + '%';
+      t.textContent = (isUp ? '↑' : '↓') + ' ' + Math.abs(k.trend).toFixed(1) + '%';
       sub.appendChild(t);
-      sub.appendChild(document.createTextNode(' 전기 대비'));
+      sub.appendChild(document.createTextNode(k.subText || ' 전기 대비'));
+    } else if (k.subText) {
+      sub.textContent = k.subText;
     } else {
       sub.textContent = '—';
     }
@@ -719,39 +830,10 @@ function renderKpiGrid(id, items, prev) {
   });
 }
 
-function chartOpts(o = {}) {
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: o.legend === false ? { display: false } : {
-        position: 'top', align: 'end',
-        labels: { color: 'rgba(255,255,255,0.7)', font: { size: 11 }, boxWidth: 10, boxHeight: 10 }
-      },
-      tooltip: {
-        backgroundColor: '#1a1d26',
-        titleColor: '#fff',
-        bodyColor: 'rgba(255,255,255,0.85)',
-        borderColor: 'rgba(255,255,255,0.1)',
-        borderWidth: 1,
-        padding: 10,
-      },
-    },
-    scales: o.scales || {
-      x: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 }, maxTicksLimit: 12 }, grid: { color: 'rgba(255,255,255,0.05)' } },
-      y: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 }, callback: v => fmtNum(v) }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
-    },
-  };
-}
-
-function fmtDate(d) {
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
-}
-
-function renderTrendChart() {
-  const canvas = $('trendChart');
-  if (state.charts.trend) state.charts.trend.destroy();
-  const rows = filtered();
+function renderAdTrend() {
+  const canvas = $('adTrendChart');
+  if (ad.charts.trend) ad.charts.trend.destroy();
+  const rows = adFiltered();
   const byDate = {};
   rows.forEach(r => {
     const key = fmtDate(r.date);
@@ -760,11 +842,10 @@ function renderTrendChart() {
     byDate[key].revenue += r.revenue;
   });
   const entries = Object.values(byDate).sort((a, b) => a.date - b.date);
-  const labels = entries.map(e => fmtDate(e.date));
-  state.charts.trend = new Chart(canvas, {
+  ad.charts.trend = new Chart(canvas, {
     type: 'line',
     data: {
-      labels,
+      labels: entries.map(e => fmtDate(e.date)),
       datasets: [
         { label: '매출', data: entries.map(e => e.revenue), borderColor: '#3182F6', backgroundColor: 'rgba(49,130,246,0.15)', borderWidth: 2, tension: 0.25, fill: true, pointRadius: 0 },
         { label: '광고비', data: entries.map(e => e.cost), borderColor: '#ff7849', backgroundColor: 'transparent', borderWidth: 2, tension: 0.25, fill: false, pointRadius: 0 },
@@ -772,23 +853,19 @@ function renderTrendChart() {
     },
     options: chartOpts(),
   });
-  $('trendMeta').textContent = `${entries.length} 일자`;
+  $('adTrendMeta').textContent = `${entries.length} 일자`;
 }
 
-function renderStoreChart() {
-  const canvas = $('storeChart');
-  if (state.charts.store) state.charts.store.destroy();
-  const rows = filtered();
+function renderAdStore() {
+  const canvas = $('adStoreChart');
+  if (ad.charts.store) ad.charts.store.destroy();
   const by = {};
-  rows.forEach(r => { if (r.store) by[r.store] = (by[r.store] || 0) + r.revenue; });
+  adFiltered().forEach(r => { if (r.store) by[r.store] = (by[r.store] || 0) + r.revenue; });
   const entries = Object.entries(by).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
   const palette = ['#3182F6', '#ff7849', '#a78bfa', '#22c55e', '#f472b6', '#fcd34d'];
-  state.charts.store = new Chart(canvas, {
+  ad.charts.store = new Chart(canvas, {
     type: 'doughnut',
-    data: {
-      labels: entries.map(e => e[0]),
-      datasets: [{ data: entries.map(e => e[1]), backgroundColor: palette, borderColor: '#1a1d26', borderWidth: 2 }]
-    },
+    data: { labels: entries.map(e => e[0]), datasets: [{ data: entries.map(e => e[1]), backgroundColor: palette, borderColor: '#1a1d26', borderWidth: 2 }] },
     options: {
       responsive: true, maintainAspectRatio: false, cutout: '60%',
       plugins: {
@@ -799,26 +876,20 @@ function renderStoreChart() {
   });
 }
 
-function renderMediaChart() {
-  const canvas = $('mediaChart');
-  if (state.charts.media) state.charts.media.destroy();
-  const rows = filtered();
+function renderAdMedia() {
+  const canvas = $('adMediaChart');
+  if (ad.charts.media) ad.charts.media.destroy();
   const by = {};
-  rows.forEach(r => {
+  adFiltered().forEach(r => {
     if (!r.media) return;
     if (!by[r.media]) by[r.media] = { cost: 0, revenue: 0 };
     by[r.media].cost += r.cost;
     by[r.media].revenue += r.revenue;
   });
-  const entries = Object.entries(by)
-    .map(([k, v]) => [k, v.cost > 0 ? (v.revenue / v.cost) * 100 : 0])
-    .sort((a, b) => b[1] - a[1]);
-  state.charts.media = new Chart(canvas, {
+  const entries = Object.entries(by).map(([k, v]) => [k, v.cost > 0 ? (v.revenue / v.cost) * 100 : 0]).sort((a, b) => b[1] - a[1]);
+  ad.charts.media = new Chart(canvas, {
     type: 'bar',
-    data: {
-      labels: entries.map(e => e[0]),
-      datasets: [{ label: 'ROAS (%)', data: entries.map(e => e[1]), backgroundColor: 'rgba(49,130,246,0.7)', borderRadius: 6 }]
-    },
+    data: { labels: entries.map(e => e[0]), datasets: [{ label: 'ROAS (%)', data: entries.map(e => e[1]), backgroundColor: 'rgba(49,130,246,0.7)', borderRadius: 6 }] },
     options: chartOpts({
       legend: false,
       scales: {
@@ -829,25 +900,24 @@ function renderMediaChart() {
   });
 }
 
-function renderIpChart() {
-  const canvas = $('ipChart');
-  if (state.charts.ip) state.charts.ip.destroy();
-  const rows = filtered();
+function renderAdIp() {
+  const canvas = $('adIpChart');
+  if (ad.charts.ip) ad.charts.ip.destroy();
   const by = {};
-  rows.forEach(r => {
+  adFiltered().forEach(r => {
     const key = (r.ip && r.ip !== '-') ? r.ip : '(미지정)';
     if (!by[key]) by[key] = { revenue: 0, cost: 0 };
     by[key].revenue += r.revenue;
     by[key].cost += r.cost;
   });
   const entries = Object.entries(by).filter(([, v]) => v.revenue > 0).sort((a, b) => b[1].revenue - a[1].revenue).slice(0, 10);
-  state.charts.ip = new Chart(canvas, {
+  ad.charts.ip = new Chart(canvas, {
     type: 'bar',
     data: {
       labels: entries.map(e => e[0]),
       datasets: [
-        { label: '매출', data: entries.map(e => e[1].revenue), backgroundColor: 'rgba(49,130,246,0.75)', borderRadius: 4, yAxisID: 'y' },
-        { label: '광고비', data: entries.map(e => e[1].cost), backgroundColor: 'rgba(255,120,73,0.75)', borderRadius: 4, yAxisID: 'y' },
+        { label: '매출', data: entries.map(e => e[1].revenue), backgroundColor: 'rgba(49,130,246,0.75)', borderRadius: 4 },
+        { label: '광고비', data: entries.map(e => e[1].cost), backgroundColor: 'rgba(255,120,73,0.75)', borderRadius: 4 },
       ]
     },
     options: chartOpts({
@@ -859,11 +929,8 @@ function renderIpChart() {
   });
 }
 
-function renderTable() {
-  const rows = filtered()
-    .filter(r => r.revenue > 0)
-    .sort((a, b) => b.revenue - a.revenue)
-    .slice(0, 30);
+function renderAdTable() {
+  const rows = adFiltered().filter(r => r.revenue > 0).sort((a, b) => b.revenue - a.revenue).slice(0, 30);
   const table = $('adTable');
   clearNode(table);
   const thead = document.createElement('thead');
@@ -872,7 +939,6 @@ function renderTable() {
     .forEach(h => { const th = document.createElement('th'); th.textContent = h; trh.appendChild(th); });
   thead.appendChild(trh);
   table.appendChild(thead);
-
   const tbody = document.createElement('tbody');
   if (rows.length === 0) {
     const tr = document.createElement('tr');
@@ -883,27 +949,16 @@ function renderTable() {
   } else {
     rows.forEach(r => {
       const tr = document.createElement('tr');
-      const cells = [
-        fmtDate(r.date),
-        r.store,
-        r.media,
-        r.ip && r.ip !== '-' ? r.ip : '—',
-        r.adName || r.channel || '—',
-      ];
-      cells.forEach((v, i) => {
+      [fmtDate(r.date), r.store, r.media, r.ip && r.ip !== '-' ? r.ip : '—', r.adName || r.channel || '—'].forEach((v, i) => {
         const td = document.createElement('td');
         td.textContent = v;
-        if (i === 4) td.style.maxWidth = '180px';
-        td.style.whiteSpace = i === 4 ? 'nowrap' : 'nowrap';
-        if (i === 4) td.style.overflow = 'hidden', td.style.textOverflow = 'ellipsis';
+        td.style.whiteSpace = 'nowrap';
+        if (i === 4) { td.style.maxWidth = '180px'; td.style.overflow = 'hidden'; td.style.textOverflow = 'ellipsis'; }
         tr.appendChild(td);
       });
       [
-        { v: r.impressions, fn: fmtNum },
-        { v: r.clicks, fn: fmtNum },
-        { v: r.cost, fn: fmtWon },
-        { v: r.purchases, fn: fmtNum },
-        { v: r.revenue, fn: fmtWon },
+        { v: r.impressions, fn: fmtNum }, { v: r.clicks, fn: fmtNum }, { v: r.cost, fn: fmtWon },
+        { v: r.purchases, fn: fmtNum }, { v: r.revenue, fn: fmtWon },
         { v: r.cost > 0 ? (r.revenue / r.cost) * 100 : null, fn: v => v != null ? Math.round(v) + '%' : '—' },
       ].forEach(({ v, fn }) => {
         const td = document.createElement('td');
@@ -915,7 +970,390 @@ function renderTable() {
     });
   }
   table.appendChild(tbody);
-  $('tableMeta').textContent = `${rows.length} 행`;
+  $('adTableMeta').textContent = `${rows.length} 행`;
+}
+
+/* ====================================================================
+   IG DASHBOARD
+   ==================================================================== */
+async function loadIg() {
+  $('igLoading').style.display = 'block';
+  $('igContent').style.display = 'none';
+  $('igError').style.display = 'none';
+  try {
+    const [contentText, followerText] = await Promise.all([
+      (await fetch(IG_CONTENT_URL)).text(),
+      (await fetch(IG_FOLLOWER_URL)).text(),
+    ]);
+    parseIgContent(contentText);
+    parseIgFollower(followerText);
+    setupIgFilters();
+    rerenderIg();
+    $('igLoading').style.display = 'none';
+    $('igContent').style.display = 'block';
+  } catch (err) {
+    console.error(err);
+    $('igLoading').style.display = 'none';
+    $('igError').style.display = 'block';
+    $('igError').textContent = '⚠ 인스타 데이터 로드 실패: ' + err.message;
+  }
+}
+
+function parseIgContent(text) {
+  const res = Papa.parse(text.trim(), { header: true, skipEmptyLines: true });
+  const rows = (res.data || [])
+    .map(r => ({
+      date: parseDateGeneric(r['일시']),
+      type: (r['종류'] || '').trim(),
+      ip: (r['IP'] || '').trim(),
+      grade: (r['등급'] || '').trim(),
+      material: (r['소재'] || '').trim(),
+      campaign: (r['캠페인명'] || '').trim(),
+      channel: (r['채널'] || '').trim(),
+      format: (r['콘텐츠'] || '').trim(),
+      impressions: toNum(r['노출']),
+      likes: toNum(r['좋아요']),
+      comments: toNum(r['댓글']),
+      shares: toNum(r['공유']),
+      saves: toNum(r['저장']),
+      engRate: parseEngRate(r['참여율']),
+      url: (r['url'] || '').trim(),
+    }))
+    .filter(r => r.date != null);
+  ig.contentRows = rows;
+}
+
+function parseIgFollower(text) {
+  const res = Papa.parse(text.trim(), { header: true, skipEmptyLines: true });
+  const rows = (res.data || [])
+    .map(r => {
+      const out = { date: parseDateGeneric(r['일자']), values: {} };
+      for (const k of Object.keys(r)) {
+        if (k === '일자' || k === '' || k == null) continue;
+        const cleaned = k.replace(/\n/g, ' ').trim();
+        out.values[cleaned] = toNum(r[k]);
+      }
+      return out;
+    })
+    .filter(r => r.date != null);
+  ig.followerRows = rows;
+
+  const accountsWithData = {};
+  rows.forEach(r => {
+    for (const acc of Object.keys(r.values)) {
+      if (r.values[acc] > 0) {
+        if (!accountsWithData[acc] || accountsWithData[acc] < r.values[acc]) {
+          accountsWithData[acc] = r.values[acc];
+        }
+      }
+    }
+  });
+  const palette = ['#3182F6', '#ff7849', '#a78bfa', '#22c55e', '#f472b6', '#fcd34d', '#2dd4bf', '#fb923c', '#818cf8', '#34d399'];
+  ig.followerAccounts = Object.entries(accountsWithData)
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, val], i) => ({ name, latestValue: val, color: palette[i % palette.length] }));
+  ig.selectedFollowers = new Set(ig.followerAccounts.slice(0, 5).map(a => a.name));
+}
+
+function setupIgFilters() {
+  ig.ipList = unique(ig.contentRows.map(r => r.ip)).filter(Boolean).sort();
+  ig.channelList = unique(ig.contentRows.map(r => r.channel)).filter(Boolean).sort();
+  ig.formatList = unique(ig.contentRows.map(r => r.format)).filter(Boolean).sort();
+  buildFilterButtons('igIpFilter', ['all', ...ig.ipList], v => { ig.filter.ip = v; rerenderIg(); });
+  buildFilterButtons('igChannelFilter', ['all', ...ig.channelList], v => { ig.filter.channel = v; rerenderIg(); });
+  buildFilterButtons('igFormatFilter', ['all', ...ig.formatList], v => { ig.filter.format = v; rerenderIg(); });
+}
+
+function igFiltered() {
+  let rows = ig.contentRows.slice();
+  if (ig.filter.range) {
+    const cutoff = Date.now() - ig.filter.range * 86400000;
+    rows = rows.filter(r => r.date.getTime() >= cutoff);
+  }
+  if (ig.filter.ip !== 'all') rows = rows.filter(r => r.ip === ig.filter.ip);
+  if (ig.filter.channel !== 'all') rows = rows.filter(r => r.channel === ig.filter.channel);
+  if (ig.filter.format !== 'all') rows = rows.filter(r => r.format === ig.filter.format);
+  return rows;
+}
+
+function rerenderIg() {
+  renderIgKPIs();
+  renderIgFollowerChips();
+  renderIgFollowerChart();
+  renderIgIpChart();
+  renderIgChannelChart();
+  renderIgReach();
+  renderIgTopPosts();
+  renderIgTable();
+}
+
+function renderIgKPIs() {
+  const rows = igFiltered();
+  const totalImp = rows.reduce((s, r) => s + r.impressions, 0);
+  const totalEng = rows.reduce((s, r) => s + r.likes + r.comments + r.shares + r.saves, 0);
+  const avgEng = totalImp > 0 ? (totalEng / totalImp * 100) : null;
+  const postCount = rows.length;
+
+  let followerSum = null, followerDelta = null;
+  if (ig.followerRows.length > 0) {
+    const sorted = ig.followerRows.slice().sort((a, b) => b.date - a.date);
+    const latest = sorted[0], prev = sorted[1];
+    if (latest) {
+      followerSum = 0;
+      ig.selectedFollowers.forEach(acc => { followerSum += latest.values[acc] || 0; });
+      if (prev) {
+        let prevSum = 0;
+        ig.selectedFollowers.forEach(acc => { prevSum += prev.values[acc] || 0; });
+        followerDelta = followerSum - prevSum;
+      }
+    }
+  }
+
+  const kpis = [
+    { label: '총 노출', value: fmtNum(totalImp), subText: `${ig.filter.range || '전체'} 기간` },
+    { label: '평균 참여율', value: fmtPct(avgEng), subText: '좋아요+댓글+공유+저장 / 노출' },
+    {
+      label: '선택 채널 팔로워',
+      value: followerSum != null ? fmtNum(followerSum) : '—',
+      trend: followerDelta != null && followerSum != null ? (followerDelta / Math.max(followerSum - followerDelta, 1)) * 100 : null,
+      subText: '직전 주차 대비',
+    },
+    { label: '게시물 수', value: postCount.toLocaleString('ko-KR'), subText: `${ig.filter.range || '전체'} 기간` },
+  ];
+  renderKpiGrid('igKpiRow', kpis);
+}
+
+function renderIgFollowerChips() {
+  const wrap = $('igFollowerChips');
+  clearNode(wrap);
+  ig.followerAccounts.forEach(acc => {
+    const chip = document.createElement('span');
+    chip.className = 'fchip';
+    if (ig.selectedFollowers.has(acc.name)) {
+      chip.style.background = acc.color + '40';
+      chip.style.color = acc.color;
+      chip.style.borderColor = acc.color + '80';
+    }
+    chip.textContent = acc.name + ' · ' + fmtNum(acc.latestValue);
+    chip.addEventListener('click', () => {
+      if (ig.selectedFollowers.has(acc.name)) ig.selectedFollowers.delete(acc.name);
+      else ig.selectedFollowers.add(acc.name);
+      renderIgFollowerChips();
+      renderIgFollowerChart();
+      renderIgKPIs();
+    });
+    wrap.appendChild(chip);
+  });
+}
+
+function renderIgFollowerChart() {
+  const canvas = $('igFollowerChart');
+  if (ig.charts.follower) ig.charts.follower.destroy();
+  const sorted = ig.followerRows.slice().sort((a, b) => a.date - b.date);
+  let rows = sorted;
+  if (ig.filter.range) {
+    const cutoff = Date.now() - ig.filter.range * 86400000;
+    rows = sorted.filter(r => r.date.getTime() >= cutoff);
+  }
+  const labels = rows.map(r => fmtDate(r.date));
+  const selected = ig.followerAccounts.filter(a => ig.selectedFollowers.has(a.name));
+  const datasets = selected.map(acc => ({
+    label: acc.name,
+    data: rows.map(r => { const n = r.values[acc.name]; return n > 0 ? n : null; }),
+    borderColor: acc.color,
+    backgroundColor: acc.color + '20',
+    borderWidth: 2,
+    tension: 0.25,
+    spanGaps: true,
+    pointRadius: 1.5,
+    fill: false,
+  }));
+  ig.charts.follower = new Chart(canvas, { type: 'line', data: { labels, datasets }, options: chartOpts({ legend: false }) });
+  $('igFollowerMeta').textContent = `${rows.length} 주차 · ${selected.length} 채널`;
+}
+
+function renderIgIpChart() {
+  const canvas = $('igIpChart');
+  if (ig.charts.ip) ig.charts.ip.destroy();
+  const by = {};
+  igFiltered().forEach(r => { by[r.ip] = (by[r.ip] || 0) + r.impressions; });
+  const entries = Object.entries(by).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const palette = ['#3182F6', '#ff7849', '#a78bfa', '#22c55e', '#f472b6', '#fcd34d', '#2dd4bf', '#fb923c', '#818cf8', '#34d399'];
+  ig.charts.ip = new Chart(canvas, {
+    type: 'doughnut',
+    data: { labels: entries.map(e => e[0]), datasets: [{ data: entries.map(e => e[1]), backgroundColor: palette, borderColor: '#1a1d26', borderWidth: 2 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '60%',
+      plugins: {
+        legend: { position: 'right', labels: { color: 'rgba(255,255,255,0.7)', font: { size: 11 }, padding: 8, boxWidth: 10 } },
+        tooltip: { backgroundColor: '#1a1d26', callbacks: { label: ctx => `${ctx.label}: ${fmtNum(ctx.raw)}` } },
+      },
+    },
+  });
+}
+
+function renderIgChannelChart() {
+  const canvas = $('igChannelChart');
+  if (ig.charts.channel) ig.charts.channel.destroy();
+  const rows = igFiltered().filter(r => r.engRate != null);
+  const by = {};
+  rows.forEach(r => {
+    if (!by[r.channel]) by[r.channel] = { sum: 0, n: 0 };
+    by[r.channel].sum += r.engRate;
+    by[r.channel].n += 1;
+  });
+  const entries = Object.entries(by).map(([k, v]) => [k, v.sum / v.n]).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  ig.charts.channel = new Chart(canvas, {
+    type: 'bar',
+    data: { labels: entries.map(e => e[0]), datasets: [{ label: '평균 참여율 (%)', data: entries.map(e => e[1]), backgroundColor: 'rgba(167,139,250,0.7)', borderRadius: 4 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: { backgroundColor: '#1a1d26', callbacks: { label: ctx => fmtPct(ctx.raw) } },
+      },
+      scales: {
+        x: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { ticks: { color: 'rgba(255,255,255,0.7)', font: { size: 11 } }, grid: { display: false } },
+      },
+    },
+  });
+}
+
+function renderIgReach() {
+  const canvas = $('igReachChart');
+  if (ig.charts.reach) ig.charts.reach.destroy();
+  const rows = igFiltered().filter(r => r.impressions > 0).sort((a, b) => a.date - b.date);
+  const daily = {};
+  rows.forEach(r => {
+    const key = fmtDate(r.date);
+    daily[key] = (daily[key] || 0) + r.impressions;
+  });
+  const entries = Object.entries(daily);
+  ig.charts.reach = new Chart(canvas, {
+    type: 'bar',
+    data: { labels: entries.map(e => e[0]), datasets: [{ label: '일별 총 노출', data: entries.map(e => e[1]), backgroundColor: 'rgba(255, 120, 73, 0.7)', borderRadius: 3 }] },
+    options: chartOpts({ legend: false }),
+  });
+  $('igReachMeta').textContent = `${entries.length} 일자 · ${rows.length} 게시물`;
+}
+
+function renderIgTopPosts() {
+  const rows = igFiltered().filter(r => r.impressions > 0).sort((a, b) => b.impressions - a.impressions).slice(0, 10);
+  const wrap = $('igTopPosts');
+  clearNode(wrap);
+  if (rows.length === 0) {
+    const empty = document.createElement('div');
+    empty.style.padding = '24px';
+    empty.style.color = 'var(--muted)';
+    empty.style.textAlign = 'center';
+    empty.textContent = '필터 결과 없음';
+    wrap.appendChild(empty);
+    return;
+  }
+  rows.forEach((r, i) => {
+    const card = document.createElement('div');
+    card.className = 'top-post';
+    const head = document.createElement('div');
+    head.className = 'top-post-head';
+    const rank = document.createElement('span');
+    rank.className = 'top-post-rank';
+    rank.textContent = '#' + (i + 1);
+    head.appendChild(rank);
+    if (r.ip) { const b = document.createElement('span'); b.className = 'badge ip'; b.textContent = r.ip; head.appendChild(b); }
+    if (r.type) { const b = document.createElement('span'); b.className = 'badge type'; b.textContent = r.type; head.appendChild(b); }
+    if (r.channel) { const b = document.createElement('span'); b.className = 'badge ch'; b.textContent = r.channel; head.appendChild(b); }
+    if (r.format) { const b = document.createElement('span'); b.className = 'badge'; b.textContent = r.format; head.appendChild(b); }
+    card.appendChild(head);
+    const cap = document.createElement('div');
+    cap.className = 'top-post-cap';
+    cap.textContent = (r.campaign || r.material || '(캠페인 정보 없음)') + ' · ' + fmtDate(r.date);
+    card.appendChild(cap);
+    const metrics = document.createElement('div');
+    metrics.className = 'top-post-metrics';
+    [
+      { l: '노출', v: r.impressions }, { l: '좋아요', v: r.likes }, { l: '댓글', v: r.comments },
+      { l: '공유', v: r.shares }, { l: '참여율', v: r.engRate, pct: true }
+    ].forEach(m => {
+      if (m.v == null) return;
+      const span = document.createElement('span');
+      span.appendChild(document.createTextNode(m.l + ' '));
+      const v = document.createElement('span');
+      v.className = 'm-v';
+      v.textContent = m.pct ? fmtPct(m.v) : fmtNum(m.v);
+      span.appendChild(v);
+      metrics.appendChild(span);
+    });
+    card.appendChild(metrics);
+    if (r.url) {
+      const link = document.createElement('a');
+      link.className = 'top-post-link';
+      link.href = r.url;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = '↗ 원본 게시물 보기';
+      card.appendChild(link);
+    }
+    wrap.appendChild(card);
+  });
+}
+
+function renderIgTable() {
+  const rows = igFiltered().sort((a, b) => b.date - a.date).slice(0, 50);
+  const table = $('igTable');
+  clearNode(table);
+  const thead = document.createElement('thead');
+  const trh = document.createElement('tr');
+  ['날짜', 'IP', '캠페인', '채널', '형식', '노출', '좋아요', '댓글', '공유', '저장', '참여율', '링크']
+    .forEach(h => { const th = document.createElement('th'); th.textContent = h; trh.appendChild(th); });
+  thead.appendChild(trh);
+  table.appendChild(thead);
+  const tbody = document.createElement('tbody');
+  if (rows.length === 0) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 12; td.style.textAlign = 'center'; td.style.padding = '32px'; td.style.color = 'var(--muted)';
+    td.textContent = '필터 결과 없음';
+    tr.appendChild(td); tbody.appendChild(tr);
+  } else {
+    rows.forEach(r => {
+      const tr = document.createElement('tr');
+      const dateTd = document.createElement('td');
+      dateTd.textContent = fmtDate(r.date);
+      dateTd.style.whiteSpace = 'nowrap';
+      tr.appendChild(dateTd);
+      [r.ip, r.campaign || r.material, r.channel, r.format].forEach((v, idx) => {
+        const td = document.createElement('td');
+        td.textContent = v || '';
+        if (idx === 1) td.className = 'cap';
+        else td.style.whiteSpace = 'nowrap';
+        tr.appendChild(td);
+      });
+      [r.impressions, r.likes, r.comments, r.shares, r.saves].forEach(v => {
+        const td = document.createElement('td');
+        td.className = 'num';
+        td.textContent = v > 0 ? fmtNum(v) : '—';
+        tr.appendChild(td);
+      });
+      const engTd = document.createElement('td');
+      engTd.className = 'num';
+      engTd.textContent = r.engRate != null ? fmtPct(r.engRate) : '—';
+      tr.appendChild(engTd);
+      const linkTd = document.createElement('td');
+      if (r.url) {
+        const a = document.createElement('a');
+        a.href = r.url; a.target = '_blank'; a.rel = 'noopener';
+        a.style.color = 'var(--accent)';
+        a.textContent = '↗';
+        linkTd.appendChild(a);
+      }
+      tr.appendChild(linkTd);
+      tbody.appendChild(tr);
+    });
+  }
+  table.appendChild(tbody);
+  $('igTableMeta').textContent = `최근 ${rows.length} 건`;
 }
 </script>
 
