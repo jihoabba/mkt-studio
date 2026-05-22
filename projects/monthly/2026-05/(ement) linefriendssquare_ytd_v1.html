@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LINE FRIENDS · YTD 광고 성과 분석 2026</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F5F6FA;--surface:#FFFFFF;--surface2:#F0F1F7;
+  --border:#E4E6EF;--border-bright:#CDD0E3;
+  --text:#1A1D2E;--text-sub:#4A4F6B;--text-muted:#9096B8;
+  --blue:#3D6FFF;--blue-bg:#EEF2FF;
+  --coral:#FF5C5C;--coral-bg:#FFF0F0;
+  --green:#00C48C;--green-bg:#E6FBF5;
+  --yellow:#FFB800;--yellow-bg:#FFF8E6;
+  --purple:#8B5CF6;--purple-bg:#F3EFFE;
+  --orange:#FF8C42;--orange-bg:#FFF3EB;
+}
+body{background:var(--bg);color:var(--text);font-family:'Pretendard',-apple-system,sans-serif;min-height:100vh}
+
+/* 탭 */
+.tab-nav{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);padding:0 40px;display:flex;align-items:stretch;overflow-x:auto;scrollbar-width:none;box-shadow:0 2px 12px rgba(0,0,0,.05)}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-brand{display:flex;align-items:center;gap:8px;padding:0 24px 0 0;margin-right:16px;border-right:1px solid var(--border);flex-shrink:0}
+.tab-brand-logo{width:28px;height:28px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800}
+.tab-brand-text{font-size:12px;font-weight:700;color:var(--text);letter-spacing:-.01em;white-space:nowrap}
+.tab-brand-sub{font-size:11px;color:var(--text-muted)}
+.tab-btn{padding:16px 18px;font-size:12px;font-weight:600;font-family:'Pretendard',sans-serif;color:var(--text-muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s;flex-shrink:0}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
+.tab-num{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:var(--surface2);border-radius:4px;font-size:11px;font-weight:700;color:var(--text-muted);margin-right:6px}
+.tab-btn.active .tab-num{background:var(--blue-bg);color:var(--blue)}
+
+/* 섹션 */
+.section{display:none;padding:48px 40px 80px;max-width:1200px;margin:0 auto;animation:fadeIn .3s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* 타이포 */
+.sec-label{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--blue);background:var(--blue-bg);padding:4px 11px;border-radius:20px;margin-bottom:14px}
+.sec-title{font-size:clamp(22px,3vw,36px);font-weight:800;color:var(--text);letter-spacing:-.02em;margin-bottom:6px;line-height:1.2}
+.sec-sub{font-size:13px;color:var(--text-muted);margin-bottom:28px}
+
+/* 신호 배지 */
+.signal-banner{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px}
+.sig-chip{display:inline-flex;align-items:center;gap:6px;background:var(--green-bg);border:1px solid #b3f0de;color:#008a63;font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;line-height:1}
+.sig-dot{width:6px;height:6px;background:var(--green);border-radius:50%;flex-shrink:0}
+
+/* 카드 */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px}
+.card-label{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:20px}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 20px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.06)}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi-blue::before{background:var(--blue)}.kpi-green::before{background:var(--green)}
+.kpi-yellow::before{background:var(--yellow)}.kpi-coral::before{background:var(--coral)}
+.kpi-purple::before{background:var(--purple)}
+.kpi-label{font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:10px;letter-spacing:.04em}
+.kpi-value{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.02em;line-height:1;margin-bottom:6px}
+.kpi-sub{font-size:11px;color:var(--text-muted)}
+
+/* 진단 박스 */
+.diag-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:20px;display:flex;flex-direction:column;gap:10px}
+.diag-row{display:flex;align-items:flex-start;gap:12px;font-size:13px;color:var(--text-sub);line-height:1.6}
+.diag-row strong{color:var(--text);font-weight:600}
+.diag-badge{flex-shrink:0;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;margin-top:2px}
+.db-warn{background:var(--coral-bg);color:var(--coral)}.db-ok{background:var(--green-bg);color:#008a63}
+.db-info{background:var(--blue-bg);color:var(--blue)}.db-caution{background:var(--yellow-bg);color:#cc9200}
+
+/* 비교 */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.compare-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;position:relative;overflow:hidden}
+.compare-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.cc-blue::before{background:var(--blue)}.cc-purple::before{background:var(--purple)}
+.cc-coral::before{background:var(--coral)}
+.compare-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:16px}
+.compare-stat-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--surface2);font-size:13px}
+.compare-stat-row:last-child{border-bottom:none}
+.cs-label{color:var(--text-muted);font-weight:500}.cs-val{font-weight:700;color:var(--text)}
+.cs-val.good{color:var(--green)}.cs-val.warn{color:var(--coral)}.cs-val.blue{color:var(--blue)}
+
+/* 테이블 */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);text-align:right;padding:0 12px 10px;border-bottom:1.5px solid var(--border)}
+.data-table th:first-child{text-align:left}
+.data-table td{font-size:12px;font-weight:500;color:var(--text-sub);text-align:right;padding:12px;border-bottom:1px solid var(--surface2)}
+.data-table td:first-child{text-align:left;font-weight:600;color:var(--text)}
+.data-table tbody tr{transition:background .15s}
+.data-table tbody tr:hover{background:var(--surface2)}
+.data-table tbody tr:last-child td{border-bottom:none}
+
+/* 매체 테이블 */
+.media-th-row{display:grid;grid-template-columns:190px 1fr 1fr 160px 1fr 1fr;padding:0 16px 10px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1.5px solid var(--border);margin-bottom:6px}
+.mth{text-align:right;padding-right:8px}.mth:first-child{text-align:left;padding-right:0}
+.media-table-row{display:grid;grid-template-columns:190px 1fr 1fr 160px 1fr 1fr;padding:12px 16px;border-radius:10px;cursor:pointer;transition:background .15s;align-items:center;margin-bottom:2px;position:relative}
+.media-table-row:hover{background:var(--surface2)}
+.media-table-row::after{content:'';position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:0 2px 2px 0}
+.row-sa::after{background:var(--blue)}.row-da::after{background:var(--coral)}
+.mnc{display:flex;align-items:center;gap:7px;padding-left:8px}
+.mn{font-size:13px;font-weight:600;color:var(--text)}
+.badge{font-size:11px;font-weight:700;letter-spacing:.05em;padding:2px 7px;border-radius:4px;flex-shrink:0}
+.badge-sa{background:var(--blue-bg);color:var(--blue)}.badge-da{background:var(--coral-bg);color:var(--coral)}
+.mtd{font-size:12px;font-weight:500;color:var(--text-sub);text-align:right;padding-right:8px}
+.roas-wrap{display:flex;align-items:center;gap:8px;justify-content:flex-end;padding-right:8px}
+.roas-bar-bg{width:52px;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;flex-shrink:0}
+.roas-bar-fill{height:100%;border-radius:2px}
+.roas-num{font-size:12px;font-weight:700;min-width:50px;text-align:right}
+
+/* 하이라이트 카드 */
+.hl-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.hl-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.hl-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.hl-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.06)}
+.hl-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.hl-green::before{background:var(--green)}.hl-blue::before{background:var(--blue)}
+.hl-yellow::before{background:var(--yellow)}.hl-coral::before{background:var(--coral)}
+.hl-purple::before{background:var(--purple)}.hl-orange::before{background:var(--orange)}
+.hl-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-bottom:10px}
+.tag-green{background:var(--green-bg);color:#008a63}.tag-blue{background:var(--blue-bg);color:var(--blue)}
+.tag-yellow{background:var(--yellow-bg);color:#cc9200}.tag-coral{background:var(--coral-bg);color:var(--coral)}
+.tag-orange{background:var(--orange-bg);color:var(--orange)}
+.hl-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4;letter-spacing:-.01em}
+.hl-body{font-size:12px;color:var(--text-sub);line-height:1.7}
+.hl-body strong{color:var(--text);font-weight:600}
+
+/* 인사이트 */
+.insight-box{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:14px;padding:26px 30px;margin-bottom:20px}
+.insight-box.green-line{border-left-color:var(--green)}
+.insight-box.coral-line{border-left-color:var(--coral)}
+.insight-title{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:16px}
+.insight-box.green-line .insight-title{color:#008a63}
+.insight-box.coral-line .insight-title{color:var(--coral)}
+.insight-body{font-size:13px;color:var(--text-sub);line-height:1.9}
+.insight-body p{margin-bottom:12px}.insight-body p:last-child{margin-bottom:0}
+.insight-body strong{color:var(--text);font-weight:600}
+.num{color:var(--blue);font-weight:700}.warn{color:var(--coral);font-weight:600}
+.good{color:#008a63;font-weight:600}.caution{color:#cc9200;font-weight:600}
+
+/* 버블 */
+.bubble-area{position:relative;width:100%;height:340px;border-left:1.5px solid var(--border-bright);border-bottom:1.5px solid var(--border-bright);margin-left:44px;margin-bottom:32px}
+.grid-h{position:absolute;left:0;right:0;border-top:1px dashed var(--border)}
+.grid-v{position:absolute;top:0;bottom:0;border-left:1px dashed var(--border)}
+.axis-tick{position:absolute;font-size:11px;font-weight:500;color:var(--text-muted)}
+.tick-y{right:calc(100% + 8px);transform:translateY(-50%)}
+.tick-x{top:calc(100% + 8px);transform:translateX(-50%)}
+.bubble{position:absolute;border-radius:50%;transform:translate(-50%,-50%);cursor:pointer;transition:transform .2s,box-shadow .2s;display:flex;align-items:center;justify-content:center}
+.bubble:hover{transform:translate(-50%,-50%) scale(1.1);box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:10}
+.bbl{font-size:11px;font-weight:700;color:#fff;text-align:center;pointer-events:none;line-height:1.3;padding:0 2px}
+.legend-row{display:flex;gap:18px;align-items:center}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--text-sub)}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+
+/* IP 바 */
+.ip-bar-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--surface2)}
+.ip-bar-row:last-child{border-bottom:none}
+.ip-name{font-size:12px;font-weight:600;color:var(--text);width:110px;flex-shrink:0}
+.ip-bar-track{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.ip-bar-fill{height:100%;border-radius:4px}
+.ip-roas-val{font-size:12px;font-weight:700;width:60px;text-align:right;flex-shrink:0}
+
+/* 툴팁 */
+.tooltip{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;pointer-events:none;z-index:999;min-width:180px;opacity:0;transition:opacity .12s;box-shadow:0 12px 40px rgba(0,0,0,.1)}
+.tooltip.show{opacity:1}
+.tt-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.tt-row{display:flex;justify-content:space-between;gap:14px;font-size:11px;color:var(--text-muted);margin-bottom:4px}
+.tt-val{font-weight:600;color:var(--text-sub)}
+
+@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.compare-grid{grid-template-columns:1fr}.hl-grid-3{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.tab-nav{padding:0 16px}.section{padding:32px 16px 60px}.hl-grid-2,.compare-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav class="tab-nav">
+  <div class="tab-brand">
+    <div class="tab-brand-logo">LF</div>
+    <div><div class="tab-brand-text">LINE FRIENDS</div><div class="tab-brand-sub">YTD 2026.01–05</div></div>
+  </div>
+  <button class="tab-btn active" onclick="switchTab(0)"><span class="tab-num">1</span>전체 성과</button>
+  <button class="tab-btn" onclick="switchTab(1)"><span class="tab-num">2</span>월별 트렌드</button>
+  <button class="tab-btn" onclick="switchTab(2)"><span class="tab-num">3</span>스토어</button>
+  <button class="tab-btn" onclick="switchTab(3)"><span class="tab-num">4</span>SA / DA</button>
+  <button class="tab-btn" onclick="switchTab(4)"><span class="tab-num">5</span>매체별</button>
+  <button class="tab-btn" onclick="switchTab(5)"><span class="tab-num">6</span>IP별</button>
+  <button class="tab-btn" onclick="switchTab(6)"><span class="tab-num">7</span>교차 분석</button>
+</nav>
+
+<!-- S1 전체 성과 -->
+<div class="section active" id="sec0">
+  <div class="sec-label">Section 01 · Executive Summary</div>
+  <h1 class="sec-title">YTD 준수한 효율을 기록 중,<br>월별 편차와 구조적 흐름을 함께 봐야 한다</h1>
+  <p class="sec-sub">2026.01.01 ~ 05.17 YTD · 스토어 2개 · 매체 11개 · IP 9종</p>
+  <div class="signal-banner">
+    <div class="sig-chip"><div class="sig-dot"></div>ROAS 727% — 업계 평균 대비 준수한 효율 수준</div>
+    <div class="sig-chip"><div class="sig-dot"></div>SA ROAS 1,208% — 브랜드 검색 수요 기반 전환 견인</div>
+    <div class="sig-chip"><div class="sig-dot"></div>구매 29,605건 — IP 브랜드 자산이 전환 구조 형성</div>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi-card kpi-blue"><div class="kpi-label">총 광고비</div><div class="kpi-value">2.20억</div><div class="kpi-sub">219,510,850원</div></div>
+    <div class="kpi-card kpi-green"><div class="kpi-label">총 매출</div><div class="kpi-value">15.96억</div><div class="kpi-sub">1,595,682,845원</div></div>
+    <div class="kpi-card kpi-yellow"><div class="kpi-label">전체 ROAS</div><div class="kpi-value">727%</div><div class="kpi-sub">SA 1,208% / DA 397%</div></div>
+    <div class="kpi-card kpi-coral"><div class="kpi-label">총 구매수</div><div class="kpi-value">29,605</div><div class="kpi-sub">CPA 7,415원</div></div>
+  </div>
+  <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="kpi-card kpi-purple"><div class="kpi-label">총 노출</div><div class="kpi-value">9,306만</div><div class="kpi-sub">93,064,040회</div></div>
+    <div class="kpi-card kpi-blue"><div class="kpi-label">총 클릭</div><div class="kpi-value">81.6만</div><div class="kpi-sub">CTR 0.88%</div></div>
+    <div class="kpi-card kpi-green"><div class="kpi-label">평균 CVR</div><div class="kpi-value">3.37%</div><div class="kpi-sub">클릭 대비 구매 전환율</div></div>
+  </div>
+  <div class="diag-box">
+    <div class="diag-row"><span class="diag-badge db-caution">특이점</span><span><strong>2월은 MMMM IP 신규 상품 출시 효과로 매출이 집중된 특이 구간이다.</strong> ROAS 1,686%, CVR 5.26%는 상시 운영 대비 이례적으로 높은 수준으로, <br>2월을 제외한 나머지 구간의 흐름을 실질 운영 성과 기준선으로 읽는 것이 적합하다.</span></div>
+    <div class="diag-row"><span class="diag-badge db-info">집계</span><span><strong>5월은 5/17까지의 데이터가 반영된 부분 집계 구간이다.</strong> 광고비·매출 절대값은 월 전체 대비 낮게 나타나며, CVR·ROAS 등 비율 지표 추이 중심으로 판단하는 것이 적합하다.</span></div>
+    <div class="diag-row"><span class="diag-badge db-ok">긍정</span><span><strong>ROAS 727%는 IP 브랜드 자산이 광고 효율을 구조적으로 높이는 결과다.</strong> SA 중심의 전환 구조와 스퀘어 스토어의 높은 효율이 전체 평균을 견인하고 있다.</span></div>
+    <div class="diag-row"><span class="diag-badge db-warn">추이</span><span><strong>4월 이후 CPC 상승과 CVR 하락이 동시에 나타나고 있다.</strong> 소재 효율과 타겟 적합도에 대한 점검이 필요한 시점이다.</span></div>
+  </div>
+  <div class="insight-box">
+    <div class="insight-title">종합 해석</div>
+    <div class="insight-body">
+      <p><span class="good">YTD 전체 성과는 준수한 효율 수준을 유지하고 있다.</span> ROAS 727%, CPA 7,415원, CVR 3.37%는 IP 브랜드 특성을 감안하면 안정적인 수치다. <br>SA 중심의 전환 구조와 스퀘어 스토어의 효율이 전체 평균을 견인하고 있다.</p>
+      <p>2월 MMMM 출시 효과라는 특이 구간이 YTD 평균을 높여놓은 구조이므로, 2월을 제외한 1·3·4·5월의 흐름을 상시 운영 성과의 실질 기준선으로 삼아야 한다. <br>이 구간의 ROAS는 278~528% 범위로 분포한다.</p>
+      <p><strong>4월 이후 CPC 상승(327원→375원)과 CVR 하락(2.83%→2.07%) 추이는 주목해야 할 신호다.</strong> <br>볼륨 유지를 위한 DA·쇼핑 SA 운영이 지속되는 가운데, 소재 리프레시 및 오디언스 정교화를 통한 효율 회복 여지가 있다.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S2 월별 트렌드 -->
+<div class="section" id="sec1">
+  <div class="sec-label">Section 02 · 월별 트렌드</div>
+  <h1 class="sec-title">2월 MMMM 출시 효과 이후<br>상시 운영 구간의 지표 흐름</h1>
+  <p class="sec-sub">월별 광고비·매출·ROAS·CVR·CPC 추이 · 5월은 ~17일 부분 집계</p>
+  <div class="signal-banner">
+    <div class="sig-chip"><div class="sig-dot"></div>2월 MMMM 출시 — IP 신제품의 매출 집중 효과 확인</div>
+    <div class="sig-chip"><div class="sig-dot"></div>1·3월 ROAS 500~667% — 상시 운영 기준 준수한 효율</div>
+  </div>
+  <div class="card">
+    <div class="card-label">월별 핵심 지표</div>
+    <table class="data-table">
+      <thead><tr><th style="text-align:left">월</th><th>광고비</th><th>매출</th><th>ROAS</th><th>구매수</th><th>CVR</th><th>CPC</th></tr></thead>
+      <tbody>
+        <tr><td>1월</td><td>7,155만</td><td>3억 7,806만</td><td style="color:#FFB800;font-weight:700">528%</td><td>8,779</td><td>3.34%</td><td>272원</td></tr>
+        <tr style="background:#FFF8E6"><td>2월 ★</td><td>4,137만</td><td>6억 9,750만</td><td style="color:#00C48C;font-weight:700">1,686%</td><td>10,967</td><td>5.26%</td><td>198원</td></tr>
+        <tr><td>3월</td><td>3,451만</td><td>2억 3,002만</td><td style="color:#FFB800;font-weight:700">667%</td><td>4,430</td><td>3.29%</td><td>256원</td></tr>
+        <tr><td>4월</td><td>4,635만</td><td>2억 1,862만</td><td style="color:#FF8C42;font-weight:700">472%</td><td>4,014</td><td>2.83%</td><td>327원</td></tr>
+        <tr style="background:#F0F1F7"><td>5월 (~17일)</td><td>2,572만</td><td>7,149만</td><td style="color:#FF8C42;font-weight:700">278%</td><td>1,415</td><td>2.07%</td><td>375원</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:12px;display:flex;gap:16px;font-size:11px;color:var(--text-muted)">
+      <span style="color:#cc9200">★ 2월: MMMM IP 신규 상품 출시로 인한 매출 집중 구간</span>
+      <span>5월: 17일까지 부분 집계 · 비율 지표 추이 중심 판단</span>
+    </div>
+  </div>
+  <div class="hl-grid-2">
+    <div class="hl-card hl-yellow">
+      <div class="hl-tag tag-yellow">★ 특이 구간</div>
+      <div class="hl-title">2월 — MMMM IP 출시로 인한 매출 집중</div>
+      <div class="hl-body">MMMM 신규 IP 상품 출시로 매출 <strong>6억 9,750만원</strong>이 집중됐다. ROAS 1,686%, CVR 5.26%는 상시 운영 대비 이례적으로 높은 수치로, <strong>IP 신제품 출시 시 효율이 폭발적으로 상승하는 패턴</strong>의 레퍼런스가 된다. 향후 신규 IP 출시 시즌의 운영 전략 수립에 참고할 수 있다.</div>
+    </div>
+    <div class="hl-card hl-coral">
+      <div class="hl-tag tag-coral">📉 추이 점검</div>
+      <div class="hl-title">4월 이후 CPC 상승 · CVR 하락 동시 진행</div>
+      <div class="hl-body">CPC가 1월 272원 → 4월 327원 → 5월 375원으로 꾸준히 상승하는 반면, CVR은 3.34% → 2.83% → 2.07%로 하락 중이다. 클릭 단가 상승과 전환율 하락이 동시에 진행되는 흐름으로, <strong>소재 효율 또는 오디언스 적합도</strong>에 대한 점검이 필요한 시점이다.</div>
+    </div>
+  </div>
+  <div class="insight-box">
+    <div class="insight-title">월별 트렌드 해석</div>
+    <div class="insight-body">
+      <p><strong>2월을 제외한 상시 운영 구간(1·3·4월)의 ROAS는 472~667% 범위에서 형성되고 있다.</strong> <span class="good"><br>1월 528%, 3월 667%는 준수한 상시 효율 수준이며</span>, SA 중심 전환 구조가 안정적으로 작동하고 있는 것으로 해석할 수 있다.</p>
+      <p>3월 광고비가 3,451만원으로 축소됐음에도 ROAS 667%를 기록한 것은 예산 효율화 관점에서 긍정적이다. 무리한 볼륨 확장 없이도 전환 효율이 유지된 구간이다.</p>
+      <p><span class="warn">4월은 광고비를 4,635만원으로 늘렸음에도 ROAS가 472%로 낮아진 점이 주목된다.</span> <br>예산 증가가 효율 개선으로 이어지지 않은 구간으로, 4월 집행된 캠페인 믹스와 소재 성과를 별도로 살펴볼 필요가 있다. <br>5월의 비율 지표 하락(CVR 2.07%, CPC 375원)도 이 흐름의 연장선에서 모니터링이 필요하다.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S3 스토어 -->
+<div class="section" id="sec2">
+  <div class="sec-label">Section 03 · 스토어 분석</div>
+  <h1 class="sec-title">스스 vs 스퀘어 —<br>운영 구조가 다른 두 스토어</h1>
+  <p class="sec-sub">매체 믹스와 운영 목표 차이로 인해 단순 ROAS 비교는 적합하지 않다</p>
+  <div class="signal-banner">
+    <div class="sig-chip"><div class="sig-dot"></div>스퀘어 ROAS 1,083% — SA 집중 구조의 효율</div>
+    <div class="sig-chip"><div class="sig-dot"></div>스스 구매 13,960건 — DA 중심 볼륨 채널 역할 수행</div>
+  </div>
+  <div class="compare-grid">
+    <div class="compare-card cc-blue">
+      <div class="compare-title">스스</div>
+      <div class="compare-stat-row"><span class="cs-label">광고비</span><span class="cs-val">1억 1,305만 (51.5%)</span></div>
+      <div class="compare-stat-row"><span class="cs-label">매출</span><span class="cs-val">4억 4,326만</span></div>
+      <div class="compare-stat-row"><span class="cs-label">ROAS</span><span class="cs-val">392%</span></div>
+      <div class="compare-stat-row"><span class="cs-label">구매수</span><span class="cs-val">13,960건</span></div>
+      <div class="compare-stat-row"><span class="cs-label">매체 믹스</span><span class="cs-val">DA 71% / SA 29%</span></div>
+    </div>
+    <div class="compare-card cc-purple">
+      <div class="compare-title">스퀘어</div>
+      <div class="compare-stat-row"><span class="cs-label">광고비</span><span class="cs-val">1억 645만 (48.5%)</span></div>
+      <div class="compare-stat-row"><span class="cs-label">매출</span><span class="cs-val good">11억 5,242만</span></div>
+      <div class="compare-stat-row"><span class="cs-label">ROAS</span><span class="cs-val good">1,083%</span></div>
+      <div class="compare-stat-row"><span class="cs-label">구매수</span><span class="cs-val">15,645건</span></div>
+      <div class="compare-stat-row"><span class="cs-label">매체 믹스</span><span class="cs-val blue">SA 54% / DA 46%</span></div>
+    </div>
+  </div>
+  <div class="hl-grid-2">
+    <div class="hl-card hl-blue">
+      <div class="hl-tag tag-blue">📊 구조 차이</div>
+      <div class="hl-title">매체 믹스 자체가 다르다</div>
+      <div class="hl-body">스스는 광고비의 <strong>71%를 DA</strong>에 배분해 타겟 확대와 상시 볼륨 유지에 집중하는 반면, 스퀘어는 <strong>54%를 SA</strong>에 배분해 검색 수요 기반 전환 중심으로 운영된다. 두 스토어의 ROAS를 같은 기준으로 비교하는 것은 운영 목표가 다른 채널을 동일 잣대로 평가하는 것과 같다.</div>
+    </div>
+    <div class="hl-card hl-yellow">
+      <div class="hl-tag tag-yellow">📈 스스 해석</div>
+      <div class="hl-title">스스 ROAS 392%는 DA 운영 비중의 결과</div>
+      <div class="hl-body">스스에서 메타 협력광고를 제외하고 재산정하면 ROAS는 약 <strong>502%</strong> 수준이다. 메타 협력광고 한 라인이 전체 평균을 끌어내리고 있으며, 볼륨 확보 채널로서의 역할은 구매수 <strong>13,960건</strong>에서 확인된다.</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">월별 ROAS 추이 — 스스 vs 스퀘어</div>
+    <table class="data-table">
+      <thead><tr><th style="text-align:left">월</th><th>스스 ROAS</th><th>스퀘어 ROAS</th><th>스스 광고비</th><th>스퀘어 광고비</th></tr></thead>
+      <tbody>
+        <tr><td>1월</td><td>320%</td><td style="color:#00C48C;font-weight:700">889%</td><td>4,537만</td><td>2,618만</td></tr>
+        <tr style="background:#FFF8E6"><td>2월 ★</td><td>484%</td><td style="color:#00C48C;font-weight:700">2,880%</td><td>2,062만</td><td>2,075만</td></tr>
+        <tr><td>3월</td><td>545%</td><td style="color:#00C48C;font-weight:700">734%</td><td>1,237만</td><td>2,214만</td></tr>
+        <tr><td>4월</td><td>402%</td><td style="color:#FFB800;font-weight:700">545%</td><td>2,369만</td><td>2,266만</td></tr>
+        <tr style="background:#F0F1F7"><td>5월 (~17일)</td><td style="color:#00C48C;font-weight:700">324%</td><td style="color:#FF8C42;font-weight:700">244%</td><td>1,099만</td><td>1,473만</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:10px;font-size:11px;color:var(--text-muted)">★ 2월: MMMM IP 출시 특이 구간 · 5월: 17일까지 부분 집계</div>
+  </div>
+  <div class="insight-box">
+    <div class="insight-title">스토어 분석 해석</div>
+    <div class="insight-body">
+      <p><span class="good">스퀘어는 SA 중심 구조에서 일관되게 준수한 효율을 기록하고 있다.</span> 2월 MMMM 출시 효과를 제외한 1·3·4월 ROAS가 545~889% 범위로 유지되며 검색 수요 기반의 안정적인 전환 흐름이 확인된다.</p>
+      <p><strong>스스는 DA 비중이 높은 운영 구조로 타겟 확대와 볼륨 유지를 담당하고 있다.</strong> <br>ROAS 지표만으로 스스의 운영 효율을 판단하는 것은 적합하지 않으며, 구매 볼륨 13,960건과 노출·클릭 기여도를 함께 고려해야 한다. <br>메타 협력광고 운영 효율 개선이 스스 전체 ROAS를 끌어올리는 데 가장 직접적인 레버가 된다.</p>
+      <p><span class="caution">5월 부분 집계 구간에서 스스(324%)가 스퀘어(244%)를 앞선 것은 이례적인 수치지만, 월 전체 데이터가 아닌 구간임을 감안해 단정적으로 해석하지 않는 것이 좋다.</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- S4 SA/DA -->
+<div class="section" id="sec3">
+  <div class="sec-label">Section 04 · SA / DA 분석</div>
+  <h1 class="sec-title">SA와 DA는 운영 목표가 다른<br>상호 보완적 구조로 운영 중</h1>
+  <p class="sec-sub">SA — 검색 수요 기반 전환 / DA — 타겟 확대 및 상시 볼륨 유지</p>
+  <div class="signal-banner">
+    <div class="sig-chip"><div class="sig-dot"></div>SA 구매수 18,316건 — 검색 기반 전환이 전체의 62%</div>
+    <div class="sig-chip"><div class="sig-dot"></div>DA — 타겟 확대·볼륨 유지 목적으로 상시 운영 중</div>
+  </div>
+  <div class="compare-grid">
+    <div class="compare-card cc-blue">
+      <div class="compare-title">SA (검색광고)</div>
+      <div class="compare-stat-row"><span class="cs-label">광고비</span><span class="cs-val">8,929만 (40.7%)</span></div>
+      <div class="compare-stat-row"><span class="cs-label">매출</span><span class="cs-val good">10억 7,866만 (67.6%)</span></div>
+      <div class="compare-stat-row"><span class="cs-label">ROAS</span><span class="cs-val good">1,208%</span></div>
+      <div class="compare-stat-row"><span class="cs-label">구매수</span><span class="cs-val">18,316건 (61.9%)</span></div>
+    </div>
+    <div class="compare-card cc-coral">
+      <div class="compare-title">DA (디스플레이광고)</div>
+      <div class="compare-stat-row"><span class="cs-label">광고비</span><span class="cs-val">1억 3,022만 (59.3%)</span></div>
+      <div class="compare-stat-row"><span class="cs-label">매출</span><span class="cs-val">5억 1,703만 (32.4%)</span></div>
+      <div class="compare-stat-row"><span class="cs-label">ROAS</span><span class="cs-val">397%</span></div>
+      <div class="compare-stat-row"><span class="cs-label">구매수</span><span class="cs-val">11,289건 (38.1%)</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">월별 SA / DA ROAS 추이</div>
+    <table class="data-table">
+      <thead><tr><th style="text-align:left">월</th><th>SA ROAS</th><th>DA ROAS</th><th>SA 광고비</th><th>DA 광고비</th></tr></thead>
+      <tbody>
+        <tr><td>1월</td><td style="color:#00C48C;font-weight:700">799%</td><td>383%</td><td>2,500만</td><td>4,655만</td></tr>
+        <tr style="background:#FFF8E6"><td>2월 ★</td><td style="color:#00C48C;font-weight:700">2,919%</td><td>669%</td><td>1,871만</td><td>2,267만</td></tr>
+        <tr><td>3월</td><td style="color:#00C48C;font-weight:700">1,013%</td><td>380%</td><td>1,564만</td><td>1,887만</td></tr>
+        <tr><td>4월</td><td style="color:#FFB800;font-weight:700">778%</td><td style="color:#FF8C42">281%</td><td>1,780만</td><td>2,856만</td></tr>
+        <tr style="background:#F0F1F7"><td>5월 (~17일)</td><td style="color:#FF8C42;font-weight:700">297%</td><td>261%</td><td>1,214만</td><td>1,357만</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:10px;font-size:11px;color:var(--text-muted)">★ 2월: MMMM IP 출시 특이 구간 · 5월: 17일까지 부분 집계</div>
+  </div>
+  <div class="hl-grid-2">
+    <div class="hl-card hl-blue">
+      <div class="hl-tag tag-blue">📊 운영 구조</div>
+      <div class="hl-title">DA — 타겟 확대와 상시 볼륨 유지가 목표</div>
+      <div class="hl-body">DA는 프로모션·신제품을 제외한 상시 운영에서 <strong>타겟군을 지속적으로 넓히고 볼륨을 유지</strong>하는 역할을 담당한다. 노출 확장·신규 타겟 도달·상시 트래픽 유입 기여도를 함께 평가하는 것이 적합하다.</div>
+    </div>
+    <div class="hl-card hl-coral">
+      <div class="hl-tag tag-coral">📉 추이 점검</div>
+      <div class="hl-title">4월 이후 DA ROAS 하락 — 효율 점검 필요</div>
+      <div class="hl-body">DA ROAS가 3월 380% → 4월 281% → 5월 261%로 하락 중이다. 볼륨 유지 기조를 유지하면서도 <strong>소재 리프레시와 오디언스 세분화</strong>를 통해 단위 효율을 회복할 여지가 있다.</div>
+    </div>
+  </div>
+  <div class="insight-box">
+    <div class="insight-title">SA / DA 구조 해석</div>
+    <div class="insight-body">
+      <p><strong>SA와 DA는 서로 다른 목표를 가진 상호 보완 구조로 운영되고 있다.</strong> <br>SA가 검색 수요를 기반으로 전환을 집중적으로 끌어오는 역할을 한다면, DA는 상시 볼륨 유지와 신규 타겟 도달을 통해 잠재 수요층을 넓히는 역할을 담당한다.</p>
+      <p><span class="good">SA는 준수한 전환 효율을 안정적으로 유지하고 있다.</span> 2월 특이 구간을 제외한 1·3·4월 SA ROAS가 778~1,013% 범위로 형성되며, 브랜드 검색 수요 기반의 전환 구조가 잘 작동하고 있다.</p>
+      <p>네이버 쇼핑 SA는 상품 단위 입찰을 통해 네이버 쇼핑 지면에 다양하게 노출시키며 <strong>네이버 생태계 내 상시 볼륨을 확보</strong>하는 역할을 담당한다. <br>브랜드·일반 검색광고와 성격이 다른 매체로, 노출·클릭 볼륨과 쇼핑 지면 점유율 관점에서 평가하는 것이 적합하다.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S5 매체별 -->
+<div class="section" id="sec4">
+  <div class="sec-label">Section 05 · 매체별 분석</div>
+  <h1 class="sec-title">매출은 소수 매체가 견인,<br>볼륨은 다수 매체가 분담</h1>
+  <p class="sec-sub">11개 매체 광고비·ROAS·구매 볼륨 교차 분석</p>
+  <div class="signal-banner">
+    <div class="sig-chip"><div class="sig-dot"></div>브랜드 SA + 구글 SA — 광고비 25%로 매출 57% 기여</div>
+    <div class="sig-chip"><div class="sig-dot"></div>메타 어드밴티지 — DA 내 준수한 효율로 안정 운영 중</div>
+    <div class="sig-chip"><div class="sig-dot"></div>29CM 협력광고 — 신규 채널 소규모 테스트 ROAS 849% 확인</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Bubble Chart — 광고비(X) × ROAS(Y) × 구매수(버블 크기)</div>
+    <div style="position:relative">
+      <div class="bubble-area" id="bubbleChart"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-left:44px;margin-top:-8px">
+        <div class="legend-row">
+          <div class="legend-item"><div class="legend-dot" style="background:#3D6FFF"></div>SA 매체</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#FF5C5C"></div>DA 매체</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#ccc;width:14px;height:14px"></div>버블 크기 = 구매수</div>
+        </div>
+        <span style="font-size:11px;color:var(--text-muted)">버블에 마우스를 올리면 상세 정보</span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div class="card-label" style="margin-bottom:0">전체 매체 성과표 — ROAS 순</div>
+      <div style="display:flex;gap:8px"><span class="badge badge-sa">SA</span><span class="badge badge-da">DA</span></div>
+    </div>
+    <div class="media-th-row"><div>매체명</div><div class="mth">광고비</div><div class="mth">매출</div><div class="mth" style="text-align:right;padding-right:8px">ROAS</div><div class="mth">구매수</div><div class="mth">CPC</div></div>
+    <div id="mediaTableBody"></div>
+  </div>
+  <div class="hl-grid-2">
+    <div class="hl-card hl-green">
+      <div class="hl-tag tag-green">✅ 핵심 전환 매체</div>
+      <div class="hl-title">브랜드 SA + 구글 SA — 광고비 25%로 매출 57%</div>
+      <div class="hl-body">합산 광고비 5,396만원(24.6%)으로 매출 <strong>9억 600만원</strong>을 견인한다. 브랜드 검색 수요가 높은 유저가 집중되는 구조로, 노출 대비 전환 밀도가 전 매체 중 가장 높다.</div>
+    </div>
+    <div class="hl-card hl-yellow">
+      <div class="hl-tag tag-yellow">🔍 확대 실험 가치</div>
+      <div class="hl-title">메타 29CM 협력광고 — 신규 채널 조합 ROAS 849%</div>
+      <div class="hl-body">3월 단 <strong>157만원</strong> 집행에 ROAS <strong>849%</strong>. ZOA IP와 29CM 채널의 조합에서 유의미한 수치가 확인됐다. 타 IP 적용 또는 예산 확대 실험을 통해 재현 가능성을 검증해볼 수 있다.</div>
+    </div>
+    <div class="hl-card hl-coral">
+      <div class="hl-tag tag-coral">⚠ 점검 필요</div>
+      <div class="hl-title">메타 협력광고 — 클릭 대비 구매로의 연결 효율 개선 여지</div>
+      <div class="hl-body">광고비 <strong>3,737만원(2위)</strong>에 ROAS <strong>171%</strong>. 클릭은 전체 1위(21%)지만 구매로의 연결이 낮다. 같은 메타 인벤토리의 어드밴티지(<strong>ROAS 555%</strong>)가 준수한 효율을 유지 중인 점을 감안해, <strong>카탈로그·오디언스·소재 설정</strong>을 중심으로 점검이 필요하다.</div>
+    </div>
+    <div class="hl-card hl-blue">
+      <div class="hl-tag tag-blue">📊 운영 관점</div>
+      <div class="hl-title">네이버 쇼핑 SA — 네이버 생태계 상시 볼륨 확보</div>
+      <div class="hl-body">상품 단위 입찰을 통해 네이버 쇼핑 지면에 다양하게 노출시키며 <strong>네이버 생태계 내 상시 트래픽과 볼륨을 유지</strong>하는 역할을 담당한다. ROAS보다 노출·클릭 볼륨과 쇼핑 지면 점유율 기준으로 평가하는 것이 적합하다.</div>
+    </div>
+  </div>
+  <div class="insight-box">
+    <div class="insight-title">매체별 분석 해석</div>
+    <div class="insight-body">
+      <p><span class="good">매출 기여 구조는 집중된 형태로 잘 작동하고 있다.</span> <br>상위 4개 매체(브랜드 SA·구글 SA·메타 어드밴티지·네이버 쇼핑 SA)가 전체 매출의 76%를 담당하며, 이 4개 매체의 광고비 비중은 55%다. <br>나머지 매체들은 볼륨 유지와 타겟 확장의 역할을 분담하는 구조다.</p>
+      <p>노출 비중 <strong>0.3%</strong>인 네이버 브랜드 SA가 매출 <strong>40%</strong>를 만들고, 노출 26%인 크리테오는 매출 4%에 그친다. 노출 볼륨보다 유저의 구매 의도가 전환을 결정하는 구조가 데이터로 확인된다.</p>
+      <p><span class="warn">메타 협력광고는 클릭에서 구매로의 연결 과정에서 효율 개선 여지가 가장 큰 매체다.</span> <br>광고비 17% → 클릭 21%(1위) → 구매 5.8% → 매출 4.0%의 흐름에서, <br>같은 메타 인벤토리의 어드밴티지(광고비 16% → 매출 12%)와 비교하면 카탈로그·오디언스·소재 설정에서 개선 포인트를 찾는 것이 적합하다.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S6 IP별 -->
+<div class="section" id="sec5">
+  <div class="sec-label">Section 06 · IP별 분석</div>
+  <h1 class="sec-title">개별 IP의 효율은 IP 자체보다<br>운영 채널 구조에서 결정된다</h1>
+  <p class="sec-sub">IP별 운영 현황 및 채널 구조 분석 · DA 운영 기준</p>
+  <div class="signal-banner">
+    <div class="sig-chip"><div class="sig-dot"></div>ZOA — 29CM 채널에서 ROAS 849%, 채널 조합 가능성 확인</div>
+    <div class="sig-chip"><div class="sig-dot"></div>BT21·조구만 — 협력광고 내 범용 타겟 대비 높은 전환 효율</div>
+  </div>
+  <div class="card">
+    <div class="card-label">IP별 ROAS 비교 (DA 운영 기준)</div>
+    <div id="ipBarChart" style="padding:8px 0"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">IP별 상세 성과</div>
+    <table class="data-table">
+      <thead><tr><th style="text-align:left">IP</th><th>운영 매체</th><th>광고비</th><th>매출</th><th>ROAS</th><th>구매수</th></tr></thead>
+      <tbody>
+        <tr><td>ZOA</td><td style="font-size:11px;color:var(--text-muted)">메타 29CM 협력광고</td><td>157만</td><td>1,338만</td><td style="color:#00C48C;font-weight:700">849%</td><td>137건</td></tr>
+        <tr><td>ALL (범용)</td><td style="font-size:11px;color:var(--text-muted)">어드밴티지 외 4개</td><td>8,581만</td><td>3억 9,038만</td><td style="color:#FFB800;font-weight:700">455%</td><td>8,941건</td></tr>
+        <tr><td>BT21</td><td style="font-size:11px;color:var(--text-muted)">메타 협력광고 100%</td><td>626만</td><td>1,331만</td><td style="color:#FF8C42;font-weight:700">213%</td><td>262건</td></tr>
+        <tr><td>조구만</td><td style="font-size:11px;color:var(--text-muted)">메타 협력광고 100%</td><td>883만</td><td>1,561만</td><td style="color:#FF8C42;font-weight:700">177%</td><td>518건</td></tr>
+        <tr><td>B&amp;F</td><td style="font-size:11px;color:var(--text-muted)">메타 협력광고 100%</td><td>443만</td><td>559만</td><td style="color:#FF5C5C;font-weight:700">126%</td><td>139건</td></tr>
+        <tr><td>BF</td><td style="font-size:11px;color:var(--text-muted)">메타 협력광고 100%</td><td>118만</td><td>100만</td><td style="color:#FF5C5C;font-weight:700">85%</td><td>31건</td></tr>
+        <tr><td>다이노탱</td><td style="font-size:11px;color:var(--text-muted)">메타 협력광고 100%</td><td>98만</td><td>62만</td><td style="color:#FF5C5C;font-weight:700">63%</td><td>21건</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="hl-grid-2">
+    <div class="hl-card hl-green">
+      <div class="hl-tag tag-green">✅ 채널 조합 발견</div>
+      <div class="hl-title">ZOA × 29CM — 다른 채널에서 다른 결과</div>
+      <div class="hl-body">ZOA만 메타 29CM 협력광고로 운영해 ROAS <strong>849%</strong>를 기록했다. 나머지 IP가 메타 협력광고 단일 채널에서 200% 이하를 기록하는 것과 대조적이다. <strong>채널 선택이 IP 효율을 결정하는 핵심 변수</strong>임을 보여주는 사례다.</div>
+    </div>
+    <div class="hl-card hl-blue">
+      <div class="hl-tag tag-blue">📊 구조 인사이트</div>
+      <div class="hl-title">협력광고 내 개별 IP가 범용 타겟 대비 높은 전환 효율</div>
+      <div class="hl-body">메타 협력광고 내 ALL(범용) ROAS 122% 대비 BT21 213%, 조구만 177%로 개별 IP가 더 높다. <strong>IP 팬덤 기반 타겟팅의 전환 잠재력이 범용 타겟보다 높게 나타나며</strong>, 채널 다각화 시 효율 개선 가능성이 있다.</div>
+    </div>
+    <div class="hl-card hl-coral">
+      <div class="hl-tag tag-coral">⚠ 구조 한계</div>
+      <div class="hl-title">개별 IP 전체가 메타 협력광고 단일 채널에 집중</div>
+      <div class="hl-body">BT21·조구만·B&amp;F·다이노탱·BF가 <strong>100% 메타 협력광고</strong>로만 운영된다. 채널 다각화 없이는 개별 IP의 효율 개선에 구조적 한계가 존재하며, ZOA 사례처럼 <strong>채널을 달리했을 때의 효율 변화 검증</strong>이 의미 있는 실험이 될 수 있다.</div>
+    </div>
+    <div class="hl-card hl-orange">
+      <div class="hl-tag tag-orange">📈 IP별 운영 과제</div>
+      <div class="hl-title">BT21 변동성 vs 조구만 효율 상한</div>
+      <div class="hl-body">BT21은 월별 ROAS 45%~403%로 변동폭이 크다. 조구만은 5개월간 130~225% 범위로 안정적이지만 상한이 낮다. <strong>BT21은 변동성 안정화, 조구만은 효율 상한 확장</strong>이 각각의 운영 과제다.</div>
+    </div>
+  </div>
+  <div class="insight-box">
+    <div class="insight-title">IP별 분석 핵심 해석</div>
+    <div class="insight-body">
+      <p><span class="good">개별 IP의 낮은 ROAS를 IP 자체의 문제로 단정하기 어렵다.</span> <br>ZOA가 다른 채널(29CM)에서 ROAS 849%를 기록했다는 것은, 개별 IP의 효율이 팬덤 크기보다 운영 채널과 조합에 의해 더 크게 좌우될 수 있음을 보여준다.</p>
+      <p><strong>현재 SA에서는 IP 구분 없이 ALL로 통합 운영되고 있다.</strong> 주요 IP(BT21·조구만)의 검색 기반 수요 여부를 확인해보는 것이 채널 확장 검토의 첫 단계가 될 수 있다.</p>
+      <p><span class="caution">다이노탱·BF는 현재 구조에서 광고비 회수 수준에 못 미치는 효율을 보이고 있다.</span> 채널을 달리했을 때 개선 가능성이 있는지, 또는 해당 IP의 시장 수요 자체에 대한 검토를 병행하는 것이 적합하다.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S7 교차 분석 -->
+<div class="section" id="sec6">
+  <div class="sec-label">Section 07 · 교차 분석</div>
+  <h1 class="sec-title">단면 분석으로는 보이지 않는<br>구조적 신호들</h1>
+  <p class="sec-sub">스토어×매체구분, 디바이스, 캠페인 목표 교차 분석</p>
+  <div class="signal-banner">
+    <div class="sig-chip"><div class="sig-dot"></div>스퀘어 × SA 조합 ROAS 1,546% — 가장 효율적인 운영 조합</div>
+    <div class="sig-chip"><div class="sig-dot"></div>PC ROAS 3,236% — 볼륨은 적지만 핵심 전환 채널</div>
+    <div class="sig-chip"><div class="sig-dot"></div>상시 SA — 브랜드 자산 기반의 안정적 매출 견인 구조</div>
+  </div>
+  <div class="card">
+    <div class="card-label">교차 분석 1 — 스토어 × SA/DA 조합별 ROAS</div>
+    <table class="data-table">
+      <thead><tr><th style="text-align:left">조합</th><th>광고비</th><th>매출</th><th>ROAS</th><th>구매수</th></tr></thead>
+      <tbody>
+        <tr style="background:#E6FBF5"><td>스퀘어 + SA ★</td><td>5,700만</td><td>8억 8,114만</td><td style="color:#00C48C;font-weight:700">1,546%</td><td>11,822건</td></tr>
+        <tr><td>스스 + SA</td><td>3,228만</td><td>1억 9,751만</td><td style="color:#FFB800;font-weight:700">612%</td><td>6,494건</td></tr>
+        <tr><td>스퀘어 + DA</td><td>4,946만</td><td>2억 7,128만</td><td style="color:#FF8C42;font-weight:700">549%</td><td>3,823건</td></tr>
+        <tr style="background:#FFF0F0"><td>스스 + DA</td><td>8,077만</td><td>2억 4,575만</td><td style="color:#FF5C5C;font-weight:700">304%</td><td>7,466건</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:10px;font-size:11px;color:var(--text-muted)">★ 스퀘어+SA: 전체 조합 중 가장 효율적인 매출 견인 구조</div>
+  </div>
+  <div class="hl-grid-2" style="margin-bottom:20px">
+    <div class="card" style="margin-bottom:0">
+      <div class="card-label">교차 분석 2 — PC vs 모바일 (SA 기준)</div>
+      <div class="compare-stat-row"><span class="cs-label">PC ROAS</span><span class="cs-val good">3,236%</span></div>
+      <div class="compare-stat-row"><span class="cs-label">MO ROAS</span><span class="cs-val">718%</span></div>
+      <div class="compare-stat-row"><span class="cs-label">PC CPA</span><span class="cs-val good">2,522원</span></div>
+      <div class="compare-stat-row"><span class="cs-label">MO CPA</span><span class="cs-val">6,302원</span></div>
+      <div class="compare-stat-row"><span class="cs-label">PC 광고비 비중</span><span class="cs-val">15.4%</span></div>
+      <div class="compare-stat-row"><span class="cs-label">MO 광고비 비중</span><span class="cs-val">84.6%</span></div>
+      <div style="margin-top:12px;font-size:12px;color:var(--text-sub);line-height:1.6">PC는 볼륨이 적지만 ROAS 4.5배, CPA 2.5배 우위. 라인프렌즈 굿즈 특성상 PC 환경에서 검색·비교 후 구매하는 패턴이 강하게 나타난다. PC 인벤토리 한도 내 비중 확대 여지 검토가 가능하다.</div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-label">교차 분석 3 — 캠페인 목표별 ROAS</div>
+      <div class="compare-stat-row"><span class="cs-label">상시 SA</span><span class="cs-val good">1,208%</span></div>
+      <div class="compare-stat-row"><span class="cs-label">상시 DA</span><span class="cs-val">429%</span></div>
+      <div class="compare-stat-row"><span class="cs-label">신제품 DA</span><span class="cs-val">316%</span></div>
+      <div class="compare-stat-row"><span class="cs-label">프로모션 DA</span><span class="cs-val warn">158%</span></div>
+      <div class="compare-stat-row"><span class="cs-label">프렌즈 위크</span><span class="cs-val warn">63%</span></div>
+      <div style="margin-top:12px;font-size:12px;color:var(--text-sub);line-height:1.6">라인프렌즈 매출의 핵심은 상시 브랜드 검색 수요에서 나온다. 프로모션 DA는 ROAS 단일 지표보다 인지 확장 및 신규 타겟 도달 관점으로 평가하는 것이 운영 목표에 부합한다.</div>
+    </div>
+  </div>
+  <div class="insight-box green-line">
+    <div class="insight-title">교차 분석 종합</div>
+    <div class="insight-body">
+      <p><span class="good">스퀘어×SA 조합이 가장 효율적인 매출 견인 구조임이 확인됐다.</span> <br>현재 5,700만원이 집행되고 있는 이 조합에서 네이버 브랜드 SA와 구글 SA의 인벤토리 한도 내 추가 확대 가능성을 검토해볼 수 있다.</p>
+      <p><strong>PC 디바이스는 볼륨은 적지만 핵심 전환 채널이다.</strong> <br>SA 기준 광고비 15.4%로 ROAS 3,236%를 기록 중이며, 라인프렌즈 굿즈의 구매 패턴상 PC에서 검색·비교 후 전환하는 유저의 구매 의도가 높게 나타난다.</p>
+      <p>프로모션 캠페인의 ROAS가 상시 운영 대비 낮게 나타나는 것은, 라인프렌즈의 매출이 시즌 이벤트보다 <strong>상시 브랜드 자산 기반 수요에서 더 안정적으로 형성</strong>된다는 것을 시사한다. <br>2월 MMMM 출시처럼 IP 신제품이 단기 매출 집중 효과를 만드는 반면, 상시 SA가 연간 매출의 안정적 기반을 이루는 구조다.</p>
+    </div>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip">
+  <div class="tt-name" id="tt-name"></div>
+  <div class="tt-row"><span>광고비</span><span class="tt-val" id="tt-cost"></span></div>
+  <div class="tt-row"><span>매출</span><span class="tt-val" id="tt-revenue"></span></div>
+  <div class="tt-row"><span>ROAS</span><span class="tt-val" id="tt-roas"></span></div>
+  <div class="tt-row"><span>구매수</span><span class="tt-val" id="tt-purchase"></span></div>
+  <div class="tt-row"><span>CPC</span><span class="tt-val" id="tt-cpc"></span></div>
+</div>
+
+<script>
+function switchTab(idx){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  document.querySelectorAll('.section').forEach((s,i)=>s.classList.toggle('active',i===idx));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+const mediaData=[
+  {name:'네이버 브랜드 SA',   type:'SA',cost:3801,revenue:63698,roas:1676,purchase:9541,cpc:240},
+  {name:'구글 SA',            type:'SA',cost:1595,revenue:26901,roas:1687,purchase:4002,cpc:438},
+  {name:'네이버 SA',          type:'SA',cost:371, revenue:5671, roas:1527,purchase:1233,cpc:166},
+  {name:'네이버 쇼핑 SA',     type:'SA',cost:3161,revenue:11596,roas:367, purchase:3540,cpc:365},
+  {name:'메타 어드밴티지',    type:'DA',cost:3582,revenue:19873,roas:555, purchase:2944,cpc:278},
+  {name:'메타 29CM 협력광고', type:'DA',cost:157, revenue:1338, roas:849, purchase:137, cpc:314},
+  {name:'크리테오',           type:'DA',cost:1206,revenue:5917, roas:491, purchase:742, cpc:183},
+  {name:'네이버 GFA ADVoost', type:'DA',cost:2164,revenue:10438,roas:482, purchase:2723,cpc:339},
+  {name:'네이버 GFA',         type:'DA',cost:2016,revenue:7726, roas:383, purchase:2996,cpc:361},
+  {name:'메타 협력광고',      type:'DA',cost:3737,revenue:6377, roas:171, purchase:1711,cpc:218},
+  {name:'트위터',             type:'DA',cost:159, revenue:35,   roas:22,  purchase:36,  cpc:73},
+];
+
+const ipData=[
+  {name:'ZOA',    roas:849,color:'#00C48C'},
+  {name:'ALL',    roas:455,color:'#3D6FFF'},
+  {name:'BT21',   roas:213,color:'#8B5CF6'},
+  {name:'조구만', roas:177,color:'#FF8C42'},
+  {name:'B&F',    roas:126,color:'#FF5C5C'},
+  {name:'BF',     roas:85, color:'#FF5C5C'},
+  {name:'다이노탱',roas:63,color:'#FF5C5C'},
+];
+
+const SA_C='#3D6FFF',DA_C='#FF5C5C';
+const tt=document.getElementById('tooltip');
+
+function roasColor(v){if(v>=1000)return'#00C48C';if(v>=500)return'#FFB800';if(v>=300)return'#FF8C42';return'#FF5C5C';}
+function showTT(d,e){
+  tt.classList.add('show');
+  const c=d.type==='SA'?SA_C:DA_C;
+  document.getElementById('tt-name').textContent=d.name;
+  document.getElementById('tt-name').style.color=c;
+  document.getElementById('tt-cost').textContent=d.cost.toLocaleString()+'만원';
+  document.getElementById('tt-revenue').textContent=d.revenue.toLocaleString()+'만원';
+  document.getElementById('tt-roas').textContent=d.roas.toLocaleString()+'%';
+  document.getElementById('tt-purchase').textContent=d.purchase.toLocaleString()+'건';
+  document.getElementById('tt-cpc').textContent=d.cpc+'원';
+  tt.style.left=(e.clientX+18)+'px';
+  tt.style.top=(e.clientY-70)+'px';
+}
+
+// 버블 차트
+const chart=document.getElementById('bubbleChart');
+const maxRoas=1800,maxCost=4300,maxP=Math.max(...mediaData.map(d=>d.purchase));
+[25,50,75].forEach(p=>{
+  const h=document.createElement('div');h.className='grid-h';h.style.top=p+'%';chart.appendChild(h);
+  const v=document.createElement('div');v.className='grid-v';v.style.left=p+'%';chart.appendChild(v);
+});
+[0,500,1000,1500].forEach(v=>{
+  const pct=96-(Math.min(v,maxRoas)/maxRoas)*88;
+  const el=document.createElement('span');el.className='axis-tick tick-y';el.style.top=pct+'%';
+  el.textContent=v===0?'0':v+'%';chart.appendChild(el);
+});
+[0,1000,2000,3000,4000].forEach(v=>{
+  const pct=(v/maxCost)*88+4;
+  const el=document.createElement('span');el.className='axis-tick tick-x';el.style.left=pct+'%';
+  el.textContent=v===0?'0':v+'만';chart.appendChild(el);
+});
+const shortMap={'네이버 브랜드 SA':'NV\n브랜드','네이버 쇼핑 SA':'NV\n쇼핑','네이버 SA':'NV SA','구글 SA':'Google','메타 어드밴티지':'META\nAdv','메타 29CM 협력광고':'29CM','메타 협력광고':'META\n협력','네이버 GFA ADVoost':'GFA\nAdv','네이버 GFA':'GFA','크리테오':'CRIT','트위터':'TW'};
+mediaData.forEach(d=>{
+  const x=(d.cost/maxCost)*88+4;
+  const y=96-(Math.min(d.roas,maxRoas)/maxRoas)*88;
+  const size=Math.max(28,Math.sqrt(d.purchase/maxP)*92);
+  const color=d.type==='SA'?SA_C:DA_C;
+  const b=document.createElement('div');
+  b.className='bubble';
+  b.style.cssText=`left:${x}%;top:${y}%;width:${size}px;height:${size}px;background:${color};`;
+  b.innerHTML=`<div class="bbl">${(shortMap[d.name]||d.name).replace(/\n/g,'<br>')}</div>`;
+  b.addEventListener('mousemove',e=>showTT(d,e));
+  b.addEventListener('mouseleave',()=>tt.classList.remove('show'));
+  chart.appendChild(b);
+});
+
+// 매체 테이블
+const sorted=[...mediaData].sort((a,b)=>b.roas-a.roas);
+const maxR=Math.max(...mediaData.map(d=>d.roas));
+const tbody=document.getElementById('mediaTableBody');
+sorted.forEach(d=>{
+  const rc=roasColor(d.roas);
+  const barW=(d.roas/maxR*100).toFixed(1);
+  const row=document.createElement('div');
+  row.className=`media-table-row row-${d.type.toLowerCase()}`;
+  row.innerHTML=`<div class="mnc"><span class="mn">${d.name}</span><span class="badge badge-${d.type.toLowerCase()}">${d.type}</span></div><div class="mtd">${d.cost.toLocaleString()}만</div><div class="mtd">${d.revenue.toLocaleString()}만</div><div class="roas-wrap"><div class="roas-bar-bg"><div class="roas-bar-fill" style="width:${barW}%;background:${rc}"></div></div><span class="roas-num" style="color:${rc}">${d.roas.toLocaleString()}%</span></div><div class="mtd">${d.purchase.toLocaleString()}건</div><div class="mtd">${d.cpc}원</div>`;
+  row.addEventListener('mousemove',e=>showTT(d,e));
+  row.addEventListener('mouseleave',()=>tt.classList.remove('show'));
+  tbody.appendChild(row);
+});
+
+// IP 바 차트
+const ipEl=document.getElementById('ipBarChart');
+const maxRI=Math.max(...ipData.map(d=>d.roas));
+ipData.forEach(d=>{
+  const barW=(d.roas/maxRI*100).toFixed(1);
+  const div=document.createElement('div');
+  div.className='ip-bar-row';
+  div.innerHTML=`<span class="ip-name">${d.name}</span><div class="ip-bar-track"><div class="ip-bar-fill" style="width:${barW}%;background:${d.color}"></div></div><span class="ip-roas-val" style="color:${d.color}">${d.roas}%</span>`;
+  ipEl.appendChild(div);
+});
+</script>
+</body>
+</html>

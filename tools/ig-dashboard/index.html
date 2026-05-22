@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<!-- ── 문서 메타
+  type:  "tool"
+  id:    "ig-dashboard"
+  title: "IG Dashboard — 인스타 성과 대시보드"
+  desc:  "콘텐츠 CSV + 팔로워 CSV 두 파일을 업로드 또는 Google Sheets URL 연결로 자동 시각화. 17개 채널 동적 표시, IP/채널/형식 필터, KPI·차트 통합."
+  file:  "tools/ig-dashboard/index.html"
+  date:  "2026-05-20"
+  tags:  ["tool", "dashboard", "instagram", "analytics", "csv"]
+── -->
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IG Dashboard — LINE FRIENDS SQUARE</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0e1015;
+    --surface: #1a1d26;
+    --surface-2: #232734;
+    --text: #f5f5f7;
+    --muted: rgba(255,255,255,0.55);
+    --faint: rgba(255,255,255,0.1);
+    --divider: rgba(255,255,255,0.08);
+    --accent: #ff7849;
+    --accent-soft: rgba(255,120,73,0.15);
+    --up: #22c55e;
+    --up-soft: rgba(34,197,94,0.12);
+    --down: #ef4444;
+    --down-soft: rgba(239,68,68,0.12);
+    --blue: #60a5fa;
+    --purple: #a78bfa;
+    --pink: #f472b6;
+    --yellow: #fcd34d;
+    --teal: #2dd4bf;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    height: 56px;
+    background: rgba(14,16,21,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--divider);
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; }
+  .brand-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
+  .brand-sub { font-size: 12px; color: var(--muted); font-weight: 500; }
+  .spacer { flex: 1; }
+  .btn-icon {
+    height: 36px; padding: 0 14px;
+    border-radius: 8px;
+    border: 1px solid var(--divider);
+    background: transparent;
+    color: var(--text);
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-icon:hover { background: var(--surface); }
+  .btn-icon.primary { background: var(--accent); border-color: var(--accent); color: white; }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 16px 80px;
+  }
+
+  /* Config */
+  .config {
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .config-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .config-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+  .file-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  @media (min-width: 600px) {
+    .file-row { grid-template-columns: 1fr 1fr; }
+  }
+  .file-field { display: flex; flex-direction: column; gap: 6px; }
+  .file-label {
+    font-size: 11px; font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .file-drop {
+    border: 1.5px dashed var(--divider);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.15s;
+    background: var(--bg);
+    position: relative;
+  }
+  .file-drop:hover { border-color: var(--accent); background: var(--surface-2); }
+  .file-drop.has-file { border-color: var(--up); border-style: solid; }
+  .file-drop input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  }
+  .file-drop .placeholder {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .file-drop .file-name {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 13px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .file-drop .file-meta {
+    font-size: 11px; color: var(--muted);
+    margin-top: 2px;
+  }
+  .url-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--divider);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 12px;
+    outline: none;
+  }
+  .url-input:focus { border-color: var(--accent); }
+  .config-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+
+  /* Filters */
+  .filters {
+    display: flex; flex-direction: column; gap: 10px;
+    margin-bottom: 20px;
+  }
+  .filter-row {
+    display: flex; gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    min-width: 56px;
+  }
+  .filter-group {
+    display: inline-flex;
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-radius: 100px;
+    padding: 3px;
+    gap: 2px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 13px; font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: 0.15s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { color: var(--text); }
+  .filter-btn.active { background: var(--accent); color: white; }
+
+  /* KPIs */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .kpi-label {
+    font-size: 11px; color: var(--muted);
+    font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-size: 26px; font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 4px;
+    font-feature-settings: "tnum" 1;
+  }
+  .kpi-sub { font-size: 12px; color: var(--muted); font-weight: 500; }
+  .kpi-trend {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 100px;
+    margin-left: 6px;
+  }
+  .kpi-trend.up { background: var(--up-soft); color: var(--up); }
+  .kpi-trend.down { background: var(--down-soft); color: var(--down); }
+
+  /* Section */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-radius: 14px;
+    padding: 18px 18px 20px;
+    margin-bottom: 16px;
+  }
+  .section-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .section-title { font-size: 15px; font-weight: 800; letter-spacing: -0.01em; }
+  .section-meta { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  @media (min-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* Chart */
+  .chart-wrap { position: relative; height: 260px; }
+  @media (min-width: 720px) {
+    .chart-wrap { height: 320px; }
+  }
+
+  /* Follower chips */
+  .follower-chips {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 12px;
+  }
+  .fchip {
+    background: var(--surface-2);
+    border: 1px solid var(--divider);
+    color: var(--muted);
+    font-size: 11px;
+    padding: 4px 9px;
+    border-radius: 100px;
+    cursor: pointer;
+    font-weight: 600;
+    user-select: none;
+    transition: 0.15s;
+  }
+  .fchip.on { color: white; border-color: transparent; }
+
+  /* Top posts */
+  .top-posts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  @media (min-width: 720px) {
+    .top-posts { grid-template-columns: 1fr 1fr; }
+  }
+  .top-post {
+    background: var(--surface-2);
+    border: 1px solid var(--divider);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .top-post-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .top-post-rank {
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+  .badge {
+    font-size: 10px; font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--faint);
+    color: var(--muted);
+  }
+  .badge.ip { background: rgba(255,120,73,0.12); color: var(--accent); }
+  .badge.type { background: rgba(96,165,250,0.12); color: var(--blue); }
+  .badge.ch { background: rgba(167,139,250,0.12); color: var(--purple); }
+  .top-post-cap {
+    font-size: 13px; color: var(--text); line-height: 1.5;
+    overflow: hidden; text-overflow: ellipsis;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  }
+  .top-post-metrics {
+    display: flex; gap: 10px;
+    font-size: 12px; color: var(--muted);
+    flex-wrap: wrap;
+  }
+  .top-post-metrics .m-v { color: var(--text); font-weight: 700; font-feature-settings: "tnum" 1; }
+  .top-post-link {
+    font-size: 11px; color: var(--accent);
+    text-decoration: none; font-weight: 600;
+  }
+  .top-post-link:hover { text-decoration: underline; }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; margin: -4px; padding: 4px; }
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .table th {
+    text-align: left;
+    font-weight: 700;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--divider);
+    white-space: nowrap;
+  }
+  .table td {
+    padding: 10px;
+    border-bottom: 1px solid var(--divider);
+    font-feature-settings: "tnum" 1;
+    vertical-align: top;
+  }
+  .table td.cap { max-width: 220px; color: var(--muted); }
+  .table .num { text-align: right; font-weight: 600; }
+  .table tr:last-child td { border-bottom: none; }
+
+  .empty-state {
+    padding: 60px 24px;
+    text-align: center;
+    color: var(--muted);
+  }
+  .empty-state strong {
+    display: block;
+    color: var(--text);
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  .error {
+    background: var(--down-soft);
+    color: var(--down);
+    border: 1px solid rgba(239,68,68,0.3);
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  @media (min-width: 720px) {
+    .kpi-row { grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .kpi { padding: 18px 20px; }
+    .kpi-value { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-dot"></span>
+    <span>IG DASHBOARD</span>
+  </div>
+  <div class="brand-sub">LINE FRIENDS SQUARE</div>
+  <div class="spacer"></div>
+  <button class="btn-icon" id="reloadBtn">↻ 새로고침</button>
+  <button class="btn-icon" id="configBtn">⚙ 설정</button>
+</header>
+
+<main class="container">
+
+  <section class="config" id="configCard" style="display:none;">
+    <div class="config-title">⚙ 데이터 소스 (Google Sheets 웹 게시 CSV URL)</div>
+    <div class="config-desc">
+      Sheets의 <b>웹 게시 → CSV</b> URL 두 개를 입력하세요. 브라우저 localStorage에 저장돼서 다음 방문에도 유지됩니다.
+    </div>
+
+    <div class="file-row">
+      <div class="file-field">
+        <span class="file-label">콘텐츠 CSV URL</span>
+        <input type="text" class="url-input" id="contentUrl" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=...&output=csv" />
+      </div>
+      <div class="file-field">
+        <span class="file-label">팔로워 CSV URL</span>
+        <input type="text" class="url-input" id="followerUrl" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=...&output=csv" />
+      </div>
+    </div>
+
+    <div class="config-actions">
+      <button class="btn-icon primary" id="loadBtn">저장 + 불러오기</button>
+      <button class="btn-icon" id="clearBtn">초기화</button>
+    </div>
+
+    <div style="background:var(--surface-2); padding:12px 14px; border-radius:8px; font-size:12px; color:var(--muted); line-height:1.6; margin-top:12px;">
+      <b style="color:var(--text);">CSV URL 발급 방법</b><br>
+      1. Google Sheets 열기 → <b>파일 → 공유 → 웹에 게시</b><br>
+      2. 시트 선택 (콘텐츠 또는 팔로워 탭) → 형식 <b>CSV</b> → 게시<br>
+      3. 나오는 URL 복사 → 위 칸에 붙여넣기<br>
+      4. 시트별로 URL이 다릅니다 (gid 값 다름)
+    </div>
+  </section>
+
+  <div class="error" id="errorBox" style="display:none;"></div>
+
+  <div id="mainContent" style="display:none;">
+
+    <div class="filters">
+      <div class="filter-row">
+        <span class="filter-label">기간</span>
+        <div class="filter-group" id="rangeFilter">
+          <button class="filter-btn" data-range="30">30일</button>
+          <button class="filter-btn active" data-range="90">90일</button>
+          <button class="filter-btn" data-range="365">1년</button>
+          <button class="filter-btn" data-range="all">전체</button>
+        </div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">IP</span>
+        <div class="filter-group" id="ipFilter"></div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">채널</span>
+        <div class="filter-group" id="channelFilter"></div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">형식</span>
+        <div class="filter-group" id="formatFilter"></div>
+      </div>
+    </div>
+
+    <div class="kpi-row" id="kpiRow"></div>
+
+    <section class="section">
+      <div class="section-head">
+        <div class="section-title">팔로워 추이</div>
+        <div class="section-meta" id="followerMeta"></div>
+      </div>
+      <div class="follower-chips" id="followerChips"></div>
+      <div class="chart-wrap">
+        <canvas id="followerChart"></canvas>
+      </div>
+    </section>
+
+    <div class="grid-2">
+      <section class="section">
+        <div class="section-head">
+          <div class="section-title">IP별 노출 분포</div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="ipChart"></canvas>
+        </div>
+      </section>
+      <section class="section">
+        <div class="section-head">
+          <div class="section-title">채널별 평균 참여율</div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="channelChart"></canvas>
+        </div>
+      </section>
+    </div>
+
+    <section class="section">
+      <div class="section-head">
+        <div class="section-title">일자별 노출 추이</div>
+        <div class="section-meta" id="reachMeta"></div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="reachChart"></canvas>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div class="section-title">TOP 10 게시물</div>
+        <div class="section-meta">노출 기준</div>
+      </div>
+      <div class="top-posts" id="topPosts"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div class="section-title">최근 게시물</div>
+        <div class="section-meta" id="tableMeta"></div>
+      </div>
+      <div class="table-wrap">
+        <table class="table" id="postsTable"></table>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="empty-state" id="emptyState">
+    <strong>설정이 필요합니다</strong>
+    상단 ⚙ 설정에서 Sheets CSV URL 두 개를 입력하면 자동으로 불러옵니다.
+  </div>
+
+</main>
+
+<script>
+/* ============================================
+   State
+   ============================================ */
+const STORAGE = {
+  contentUrl: 'igDash.contentUrl',
+  followerUrl: 'igDash.followerUrl',
+};
+
+const state = {
+  contentRows: [],
+  followerRows: [],
+  followerAccounts: [],
+  selectedFollowers: new Set(),
+  ipList: [],
+  channelList: [],
+  formatList: [],
+  filter: {
+    range: 90,
+    ip: 'all',
+    channel: 'all',
+    format: 'all',
+  },
+  charts: {},
+};
+
+const $ = (id) => document.getElementById(id);
+
+/* ============================================
+   Boot
+   ============================================ */
+window.addEventListener('DOMContentLoaded', () => {
+  const cu = localStorage.getItem(STORAGE.contentUrl) || '';
+  const fu = localStorage.getItem(STORAGE.followerUrl) || '';
+  $('contentUrl').value = cu;
+  $('followerUrl').value = fu;
+
+  if (cu && fu) {
+    loadAll();
+  } else {
+    $('configCard').style.display = 'block';
+    $('emptyState').style.display = 'block';
+  }
+
+  $('loadBtn').addEventListener('click', saveAndLoad);
+  $('clearBtn').addEventListener('click', clearConfig);
+  $('reloadBtn').addEventListener('click', () => {
+    const c = localStorage.getItem(STORAGE.contentUrl);
+    const f = localStorage.getItem(STORAGE.followerUrl);
+    if (c && f) loadAll();
+  });
+  $('configBtn').addEventListener('click', () => {
+    const c = $('configCard');
+    c.style.display = c.style.display === 'none' ? 'block' : 'none';
+  });
+
+  $('rangeFilter').addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    $('rangeFilter').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const r = btn.dataset.range;
+    state.filter.range = r === 'all' ? null : parseInt(r, 10);
+    rerender();
+  });
+});
+
+function saveAndLoad() {
+  const c = $('contentUrl').value.trim();
+  const f = $('followerUrl').value.trim();
+  if (!c || !f) {
+    showError('두 URL 모두 입력해주세요');
+    return;
+  }
+  localStorage.setItem(STORAGE.contentUrl, c);
+  localStorage.setItem(STORAGE.followerUrl, f);
+  hideError();
+  loadAll();
+}
+
+function clearConfig() {
+  localStorage.removeItem(STORAGE.contentUrl);
+  localStorage.removeItem(STORAGE.followerUrl);
+  $('contentUrl').value = '';
+  $('followerUrl').value = '';
+  state.contentRows = [];
+  state.followerRows = [];
+  state.followerAccounts = [];
+  $('mainContent').style.display = 'none';
+  $('emptyState').style.display = 'block';
+}
+
+async function loadAll() {
+  const contentUrl = localStorage.getItem(STORAGE.contentUrl);
+  const followerUrl = localStorage.getItem(STORAGE.followerUrl);
+  if (!contentUrl || !followerUrl) return;
+  hideError();
+  try {
+    const [contentText, followerText] = await Promise.all([
+      fetchText(contentUrl),
+      fetchText(followerUrl),
+    ]);
+    parseContent(contentText);
+    parseFollower(followerText);
+    setupFilters();
+    rerender();
+    $('configCard').style.display = 'none';
+    $('emptyState').style.display = 'none';
+    $('mainContent').style.display = 'block';
+  } catch (err) {
+    console.error(err);
+    showError('데이터 로드 실패: ' + err.message + ' — 시트가 "웹에 게시" 되어 있는지, URL이 정확한지 확인하세요.');
+  }
+}
+
+async function fetchText(url) {
+  const res = await fetch(url, { redirect: 'follow' });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return await res.text();
+}
+
+function showError(msg) {
+  const box = $('errorBox');
+  box.textContent = '⚠ ' + msg;
+  box.style.display = 'block';
+}
+function hideError() { $('errorBox').style.display = 'none'; }
+
+/* ============================================
+   Parse CSVs
+   ============================================ */
+function parseContent(text) {
+  const res = Papa.parse(text.trim(), { header: true, skipEmptyLines: true });
+  const rows = (res.data || [])
+    .map(normalizeContentRow)
+    .filter(r => r.date != null);
+  state.contentRows = rows;
+}
+
+function normalizeContentRow(r) {
+  return {
+    date: parseDate(r['일시']),
+    type: (r['종류'] || '').trim(),
+    ip: (r['IP'] || '').trim(),
+    grade: (r['등급'] || '').trim(),
+    material: (r['소재'] || '').trim(),
+    campaign: (r['캠페인명'] || '').trim(),
+    channel: (r['채널'] || '').trim(),
+    format: (r['콘텐츠'] || '').trim(),
+    impressions: toNum(r['노출']),
+    likes: toNum(r['좋아요']),
+    comments: toNum(r['댓글']),
+    shares: toNum(r['공유']),
+    saves: toNum(r['저장']),
+    engRate: parseEngRate(r['참여율']),
+    url: (r['url'] || '').trim(),
+    raw: r,
+  };
+}
+
+function parseFollower(text) {
+  const res = Papa.parse(text.trim(), { header: true, skipEmptyLines: true });
+  const rows = (res.data || [])
+    .map(r => {
+      const out = { date: parseDate(r['일자']), values: {} };
+      for (const k of Object.keys(r)) {
+        if (k === '일자' || k === '' || k == null) continue;
+        const cleaned = k.replace(/\n/g, ' ').trim();
+        out.values[cleaned] = toNum(r[k]);
+      }
+      return out;
+    })
+    .filter(r => r.date != null);
+  state.followerRows = rows;
+
+  // Collect accounts that have at least one positive value
+  const accountsWithData = {};
+  rows.forEach(r => {
+    for (const acc of Object.keys(r.values)) {
+      if (r.values[acc] > 0) {
+        if (!accountsWithData[acc] || accountsWithData[acc] < r.values[acc]) {
+          accountsWithData[acc] = r.values[acc];
+        }
+      }
+    }
+  });
+
+  const palette = ['#ff7849', '#60a5fa', '#a78bfa', '#22c55e', '#f472b6', '#fcd34d', '#2dd4bf', '#fb923c', '#818cf8', '#34d399'];
+  state.followerAccounts = Object.entries(accountsWithData)
+    .sort((a, b) => b[1] - a[1])  // sort by latest value desc
+    .map(([name, val], i) => ({
+      name,
+      latestValue: val,
+      color: palette[i % palette.length],
+    }));
+
+  // Default: top 5 selected
+  state.selectedFollowers = new Set(state.followerAccounts.slice(0, 5).map(a => a.name));
+}
+
+function parseDate(s) {
+  if (!s) return null;
+  const cleaned = String(s).trim();
+  // "2024. 1. 2" or "2024. 1. 2 " format
+  const m = cleaned.match(/^(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/);
+  if (m) {
+    const d = new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
+    return isNaN(d.getTime()) ? null : d;
+  }
+  const d = new Date(cleaned);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function toNum(v) {
+  if (v == null || v === '' || v === '#REF!') return 0;
+  if (typeof v === 'number') return v;
+  const s = String(v).replace(/[,\s]/g, '').replace(/[^\d.\-]/g, '');
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+
+function parseEngRate(v) {
+  if (v == null || v === '') return null;
+  const s = String(v).trim();
+  if (s.endsWith('%')) {
+    const n = parseFloat(s.replace('%', ''));
+    return isNaN(n) ? null : n;
+  }
+  const n = parseFloat(s);
+  if (isNaN(n)) return null;
+  // If raw number like 0.16, treat as decimal (×100); but some values are already %
+  return n < 1 ? n * 100 : n;
+}
+
+function fmt(n) {
+  if (n == null) return '—';
+  const abs = Math.abs(n);
+  if (abs >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (abs >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+  return Math.round(n).toLocaleString('ko-KR');
+}
+function fmtPct(n) {
+  if (n == null || isNaN(n)) return '—';
+  return n.toFixed(1) + '%';
+}
+function clearNode(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+
+/* ============================================
+   Filter setup
+   ============================================ */
+function setupFilters() {
+  state.ipList = unique(state.contentRows.map(r => r.ip)).filter(Boolean).sort();
+  state.channelList = unique(state.contentRows.map(r => r.channel)).filter(Boolean).sort();
+  state.formatList = unique(state.contentRows.map(r => r.format)).filter(Boolean).sort();
+
+  buildFilterButtons('ipFilter', ['all', ...state.ipList], (v) => {
+    state.filter.ip = v;
+    rerender();
+  });
+  buildFilterButtons('channelFilter', ['all', ...state.channelList], (v) => {
+    state.filter.channel = v;
+    rerender();
+  });
+  buildFilterButtons('formatFilter', ['all', ...state.formatList], (v) => {
+    state.filter.format = v;
+    rerender();
+  });
+}
+
+function unique(arr) { return Array.from(new Set(arr)); }
+
+function buildFilterButtons(containerId, values, onClick) {
+  const wrap = $(containerId);
+  clearNode(wrap);
+  values.forEach((v, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = v === 'all' ? '전체' : v;
+    btn.dataset.value = v;
+    btn.addEventListener('click', () => {
+      wrap.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      onClick(v);
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+function filteredContent() {
+  let rows = state.contentRows.slice();
+  if (state.filter.range) {
+    const cutoff = Date.now() - state.filter.range * 86400000;
+    rows = rows.filter(r => r.date.getTime() >= cutoff);
+  }
+  if (state.filter.ip !== 'all') rows = rows.filter(r => r.ip === state.filter.ip);
+  if (state.filter.channel !== 'all') rows = rows.filter(r => r.channel === state.filter.channel);
+  if (state.filter.format !== 'all') rows = rows.filter(r => r.format === state.filter.format);
+  return rows;
+}
+
+/* ============================================
+   Render
+   ============================================ */
+function rerender() {
+  renderKPIs();
+  renderFollowerChips();
+  renderFollowerChart();
+  renderIpChart();
+  renderChannelChart();
+  renderReachChart();
+  renderTopPosts();
+  renderPostsTable();
+}
+
+function renderKPIs() {
+  const rows = filteredContent();
+  const totalImp = rows.reduce((s, r) => s + r.impressions, 0);
+  const totalLikes = rows.reduce((s, r) => s + r.likes, 0);
+  const totalEng = rows.reduce((s, r) => s + r.likes + r.comments + r.shares + r.saves, 0);
+  const avgEng = totalImp > 0 ? (totalEng / totalImp * 100) : null;
+  const postCount = rows.length;
+
+  // Follower (latest snapshot, selected accounts sum)
+  let followerSum = null, followerDelta = null;
+  if (state.followerRows.length > 0) {
+    const sorted = state.followerRows.slice().sort((a, b) => b.date - a.date);
+    const latest = sorted[0];
+    const prev = sorted[1];
+    if (latest) {
+      followerSum = 0;
+      state.selectedFollowers.forEach(acc => { followerSum += latest.values[acc] || 0; });
+      if (prev) {
+        let prevSum = 0;
+        state.selectedFollowers.forEach(acc => { prevSum += prev.values[acc] || 0; });
+        followerDelta = followerSum - prevSum;
+      }
+    }
+  }
+
+  const wrap = $('kpiRow');
+  clearNode(wrap);
+  const kpis = [
+    { label: '총 노출', value: fmt(totalImp), sub: `${state.filter.range || '전체'} 기간` },
+    { label: '평균 참여율', value: fmtPct(avgEng), sub: `좋아요+댓글+공유+저장 / 노출` },
+    {
+      label: '선택 채널 팔로워',
+      value: followerSum != null ? fmt(followerSum) : '—',
+      sub: followerDelta != null ? { text: '직전 주차 대비', delta: followerDelta } : '데이터 없음'
+    },
+    { label: '게시물 수', value: postCount.toLocaleString('ko-KR'), sub: `${state.filter.range || '전체'} 기간` },
+  ];
+  kpis.forEach(k => {
+    const card = document.createElement('div');
+    card.className = 'kpi';
+    const l = document.createElement('div');
+    l.className = 'kpi-label';
+    l.textContent = k.label;
+    card.appendChild(l);
+    const v = document.createElement('div');
+    v.className = 'kpi-value';
+    v.textContent = k.value;
+    card.appendChild(v);
+    const sub = document.createElement('div');
+    sub.className = 'kpi-sub';
+    if (typeof k.sub === 'string') sub.textContent = k.sub;
+    else {
+      sub.textContent = k.sub.text;
+      const t = document.createElement('span');
+      t.className = 'kpi-trend ' + (k.sub.delta >= 0 ? 'up' : 'down');
+      t.textContent = (k.sub.delta >= 0 ? '↑' : '↓') + ' ' + fmt(Math.abs(k.sub.delta));
+      sub.appendChild(t);
+    }
+    card.appendChild(sub);
+    wrap.appendChild(card);
+  });
+}
+
+function renderFollowerChips() {
+  const wrap = $('followerChips');
+  clearNode(wrap);
+  state.followerAccounts.forEach(acc => {
+    const chip = document.createElement('span');
+    chip.className = 'fchip' + (state.selectedFollowers.has(acc.name) ? ' on' : '');
+    if (state.selectedFollowers.has(acc.name)) {
+      chip.style.background = acc.color + '40';
+      chip.style.color = acc.color;
+      chip.style.borderColor = acc.color + '80';
+    }
+    chip.textContent = acc.name + ' · ' + fmt(acc.latestValue);
+    chip.addEventListener('click', () => {
+      if (state.selectedFollowers.has(acc.name)) state.selectedFollowers.delete(acc.name);
+      else state.selectedFollowers.add(acc.name);
+      renderFollowerChips();
+      renderFollowerChart();
+      renderKPIs();
+    });
+    wrap.appendChild(chip);
+  });
+}
+
+function renderFollowerChart() {
+  const canvas = $('followerChart');
+  if (state.charts.follower) state.charts.follower.destroy();
+
+  const sorted = state.followerRows.slice().sort((a, b) => a.date - b.date);
+  let rows = sorted;
+  if (state.filter.range) {
+    const cutoff = Date.now() - state.filter.range * 86400000;
+    rows = sorted.filter(r => r.date.getTime() >= cutoff);
+  }
+
+  const labels = rows.map(r => fmtDate(r.date));
+  const selected = state.followerAccounts.filter(a => state.selectedFollowers.has(a.name));
+  const datasets = selected.map(acc => ({
+    label: acc.name,
+    data: rows.map(r => {
+      const n = r.values[acc.name];
+      return n > 0 ? n : null;
+    }),
+    borderColor: acc.color,
+    backgroundColor: acc.color + '20',
+    borderWidth: 2,
+    tension: 0.25,
+    spanGaps: true,
+    pointRadius: 1.5,
+    fill: false,
+  }));
+
+  state.charts.follower = new Chart(canvas, {
+    type: 'line',
+    data: { labels, datasets },
+    options: chartOpts({ legend: false }),
+  });
+
+  $('followerMeta').textContent = `${rows.length} 주차 · ${selected.length} 채널`;
+}
+
+function renderIpChart() {
+  const canvas = $('ipChart');
+  if (state.charts.ip) state.charts.ip.destroy();
+
+  const rows = filteredContent();
+  const byIP = {};
+  rows.forEach(r => { byIP[r.ip] = (byIP[r.ip] || 0) + r.impressions; });
+  const entries = Object.entries(byIP)
+    .filter(([, v]) => v > 0)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+
+  const palette = ['#ff7849', '#60a5fa', '#a78bfa', '#22c55e', '#f472b6', '#fcd34d', '#2dd4bf', '#fb923c', '#818cf8', '#34d399'];
+
+  state.charts.ip = new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels: entries.map(e => e[0]),
+      datasets: [{
+        data: entries.map(e => e[1]),
+        backgroundColor: palette,
+        borderColor: '#1a1d26',
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: { position: 'right', labels: { color: 'rgba(255,255,255,0.7)', font: { size: 11 }, padding: 8, boxWidth: 10 } },
+        tooltip: {
+          backgroundColor: '#1a1d26',
+          titleColor: '#fff',
+          bodyColor: 'rgba(255,255,255,0.85)',
+          callbacks: {
+            label: (ctx) => `${ctx.label}: ${fmt(ctx.raw)}`
+          }
+        },
+      },
+    },
+  });
+}
+
+function renderChannelChart() {
+  const canvas = $('channelChart');
+  if (state.charts.channel) state.charts.channel.destroy();
+
+  const rows = filteredContent().filter(r => r.engRate != null);
+  const byCh = {};
+  rows.forEach(r => {
+    if (!byCh[r.channel]) byCh[r.channel] = { sum: 0, n: 0 };
+    byCh[r.channel].sum += r.engRate;
+    byCh[r.channel].n += 1;
+  });
+  const entries = Object.entries(byCh)
+    .map(([k, v]) => [k, v.sum / v.n])
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+
+  state.charts.channel = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: entries.map(e => e[0]),
+      datasets: [{
+        label: '평균 참여율 (%)',
+        data: entries.map(e => e[1]),
+        backgroundColor: 'rgba(167,139,250,0.7)',
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a1d26',
+          callbacks: { label: (ctx) => fmtPct(ctx.raw) }
+        },
+      },
+      scales: {
+        x: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { ticks: { color: 'rgba(255,255,255,0.7)', font: { size: 11 } }, grid: { display: false } },
+      },
+    },
+  });
+}
+
+function renderReachChart() {
+  const canvas = $('reachChart');
+  if (state.charts.reach) state.charts.reach.destroy();
+
+  const rows = filteredContent()
+    .filter(r => r.impressions > 0)
+    .sort((a, b) => a.date - b.date);
+
+  // Aggregate per day
+  const daily = {};
+  rows.forEach(r => {
+    const key = fmtDate(r.date);
+    daily[key] = (daily[key] || 0) + r.impressions;
+  });
+  const entries = Object.entries(daily);
+
+  state.charts.reach = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: entries.map(e => e[0]),
+      datasets: [{
+        label: '일별 총 노출',
+        data: entries.map(e => e[1]),
+        backgroundColor: 'rgba(255, 120, 73, 0.7)',
+        borderRadius: 3,
+      }]
+    },
+    options: chartOpts({ legend: false }),
+  });
+
+  $('reachMeta').textContent = `${entries.length} 일자 · ${rows.length} 게시물`;
+}
+
+function chartOpts(o = {}) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: o.legend === false ? { display: false } : {
+        position: 'top', align: 'end',
+        labels: { color: 'rgba(255,255,255,0.7)', font: { size: 11 }, boxWidth: 10, boxHeight: 10 }
+      },
+      tooltip: {
+        backgroundColor: '#1a1d26',
+        titleColor: '#fff',
+        bodyColor: 'rgba(255,255,255,0.85)',
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 1,
+        padding: 10,
+      },
+    },
+    scales: {
+      x: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 }, maxTicksLimit: 12 }, grid: { color: 'rgba(255,255,255,0.05)' } },
+      y: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
+    },
+  };
+}
+
+function fmtDate(d) {
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function renderTopPosts() {
+  const rows = filteredContent()
+    .filter(r => r.impressions > 0)
+    .sort((a, b) => b.impressions - a.impressions)
+    .slice(0, 10);
+
+  const wrap = $('topPosts');
+  clearNode(wrap);
+
+  if (rows.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.style.padding = '32px 16px';
+    empty.textContent = '해당 필터에 게시물 없음';
+    wrap.appendChild(empty);
+    return;
+  }
+
+  rows.forEach((r, i) => {
+    const card = document.createElement('div');
+    card.className = 'top-post';
+
+    const head = document.createElement('div');
+    head.className = 'top-post-head';
+    const rank = document.createElement('span');
+    rank.className = 'top-post-rank';
+    rank.textContent = '#' + (i + 1);
+    head.appendChild(rank);
+    if (r.ip) {
+      const b = document.createElement('span'); b.className = 'badge ip'; b.textContent = r.ip; head.appendChild(b);
+    }
+    if (r.type) {
+      const b = document.createElement('span'); b.className = 'badge type'; b.textContent = r.type; head.appendChild(b);
+    }
+    if (r.channel) {
+      const b = document.createElement('span'); b.className = 'badge ch'; b.textContent = r.channel; head.appendChild(b);
+    }
+    if (r.format) {
+      const b = document.createElement('span'); b.className = 'badge'; b.textContent = r.format; head.appendChild(b);
+    }
+    card.appendChild(head);
+
+    const cap = document.createElement('div');
+    cap.className = 'top-post-cap';
+    cap.textContent = (r.campaign || r.material || '(캠페인 정보 없음)') + ' · ' + fmtDate(r.date);
+    card.appendChild(cap);
+
+    const metrics = document.createElement('div');
+    metrics.className = 'top-post-metrics';
+    const ms = [
+      { label: '노출', val: r.impressions },
+      { label: '좋아요', val: r.likes },
+      { label: '댓글', val: r.comments },
+      { label: '공유', val: r.shares },
+      { label: '참여율', val: r.engRate, isPct: true },
+    ];
+    ms.forEach(m => {
+      if (m.val == null) return;
+      const span = document.createElement('span');
+      span.appendChild(document.createTextNode(m.label + ' '));
+      const v = document.createElement('span');
+      v.className = 'm-v';
+      v.textContent = m.isPct ? fmtPct(m.val) : fmt(m.val);
+      span.appendChild(v);
+      metrics.appendChild(span);
+    });
+    card.appendChild(metrics);
+
+    if (r.url) {
+      const link = document.createElement('a');
+      link.className = 'top-post-link';
+      link.href = r.url;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = '↗ 원본 게시물 보기';
+      card.appendChild(link);
+    }
+    wrap.appendChild(card);
+  });
+}
+
+function renderPostsTable() {
+  const rows = filteredContent().sort((a, b) => b.date - a.date).slice(0, 50);
+
+  const table = $('postsTable');
+  clearNode(table);
+
+  const thead = document.createElement('thead');
+  const trh = document.createElement('tr');
+  ['날짜', 'IP', '캠페인', '채널', '형식', '노출', '좋아요', '댓글', '공유', '저장', '참여율', '링크']
+    .forEach(h => { const th = document.createElement('th'); th.textContent = h; trh.appendChild(th); });
+  thead.appendChild(trh);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  if (rows.length === 0) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 12;
+    td.style.textAlign = 'center';
+    td.style.padding = '32px';
+    td.style.color = 'var(--muted)';
+    td.textContent = '해당 필터에 게시물 없음';
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+  } else {
+    rows.forEach(r => {
+      const tr = document.createElement('tr');
+      const dateTd = document.createElement('td');
+      dateTd.textContent = fmtDate(r.date);
+      dateTd.style.whiteSpace = 'nowrap';
+      tr.appendChild(dateTd);
+
+      [r.ip, r.campaign || r.material, r.channel, r.format].forEach((v, idx) => {
+        const td = document.createElement('td');
+        td.textContent = v || '';
+        if (idx === 1) td.className = 'cap';
+        else td.style.whiteSpace = 'nowrap';
+        tr.appendChild(td);
+      });
+
+      [r.impressions, r.likes, r.comments, r.shares, r.saves].forEach(v => {
+        const td = document.createElement('td');
+        td.className = 'num';
+        td.textContent = v > 0 ? fmt(v) : '—';
+        tr.appendChild(td);
+      });
+
+      const engTd = document.createElement('td');
+      engTd.className = 'num';
+      engTd.textContent = r.engRate != null ? fmtPct(r.engRate) : '—';
+      tr.appendChild(engTd);
+
+      const linkTd = document.createElement('td');
+      if (r.url) {
+        const a = document.createElement('a');
+        a.href = r.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.style.color = 'var(--accent)';
+        a.textContent = '↗';
+        linkTd.appendChild(a);
+      }
+      tr.appendChild(linkTd);
+
+      tbody.appendChild(tr);
+    });
+  }
+  table.appendChild(tbody);
+
+  $('tableMeta').textContent = `최근 ${rows.length} 건`;
+}
+</script>
+
+</body>
+</html>

@@ -1,3 +1,13 @@
+<!-- ── 문서 메타
+  type:  "idea"
+  id:    "2026-05-14-retro-handheld-giveaway"
+  title: "레트로 게임기 굿즈 아이디어 (이벤트 경품)"
+  desc:  "다마고치 양산 어려움 → 시중 에뮬레이터 핸드헬드 + 자체 8bit ROM 발상. GB Studio 활용, Miyoo/Anbernic 검토. 진행 결정 안 함."
+  file:  "ideas/2026-05-14-retro-handheld-giveaway.md"
+  date:  "2026-05-14"
+  tags:  ["idea", "giveaway", "merchandise", "retro-game", "event"]
+── -->
+
 # 레트로 게임기 굿즈 아이디어 (브레인스토밍)
 
 날짜: 2026-05-14

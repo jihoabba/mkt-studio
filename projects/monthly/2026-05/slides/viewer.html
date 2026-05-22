@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>4월 이후 광고 효율 하락 — Slide Viewer</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #2a2a2a;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: #1a1a1a;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .title { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
+  .meta { font-size: 12px; color: rgba(255,255,255,0.6); }
+  .stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .frame-wrap {
+    aspect-ratio: 720 / 405;
+    width: min(96vw, calc(96vh * 720 / 405));
+    background: #fff;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  iframe {
+    width: 720pt;
+    height: 405pt;
+    border: 0;
+    transform-origin: top left;
+    position: absolute;
+    top: 0; left: 0;
+  }
+  .controls {
+    background: #1a1a1a;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    gap: 12px;
+  }
+  button {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.15s;
+  }
+  button:hover:not(:disabled) { background: rgba(255,255,255,0.18); }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .progress { display: flex; gap: 4px; }
+  .dot {
+    width: 8px; height: 8px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.15s;
+  }
+  .dot.active { background: #ff7849; transform: scale(1.3); }
+  .dot:hover { background: rgba(255,255,255,0.5); }
+  .counter {
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 600;
+    min-width: 60px;
+    text-align: center;
+  }
+  .hint {
+    position: absolute;
+    bottom: 12px; right: 16px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    background: rgba(0,0,0,0.5);
+    padding: 4px 10px;
+    border-radius: 100px;
+    backdrop-filter: blur(8px);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title">4월 이후 광고 효율 하락 — 진단과 대응</div>
+  <div class="meta">2026.05 먼슬리 보고 · 보완 자료</div>
+</header>
+
+<div class="stage">
+  <div class="frame-wrap" id="frameWrap">
+    <iframe id="slideFrame" src="slide-01.html"></iframe>
+    <div class="hint">← → 또는 Space 키로 이동</div>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="prevBtn">← 이전</button>
+  <div class="progress" id="progress"></div>
+  <span class="counter" id="counter">1 / 11</span>
+  <button id="nextBtn">다음 →</button>
+</div>
+
+<script>
+const TOTAL = 11;
+let current = 1;
+
+const frame = document.getElementById('slideFrame');
+const counter = document.getElementById('counter');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const progress = document.getElementById('progress');
+const frameWrap = document.getElementById('frameWrap');
+
+function pad(n) { return String(n).padStart(2, '0'); }
+
+function update() {
+  frame.src = 'slide-' + pad(current) + '.html';
+  counter.textContent = current + ' / ' + TOTAL;
+  prevBtn.disabled = current === 1;
+  nextBtn.disabled = current === TOTAL;
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('active', i + 1 === current);
+  });
+}
+
+function scale() {
+  const wrap = frameWrap.getBoundingClientRect();
+  const SLIDE_W = 960; // 720pt = 960px
+  const SLIDE_H = 540; // 405pt = 540px
+  const sx = wrap.width / SLIDE_W;
+  const sy = wrap.height / SLIDE_H;
+  const s = Math.min(sx, sy);
+  frame.style.transform = 'scale(' + s + ')';
+  frame.style.width = SLIDE_W + 'px';
+  frame.style.height = SLIDE_H + 'px';
+}
+
+// Build progress dots
+for (let i = 1; i <= TOTAL; i++) {
+  const dot = document.createElement('div');
+  dot.className = 'dot';
+  dot.addEventListener('click', () => { current = i; update(); });
+  progress.appendChild(dot);
+}
+
+prevBtn.addEventListener('click', () => { if (current > 1) { current--; update(); } });
+nextBtn.addEventListener('click', () => { if (current < TOTAL) { current++; update(); } });
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); if (current < TOTAL) { current++; update(); } }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); if (current > 1) { current--; update(); } }
+});
+
+window.addEventListener('resize', scale);
+window.addEventListener('load', scale);
+
+update();
+scale();
+</script>
+
+</body>
+</html>

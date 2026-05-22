@@ -1,0 +1,222 @@
+{
+  "generated_at": "2026-05-22T10:42:23",
+  "count": 14,
+  "items": [
+    {
+      "type": "project",
+      "id": "monthly-2026-05",
+      "title": "2026년 5월 먼슬리 — 광고 성과 진단·전략",
+      "desc": "ement 대행사 YTD 광고 성과 리포트 + 4월 이후 효율 하락 보완 분석 + 11장 발표 슬라이드. CPC↑·CVR↓ 구조적 진단, C+D+A 대응 조합.",
+      "file": "projects/monthly/2026-05/README.md",
+      "date": "2026-05-22",
+      "tags": [
+        "project",
+        "monthly",
+        "ad-performance",
+        "ement",
+        "diagnosis"
+      ]
+    },
+    {
+      "type": "report",
+      "id": "2026-05-22-ad-efficiency-diagnosis",
+      "title": "4월 이후 광고 소재 효율 하락 — 진단 & 전략 보완",
+      "desc": "ement YTD 광고 리포트 보완 자료. CPC↑·CVR↓ 동시 진행의 구조적 원인 진단(콘텐츠·상품 사이클 공백). 4가지 대응 옵션과 추천 조합(C+D+A 일부), 우선순위 로드맵.",
+      "file": "projects/monthly/2026-05/보완_4월-이후-소재-효율-하락-진단과-대응.md",
+      "date": "2026-05-22",
+      "tags": [
+        "report",
+        "monthly",
+        "ad-efficiency",
+        "diagnosis",
+        "strategy",
+        "supplement"
+      ],
+      "source": "projects/monthly/2026-05/(ement) linefriendssquare_ytd_v1.html"
+    },
+    {
+      "type": "tool",
+      "id": "ig-dashboard",
+      "title": "IG Dashboard — 인스타 성과 대시보드",
+      "desc": "콘텐츠 CSV + 팔로워 CSV 두 파일을 업로드 또는 Google Sheets URL 연결로 자동 시각화. 17개 채널 동적 표시, IP/채널/형식 필터, KPI·차트 통합.",
+      "file": "tools/ig-dashboard/index.html",
+      "date": "2026-05-20",
+      "tags": [
+        "tool",
+        "dashboard",
+        "instagram",
+        "analytics",
+        "csv"
+      ]
+    },
+    {
+      "type": "tool",
+      "id": "data-card",
+      "title": "Weekly MKT Report — 카드 생성기",
+      "desc": "팀장이 매주 공유하는 주간 마케팅 리포트 텍스트를 붙여넣으면 9:16 카드뉴스 PNG로 자동 생성. 라인 단체방 공유용. 다크 테마 + Pretendard.",
+      "file": "tools/data-card/index.html",
+      "date": "2026-05-18",
+      "tags": [
+        "tool",
+        "card-generator",
+        "report",
+        "weekly",
+        "instagram"
+      ]
+    },
+    {
+      "type": "meeting",
+      "id": "2026-05-14-team-share",
+      "title": "마케팅 팀 공유 미팅",
+      "desc": "마케팅 먼슬리·IP 동향·에스파 꼴레 프리오더·꼴레 브랜드 정책·리빈느 PB 등 공유",
+      "file": "팀미팅/2026-05-14-team-share.html",
+      "date": "2026-05-14",
+      "tags": [
+        "meeting",
+        "team-share",
+        "ip",
+        "collab"
+      ],
+      "attendees": [
+        "마케팅팀"
+      ],
+      "meetingNum": "001"
+    },
+    {
+      "type": "idea",
+      "id": "2026-05-14-retro-handheld-giveaway",
+      "title": "레트로 게임기 굿즈 아이디어 (이벤트 경품)",
+      "desc": "다마고치 양산 어려움 → 시중 에뮬레이터 핸드헬드 + 자체 8bit ROM 발상. GB Studio 활용, Miyoo/Anbernic 검토. 진행 결정 안 함.",
+      "file": "ideas/2026-05-14-retro-handheld-giveaway.md",
+      "date": "2026-05-14",
+      "tags": [
+        "idea",
+        "giveaway",
+        "merchandise",
+        "retro-game",
+        "event"
+      ]
+    },
+    {
+      "type": "prototype",
+      "id": "fan-square",
+      "title": "팬 스퀘어 — 팬덤 인터랙티브 페이지",
+      "desc": "팬덤 대상 인터랙티브 콘텐츠 프로토타입 (Claude/Gemini 두 버전 비교용).",
+      "file": "prototypes/fan-square/index.html",
+      "date": "2026-05-14",
+      "tags": [
+        "prototype",
+        "fandom",
+        "interactive",
+        "experiment"
+      ]
+    },
+    {
+      "type": "prototype",
+      "id": "truz-preorder",
+      "title": "TRUZ 프리오더 — 런칭 페이지",
+      "desc": "TRUZ 신상 프리오더 캠페인 랜딩 + 미니 게임. 요치 캐릭터 활용.",
+      "file": "prototypes/truz-preorder/index.html",
+      "date": "2026-05-14",
+      "tags": [
+        "prototype",
+        "preorder",
+        "truz",
+        "landing",
+        "campaign"
+      ]
+    },
+    {
+      "type": "project",
+      "id": "youtube-contents",
+      "title": "YouTube 콘텐츠 프로젝트 — 팟캐스트 포맷 검토",
+      "desc": "square_b.side 인스타에서 시작된 B급 매체 콘텐츠가 본 계정 + YouTube로 확장. 케파 부담 줄이는 AI 팟캐스트 포맷 검토 진행.",
+      "file": "projects/youtube-contents/context.md",
+      "date": "2026-05-14",
+      "tags": [
+        "project",
+        "youtube",
+        "podcast",
+        "b-side",
+        "content-strategy"
+      ]
+    },
+    {
+      "type": "prototype",
+      "id": "couple-day-app",
+      "title": "부부의 날 — 캐릭터상 매칭",
+      "desc": "사진 두 장 업로드 → 얼굴 분석으로 어울리는 라인프렌즈/BT21 캐릭터상 매칭 + 굿즈 자동 추천. 5/21 부부의 날 이벤트용. 사이월드 미니홈피 톤.",
+      "file": "prototypes/couple-day-app/index.html",
+      "date": "2026-05-12",
+      "tags": [
+        "prototype",
+        "event",
+        "face-api",
+        "couple-day",
+        "cyworld",
+        "matching"
+      ]
+    },
+    {
+      "type": "prototype",
+      "id": "popup-manager",
+      "title": "팝업 매니저 — 운영 가이드 & 게임 모음",
+      "desc": "팝업스토어 운영 가이드 + 부속 게임/이벤트 (rpg-game, sally-run, events 등). 키오스크·체험형 운영용.",
+      "file": "prototypes/popup-manager/guide.html",
+      "date": "2026-05-12",
+      "tags": [
+        "prototype",
+        "popup",
+        "operation",
+        "kiosk",
+        "game"
+      ]
+    },
+    {
+      "type": "prototype",
+      "id": "offline-game-lucky-draw",
+      "title": "행운의 뽑기 — 오프라인 키오스크 게임",
+      "desc": "오프라인 매장 키오스크용 럭키 드로우 게임. 문방구 스타일 UI + 라인프렌즈 캐릭터 굿즈 보상.",
+      "file": "prototypes/offline-game/index.html",
+      "date": "2026-05-06",
+      "tags": [
+        "prototype",
+        "event",
+        "offline",
+        "kiosk",
+        "lucky-draw",
+        "game"
+      ]
+    },
+    {
+      "type": "tool",
+      "id": "settlement-check",
+      "title": "광고비 정산 체크 도구",
+      "desc": "검수확인서.xlsx + 정산 RAW.xlsx 파싱 → 매체별 비용 합산·오차 검증 → 발주서 PDF 변환 → _체크시트.html 자동 생성. AppleScript 기반 macOS 전용.",
+      "file": "tools/settlement-check/README.md",
+      "date": "2026-04-15",
+      "tags": [
+        "tool",
+        "settlement",
+        "ad-budget",
+        "automation",
+        "python",
+        "macos"
+      ]
+    },
+    {
+      "type": "prototype",
+      "id": "mkt-monthly-hub",
+      "title": "마케팅 먼슬리 — 콘텐츠 허브 (구버전)",
+      "desc": "초기 먼슬리 리포트 콘텐츠 허브 프로토타입 (discovery-front, kakao, memo, sally-run, stock-front 시리즈).",
+      "file": "prototypes/mkt-monthly/index.html",
+      "date": "2026-03-01",
+      "tags": [
+        "prototype",
+        "hub",
+        "monthly",
+        "legacy"
+      ]
+    }
+  ]
+}

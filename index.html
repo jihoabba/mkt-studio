@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mkt-studio — LINE FRIENDS SQUARE 마케팅 허브</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --text: #1d1d1f;
+  --text-secondary: rgba(0,0,0,0.55);
+  --text-muted: rgba(0,0,0,0.4);
+  --accent: #0071e3;
+  --green: #1d8348;
+  --orange: #b95000;
+  --purple: #7048c1;
+  --red: #c0392b;
+  --divider: rgba(0,0,0,0.08);
+  --divider-strong: rgba(0,0,0,0.14);
+  --shadow: 0 2px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-hover: 0 10px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+  --radius: 16px;
+  --green-bg: rgba(29,131,72,0.08);
+  --orange-bg: rgba(185,80,0,0.08);
+  --blue-bg: rgba(0,113,227,0.07);
+  --purple-bg: rgba(112,72,193,0.08);
+  --red-bg: rgba(192,57,43,0.08);
+}
+html { background: var(--bg); font-family: 'Pretendard Variable', Pretendard, -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif; color: var(--text); -webkit-font-smoothing: antialiased; }
+body { min-height: 100vh; letter-spacing: -0.01em; }
+
+.header {
+  background: rgba(245,245,247,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--divider);
+  position: sticky; top: 0; z-index: 100;
+  padding: 0 32px;
+  height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-logo { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); }
+.header-sep { width: 1px; height: 14px; background: var(--divider-strong); }
+.header-title { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.badge-live {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px;
+  background: var(--green-bg);
+  border-radius: 100px;
+  font-size: 11px; font-weight: 600; color: var(--green); letter-spacing: 0.04em;
+}
+.badge-live::before {
+  content: ''; width: 6px; height: 6px;
+  border-radius: 50%; background: var(--green);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.hero { padding: 56px 32px 24px; max-width: 1200px; margin: 0 auto; }
+.hero-eyebrow { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+.hero h1 { font-size: 40px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.1; }
+.hero h1 .accent { color: var(--accent); }
+.hero-sub { font-size: 16px; color: var(--text-secondary); margin-top: 12px; font-weight: 500; max-width: 640px; line-height: 1.5; }
+.hero-meta {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  margin-top: 24px; padding: 14px 18px;
+  background: var(--surface); border: 1px solid var(--divider); border-radius: 12px;
+  font-size: 12px; color: var(--text-secondary);
+}
+.hero-meta .item { display: flex; align-items: center; gap: 6px; }
+.hero-meta .item strong { color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.toolbar {
+  max-width: 1200px; margin: 0 auto;
+  padding: 24px 32px 16px;
+  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+}
+.search {
+  flex: 1; min-width: 240px;
+  position: relative;
+}
+.search input {
+  width: 100%;
+  height: 40px;
+  padding: 0 16px 0 38px;
+  border: 1px solid var(--divider-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+  transition: 0.15s;
+}
+.search input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--blue-bg); }
+.search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+.filters {
+  display: inline-flex; gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 100px;
+  padding: 3px;
+  flex-wrap: wrap;
+}
+.filter-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 13px; font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.filter-btn:hover { color: var(--text); }
+.filter-btn.active { background: var(--text); color: white; }
+.filter-count { margin-left: 4px; opacity: 0.6; font-size: 11px; font-variant-numeric: tabular-nums; }
+
+.grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 32px 64px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+  padding: 18px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition: 0.2s;
+}
+.card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--divider-strong); }
+.card-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.card-type {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 3px 8px; border-radius: 5px;
+}
+.type-report { background: var(--blue-bg); color: var(--accent); }
+.type-meeting { background: var(--purple-bg); color: var(--purple); }
+.type-idea { background: var(--orange-bg); color: var(--orange); }
+.type-tool { background: var(--green-bg); color: var(--green); }
+.type-prototype { background: var(--red-bg); color: var(--red); }
+.type-project { background: rgba(0,0,0,0.06); color: var(--text); }
+.card-date { font-size: 11px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.card-title { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.3; }
+.card-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.55; flex: 1; }
+.card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; padding-top: 10px; border-top: 1px dashed var(--divider); }
+.tag {
+  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--bg);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.empty { padding: 80px 32px; text-align: center; color: var(--text-muted); grid-column: 1 / -1; }
+.empty strong { display: block; font-size: 16px; color: var(--text); margin-bottom: 6px; }
+
+.footer {
+  border-top: 1px solid var(--divider);
+  padding: 24px 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.footer a { color: var(--accent); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+@media (max-width: 720px) {
+  .hero { padding: 32px 20px 16px; }
+  .hero h1 { font-size: 28px; }
+  .toolbar { padding: 16px 20px 12px; flex-direction: column; align-items: stretch; }
+  .grid { padding: 12px 20px 48px; grid-template-columns: 1fr; }
+  .header { padding: 0 20px; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <span class="header-logo">LINE FRIENDS</span>
+    <span class="header-sep"></span>
+    <span class="header-title">mkt-studio</span>
+  </div>
+  <div class="header-right">
+    <span class="badge-live">SYNCED</span>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-eyebrow">MARKETING WORK HUB</div>
+  <h1>마케팅 업무 산출물<br>한 곳에서 보기 · <span class="accent">검색 · 추적</span></h1>
+  <p class="hero-sub">회의록 · 보고서 · 아이디어 · 도구 · 프로토타입 · 프로젝트가 모두 모이는 사내 마케팅 허브. 신규 산출물 추가 시 메타 블록만 넣으면 자동 인덱싱됩니다.</p>
+  <div class="hero-meta" id="metaBar"></div>
+</section>
+
+<section class="toolbar">
+  <div class="search">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="searchInput" placeholder="제목 · 설명 · 태그 검색…">
+  </div>
+  <div class="filters" id="filterBar"></div>
+</section>
+
+<main class="grid" id="grid"></main>
+
+<footer class="footer">
+  <div>
+    <strong style="color:var(--text);">mkt-studio</strong>
+    <span> · </span>
+    <a href="https://github.com/jihoabba/mkt-studio" target="_blank" rel="noopener">GitHub</a>
+  </div>
+  <div id="updatedAt"></div>
+</footer>
+
+<script>
+const TYPE_LABELS = {
+  report: '리포트',
+  meeting: '회의록',
+  idea: '아이디어',
+  tool: '도구',
+  prototype: '프로토타입',
+  project: '프로젝트',
+};
+const TYPE_ORDER = ['report', 'meeting', 'idea', 'tool', 'prototype', 'project'];
+
+let allItems = [];
+let activeType = 'all';
+let searchText = '';
+
+function el(tag, opts, ...children) {
+  const node = document.createElement(tag);
+  if (opts) {
+    if (opts.cls) node.className = opts.cls;
+    if (opts.text != null) node.textContent = String(opts.text);
+    if (opts.style) node.setAttribute('style', opts.style);
+    if (opts.attrs) for (const k of Object.keys(opts.attrs)) if (opts.attrs[k] != null) node.setAttribute(k, opts.attrs[k]);
+    if (opts.on) for (const k of Object.keys(opts.on)) node.addEventListener(k, opts.on[k]);
+  }
+  for (const c of children) {
+    if (c == null || c === false) continue;
+    if (typeof c === 'string' || typeof c === 'number') node.appendChild(document.createTextNode(String(c)));
+    else node.appendChild(c);
+  }
+  return node;
+}
+function clearNode(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+
+async function loadManifest() {
+  try {
+    const res = await fetch('_meta/manifest.json?ts=' + Date.now());
+    if (!res.ok) throw new Error('manifest 로드 실패');
+    const data = await res.json();
+    allItems = data.items || [];
+    const updated = document.getElementById('updatedAt');
+    updated.textContent = '최근 업데이트: ' + (data.generated_at || '—');
+    renderMetaBar(data);
+    renderFilters();
+    render();
+  } catch (e) {
+    const grid = document.getElementById('grid');
+    clearNode(grid);
+    const empty = el('div', { cls: 'empty' });
+    empty.appendChild(el('strong', { text: '매니페스트 로드 실패' }));
+    empty.appendChild(document.createTextNode('scripts/build-manifest.py 를 실행한 후 다시 시도하세요.'));
+    grid.appendChild(empty);
+  }
+}
+
+function renderMetaBar(data) {
+  const bar = document.getElementById('metaBar');
+  clearNode(bar);
+  const byType = {};
+  allItems.forEach(i => { byType[i.type] = (byType[i.type] || 0) + 1; });
+
+  const totalItem = el('div', { cls: 'item' });
+  totalItem.appendChild(el('strong', { text: String(data.count) }));
+  totalItem.appendChild(document.createTextNode('건 산출물'));
+  bar.appendChild(totalItem);
+
+  TYPE_ORDER.forEach(t => {
+    if (!byType[t]) return;
+    const item = el('div', { cls: 'item' });
+    item.appendChild(document.createTextNode(TYPE_LABELS[t] + ' '));
+    item.appendChild(el('strong', { text: String(byType[t]) }));
+    bar.appendChild(item);
+  });
+}
+
+function renderFilters() {
+  const bar = document.getElementById('filterBar');
+  clearNode(bar);
+  const byType = {};
+  allItems.forEach(i => { byType[i.type] = (byType[i.type] || 0) + 1; });
+  const buttons = [{ key: 'all', label: '전체', count: allItems.length }];
+  TYPE_ORDER.forEach(t => {
+    if (byType[t]) buttons.push({ key: t, label: TYPE_LABELS[t], count: byType[t] });
+  });
+  buttons.forEach(b => {
+    const btn = el('button', {
+      cls: 'filter-btn' + (activeType === b.key ? ' active' : ''),
+      attrs: { 'data-type': b.key },
+      on: { click: () => { activeType = b.key; renderFilters(); render(); } }
+    });
+    btn.appendChild(document.createTextNode(b.label));
+    btn.appendChild(el('span', { cls: 'filter-count', text: String(b.count) }));
+    bar.appendChild(btn);
+  });
+}
+
+function render() {
+  const grid = document.getElementById('grid');
+  clearNode(grid);
+
+  const filtered = allItems.filter(item => {
+    if (activeType !== 'all' && item.type !== activeType) return false;
+    if (searchText) {
+      const q = searchText.toLowerCase();
+      const hay = [item.title, item.desc, (item.tags || []).join(' '), item.id].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    const empty = el('div', { cls: 'empty' });
+    empty.appendChild(el('strong', { text: '검색 결과 없음' }));
+    empty.appendChild(document.createTextNode('다른 키워드를 시도해보세요.'));
+    grid.appendChild(empty);
+    return;
+  }
+
+  filtered.forEach(item => {
+    const card = el('a', {
+      cls: 'card',
+      attrs: { href: item.file || '#', target: '_blank', rel: 'noopener' }
+    });
+    const head = el('div', { cls: 'card-head' });
+    head.appendChild(el('span', {
+      cls: 'card-type type-' + (item.type || 'project'),
+      text: TYPE_LABELS[item.type] || item.type
+    }));
+    head.appendChild(el('span', { cls: 'card-date', text: item.date || '' }));
+    card.appendChild(head);
+    card.appendChild(el('div', { cls: 'card-title', text: item.title || item.id || 'Untitled' }));
+    card.appendChild(el('div', { cls: 'card-desc', text: item.desc || '' }));
+
+    if (item.tags && item.tags.length > 0) {
+      const tagsWrap = el('div', { cls: 'card-tags' });
+      item.tags.slice(0, 5).forEach(t => {
+        tagsWrap.appendChild(el('span', { cls: 'tag', text: t }));
+      });
+      card.appendChild(tagsWrap);
+    }
+    grid.appendChild(card);
+  });
+}
+
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  searchText = e.target.value.trim();
+  render();
+});
+
+loadManifest();
+</script>
+
+</body>
+</html>

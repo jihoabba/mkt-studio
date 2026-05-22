@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Slide 03 — 표면 신호</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 720pt; height: 405pt;
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+    background: #FFFFFF;
+    color: #191F28;
+    overflow: hidden;
+    letter-spacing: -0.01em;
+  }
+  .slide { width: 100%; height: 100%; padding: 40px 56px; display: flex; flex-direction: column; }
+  .header { margin-bottom: 22px; }
+  .label { font-size: 12px; font-weight: 700; color: #3182F6; letter-spacing: 1px; margin-bottom: 6px; }
+  h2 { font-size: 24px; font-weight: 800; color: #191F28; letter-spacing: -0.5px; margin: 0; }
+  .sub { font-size: 14px; color: #8B95A1; margin-top: 6px; font-weight: 500; }
+  .grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .card { background: #F9FAFB; border: 1px solid #F2F4F6; border-radius: 16px; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .metric-label { display: flex; align-items: center; gap: 8px; }
+  .metric-tag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
+  .metric-tag.up { background: #FFF0F0; color: #F04452; }
+  .metric-tag.down { background: #FFF8E6; color: #F59E0B; }
+  .metric-name { font-size: 14px; font-weight: 700; color: #4E5968; }
+  .metric-row { display: flex; align-items: baseline; gap: 6px; font-variant-numeric: tabular-nums; }
+  .m-num { font-size: 26px; font-weight: 900; color: #191F28; letter-spacing: -1px; line-height: 1; }
+  .m-arrow { font-size: 16px; color: #8B95A1; font-weight: 400; }
+  .m-unit { font-size: 14px; color: #4E5968; font-weight: 600; margin-left: 4px; }
+  .month-row { font-size: 11px; color: #8B95A1; letter-spacing: 0.5px; margin-top: 4px; }
+  .change-pill { align-self: flex-start; font-size: 13px; font-weight: 800; padding: 5px 12px; border-radius: 100px; margin-top: 4px; }
+  .change-pill.up { background: #FFF0F0; color: #F04452; }
+  .change-pill.down { background: #FFF8E6; color: #F59E0B; }
+  .insight { background: #191F28; color: #FFFFFF; border-radius: 14px; padding: 16px 22px; display: flex; align-items: center; gap: 14px; }
+  .insight-quote { font-size: 16px; font-weight: 800; color: #FFFFFF; }
+  .insight-quote .blue { color: #6AA9FF; }
+  .insight-sep { width: 1px; height: 24px; background: rgba(255,255,255,0.2); }
+  .insight-desc { font-size: 12px; color: #D1D6DB; line-height: 1.5; flex: 1; }
+  .footer { margin-top: 12px; display: flex; justify-content: space-between; font-size: 11px; color: #8B95A1; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="slide">
+  <header class="header">
+    <div class="label">01 · 현황 — 표면 신호</div>
+    <h2>CPC 상승, CVR 하락 — 동시 진행</h2>
+    <p class="sub">두 지표가 같이 악화 = "더 비싼 클릭이 덜 산다"</p>
+  </header>
+  <div class="grid">
+    <div class="card">
+      <div class="metric-label">
+        <span class="metric-tag up">↑ +37.9%</span>
+        <span class="metric-name">CPC · 클릭당 비용</span>
+      </div>
+      <div class="metric-row">
+        <span class="m-num">272</span>
+        <span class="m-arrow">→</span>
+        <span class="m-num">327</span>
+        <span class="m-arrow">→</span>
+        <span class="m-num">375</span>
+        <span class="m-unit">원</span>
+      </div>
+      <div class="month-row">1월 · 4월 · 5월(17일까지)</div>
+      <p style="font-size:12px; color:#4E5968; line-height:1.5; margin-top:6px;">광고비가 더 비싸지고 있음 — 메타 알고리즘이 효율 낮은 풀에 비싼 입찰을 강요</p>
+    </div>
+    <div class="card">
+      <div class="metric-label">
+        <span class="metric-tag down">↓ -38.0%</span>
+        <span class="metric-name">CVR · 전환율</span>
+      </div>
+      <div class="metric-row">
+        <span class="m-num">3.34</span>
+        <span class="m-arrow">→</span>
+        <span class="m-num">2.83</span>
+        <span class="m-arrow">→</span>
+        <span class="m-num">2.07</span>
+        <span class="m-unit">%</span>
+      </div>
+      <div class="month-row">1월 · 4월 · 5월(17일까지)</div>
+      <p style="font-size:12px; color:#4E5968; line-height:1.5; margin-top:6px;">클릭한 사람이 덜 사고 있음 — 메타 리타겟팅이 두 스토어 모두 동반 하락</p>
+    </div>
+  </div>
+  <div class="insight" style="margin-top:14px;">
+    <span class="insight-quote">“더 비싼 클릭이 <span class="blue">덜 산다</span>”</span>
+    <div class="insight-sep"></div>
+    <span class="insight-desc">메타 리타겟팅 효율이 <strong style="color:#fff;">스스·스퀘어</strong> 두 스토어에서 동반 하락 중</span>
+  </div>
+  <div class="footer"><span>출처: ement YTD 광고 성과 분석 2026</span><span>03 / 11</span></div>
+</div>
+</body>
+</html>

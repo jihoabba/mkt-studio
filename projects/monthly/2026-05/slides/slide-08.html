@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Slide 08 — 4가지 옵션</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 720pt; height: 405pt;
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+    background: #FFFFFF;
+    color: #191F28;
+    overflow: hidden;
+    letter-spacing: -0.01em;
+  }
+  .slide { width: 100%; height: 100%; padding: 32px 48px; display: flex; flex-direction: column; }
+  .header { margin-bottom: 14px; }
+  .label { font-size: 12px; font-weight: 700; color: #3182F6; letter-spacing: 1px; margin-bottom: 6px; }
+  h2 { font-size: 22px; font-weight: 800; color: #191F28; letter-spacing: -0.5px; margin: 0; }
+  .sub { font-size: 13px; color: #8B95A1; margin-top: 4px; font-weight: 500; }
+  .grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; }
+  .opt { background: #F9FAFB; border: 1px solid #F2F4F6; border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; position: relative; }
+  .opt.rec { background: #EBF4FF; border: 2px solid #3182F6; }
+  .opt-head { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+  .opt-key { font-size: 11px; font-weight: 800; width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: #4E5968; color: #FFFFFF; }
+  .opt.rec .opt-key { background: #3182F6; }
+  .opt-tag { font-size: 10px; font-weight: 800; color: #8B95A1; letter-spacing: 0.5px; }
+  .opt.rec .opt-tag { color: #3182F6; }
+  .opt-star { margin-left: auto; font-size: 13px; color: #3182F6; }
+  .opt-title { font-size: 14px; font-weight: 800; color: #191F28; line-height: 1.35; }
+  .opt-desc { font-size: 11px; color: #4E5968; line-height: 1.55; }
+  .pc { margin-top: auto; padding-top: 8px; border-top: 1px solid #ECEFF2; display: grid; grid-template-columns: 14px 1fr; column-gap: 6px; row-gap: 3px; font-size: 10px; line-height: 1.4; }
+  .opt.rec .pc { border-top-color: rgba(49,130,246,0.2); }
+  .pc .mark.pro { color: #30B562; font-weight: 800; }
+  .pc .mark.con { color: #F04452; font-weight: 800; }
+  .pc-text { color: #4E5968; }
+  .footer { margin-top: 10px; display: flex; justify-content: space-between; font-size: 11px; color: #8B95A1; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="slide">
+  <header class="header">
+    <div class="label">04 · 대응 전략 — 옵션 매트릭스</div>
+    <h2>4가지 옵션 — 수비형 / 공격형 / 콘텐츠형 / 분산형</h2>
+    <p class="sub">★ 표시는 추천 옵션 (즉시 실행 가능 + 데이터 근거 있음)</p>
+  </header>
+  <div class="grid">
+    <div class="opt">
+      <div class="opt-head"><span class="opt-key">A</span><span class="opt-tag">수비형</span></div>
+      <div class="opt-title">광고비 효율화 + 프로모션 집중</div>
+      <div class="opt-desc">메타 리타겟팅·DA 축소, 절감분을 상시 SA·시즌 프로모션에 집중</div>
+      <div class="pc">
+        <span class="mark pro">+</span><span class="pc-text">즉시 ROAS 회복, 위험 최소</span>
+        <span class="mark con">−</span><span class="pc-text">볼륨 축소 → 신규 풀 더 마름 (악순환 우려)</span>
+      </div>
+    </div>
+    <div class="opt">
+      <div class="opt-head"><span class="opt-key">B</span><span class="opt-tag">공격형</span></div>
+      <div class="opt-title">신규 시장·타겟 발굴</div>
+      <div class="opt-desc">룩어라이크 확장, 신규 지역·연령대 테스트, 인플루언서 협업</div>
+      <div class="pc">
+        <span class="mark pro">+</span><span class="pc-text">리타겟팅 풀 자체를 키움 — 근본 처방</span>
+        <span class="mark con">−</span><span class="pc-text">초기 ROAS 낮을 수 있음, 검증 기간 필요</span>
+      </div>
+    </div>
+    <div class="opt rec">
+      <div class="opt-head"><span class="opt-key">C</span><span class="opt-tag">콘텐츠형 · 추천</span><span class="opt-star">★</span></div>
+      <div class="opt-title">콘텐츠·소재 강화 — "이달의 발굴템"</div>
+      <div class="opt-desc">신제품 없어도 신선도를 만드는 큐레이션 / 팬덤 UGC 활용</div>
+      <div class="pc">
+        <span class="mark pro">+</span><span class="pc-text">신제품 사이클과 무관, 우리 팀 강점과 일치</span>
+        <span class="mark con">−</span><span class="pc-text">콘텐츠 제작 케파 필요</span>
+      </div>
+    </div>
+    <div class="opt rec">
+      <div class="opt-head"><span class="opt-key">D</span><span class="opt-tag">분산형 · 추천</span><span class="opt-star">★</span></div>
+      <div class="opt-title">채널 다각화 — PC 확대·29CM 협력광고</div>
+      <div class="opt-desc">PC 인벤토리 (ROAS 3,236%) 확대, 29CM·올웨이즈 등 신규 채널</div>
+      <div class="pc">
+        <span class="mark pro">+</span><span class="pc-text">ZOA × 29CM ROAS 849%로 이미 검증된 방향</span>
+        <span class="mark con">−</span><span class="pc-text">채널별 학습 기간 필요</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span></span><span>08 / 11</span></div>
+</div>
+</body>
+</html>

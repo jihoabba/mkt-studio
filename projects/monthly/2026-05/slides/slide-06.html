@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Slide 06 — 보조 증거</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 720pt; height: 405pt;
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+    background: #FFFFFF;
+    color: #191F28;
+    overflow: hidden;
+    letter-spacing: -0.01em;
+  }
+  .slide { width: 100%; height: 100%; padding: 36px 48px; display: flex; flex-direction: column; }
+  .header { margin-bottom: 18px; }
+  .label { font-size: 12px; font-weight: 700; color: #3182F6; letter-spacing: 1px; margin-bottom: 6px; }
+  h2 { font-size: 22px; font-weight: 800; color: #191F28; letter-spacing: -0.5px; margin: 0; }
+  .sub { font-size: 13px; color: #8B95A1; margin-top: 6px; font-weight: 500; }
+  .grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .card { background: #F9FAFB; border: 1px solid #F2F4F6; border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; gap: 10px; }
+  .card.good { background: #F4FBF6; border-color: #D7F0DF; }
+  .card.bad { background: #FFF6F6; border-color: #FFDDDD; }
+  .card-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 100px; align-self: flex-start; letter-spacing: 0.5px; }
+  .card.good .card-tag { background: #30B562; color: #FFFFFF; }
+  .card.bad .card-tag { background: #F04452; color: #FFFFFF; }
+  .card-title { font-size: 15px; font-weight: 800; color: #191F28; line-height: 1.4; }
+  .card-title .muted { color: #8B95A1; font-weight: 500; font-size: 13px; }
+  .big-stat { display: flex; align-items: baseline; gap: 6px; font-variant-numeric: tabular-nums; }
+  .big-stat .n { font-size: 36px; font-weight: 900; color: #191F28; letter-spacing: -1.2px; line-height: 1; }
+  .big-stat .u { font-size: 14px; color: #4E5968; font-weight: 700; margin-left: 2px; }
+  .stat-desc { font-size: 12px; color: #4E5968; line-height: 1.55; }
+  .stat-desc strong { color: #191F28; font-weight: 700; }
+  .funnel { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .f-pill { font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: #FFFFFF; border: 1px solid #F2F4F6; color: #4E5968; font-variant-numeric: tabular-nums; }
+  .f-pill.weak { background: #FFE5E5; border-color: #FFCCCC; color: #C9333F; }
+  .f-arrow { font-size: 11px; color: #8B95A1; }
+  .compare { margin-top: auto; padding-top: 10px; border-top: 1px solid #E5E8EB; font-size: 11px; color: #4E5968; line-height: 1.55; }
+  .compare strong { color: #191F28; font-weight: 700; }
+  .footer { margin-top: 12px; display: flex; justify-content: space-between; font-size: 11px; color: #8B95A1; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="slide">
+  <header class="header">
+    <div class="label">03 · 보조 증거 — 데이터로 검증</div>
+    <h2>검색(SA)은 멀쩡, 푸시(메타·DA)만 하락</h2>
+    <p class="sub">진단 적중 — 광고 운영 문제가 아니라 푸시 채널 신선도 고갈</p>
+  </header>
+  <div class="grid">
+    <div class="card good">
+      <span class="card-tag">✓ 브랜드 자산 · 멀쩡</span>
+      <div class="card-title">상시 SA <span class="muted">/ 검색 수요 기반</span></div>
+      <div class="big-stat"><span class="n">1,208</span><span class="u">% ROAS</span></div>
+      <p class="stat-desc">광고비 <strong>40.7%</strong> → 매출 <strong>67.6%</strong> · 구매 <strong>62%</strong> 견인</p>
+      <p class="compare">브랜드 검색 수요는 그대로 유지 — 광고가 끌어오는 게 아니라 <strong>유저가 찾아오는 구조</strong>가 살아있음</p>
+    </div>
+    <div class="card bad">
+      <span class="card-tag">⚠ 푸시 채널 · 신선도 고갈</span>
+      <div class="card-title">메타 리타겟팅 <span class="muted">/ 클릭→구매 전환 약함</span></div>
+      <div class="funnel">
+        <span class="f-pill">광고비 17%</span>
+        <span class="f-arrow">›</span>
+        <span class="f-pill">클릭 21% <strong style="color:#3182F6;">1위</strong></span>
+        <span class="f-arrow">›</span>
+        <span class="f-pill weak">구매 5.8%</span>
+        <span class="f-arrow">›</span>
+        <span class="f-pill weak">매출 4.0%</span>
+      </div>
+      <p class="stat-desc" style="margin-top:4px;">클릭은 잘 받는데 <strong>전환은 안 됨</strong></p>
+      <p class="compare">같은 메타 안의 <strong>어드밴티지(ROAS 555%)</strong>와 명확한 격차 — 카탈로그·오디언스·소재 점검 포인트</p>
+    </div>
+  </div>
+  <div class="footer"><span>출처: ement YTD 광고 성과 분석 2026</span><span>06 / 11</span></div>
+</div>
+</body>
+</html>

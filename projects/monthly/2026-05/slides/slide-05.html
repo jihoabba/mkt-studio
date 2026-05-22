@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Slide 05 — 구조적 원인</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 720pt; height: 405pt;
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+    background: #FFFFFF;
+    color: #191F28;
+    overflow: hidden;
+    letter-spacing: -0.01em;
+  }
+  .slide { width: 100%; height: 100%; padding: 36px 48px; display: flex; flex-direction: column; }
+  .header { margin-bottom: 18px; }
+  .label { font-size: 12px; font-weight: 700; color: #3182F6; letter-spacing: 1px; margin-bottom: 6px; }
+  h2 { font-size: 22px; font-weight: 800; color: #191F28; letter-spacing: -0.5px; margin: 0; }
+  .sub { font-size: 13px; color: #8B95A1; margin-top: 6px; font-weight: 500; }
+  .flow { flex: 1; display: grid; grid-template-columns: 1fr 16px 1fr 16px 1fr 16px 1fr; align-items: stretch; gap: 0; }
+  .step { background: #F9FAFB; border: 1px solid #F2F4F6; border-radius: 14px; padding: 16px 14px; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+  .step-num { display: inline-block; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; background: #EBF4FF; color: #3182F6; letter-spacing: 0.5px; align-self: flex-start; }
+  .step-title { font-size: 14px; font-weight: 800; color: #191F28; line-height: 1.35; }
+  .step-desc { font-size: 11px; color: #4E5968; line-height: 1.55; margin-top: auto; }
+  .step.last { background: #191F28; border-color: #191F28; }
+  .step.last .step-num { background: rgba(106,169,255,0.15); color: #6AA9FF; }
+  .step.last .step-title { color: #FFFFFF; }
+  .step.last .step-desc { color: #D1D6DB; }
+  .arrow { display: flex; align-items: center; justify-content: center; font-size: 16px; color: #3182F6; font-weight: 700; }
+  .insight { margin-top: 16px; background: #FFF8E6; border-left: 4px solid #F59E0B; border-radius: 0 12px 12px 0; padding: 12px 18px; font-size: 13px; color: #92560A; line-height: 1.55; font-weight: 600; }
+  .insight strong { color: #5A370A; font-weight: 800; }
+  .footer { margin-top: 12px; display: flex; justify-content: space-between; font-size: 11px; color: #8B95A1; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="slide">
+  <header class="header">
+    <div class="label">03 · 구조적 원인</div>
+    <h2>4단계 흐름 — 신제품 공백이 광고 효율 하락으로 이어진다</h2>
+    <p class="sub">광고 문제가 아니라 콘텐츠·상품 사이클 공백의 결과</p>
+  </header>
+  <div class="flow">
+    <div class="step">
+      <span class="step-num">STEP 01</span>
+      <div class="step-title">신제품·티징 부재</div>
+      <p class="step-desc">새 콘텐츠 부재로<br>신규 트래픽 유입 감소</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="step">
+      <span class="step-num">STEP 02</span>
+      <div class="step-title">리타겟팅 풀 노후화</div>
+      <p class="step-desc">살 사람은 이미 샀고<br>안 살 사람은 안 삼</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="step">
+      <span class="step-num">STEP 03</span>
+      <div class="step-title">동일 소재 반복</div>
+      <p class="step-desc">광고 피로도 ↑<br>호기심·전환 의도 ↓</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="step last">
+      <span class="step-num">STEP 04</span>
+      <div class="step-title">CPC ↑ · CVR ↓</div>
+      <p class="step-desc">알고리즘이<br>비싼 입찰을 강요</p>
+    </div>
+  </div>
+  <div class="insight">⚠ <strong>광고팀이 더 잘 운영해서 풀리는 문제가 아닙니다</strong> — 콘텐츠·상품 사이클의 공백이 광고 지표에 그대로 나타나는 구조</div>
+  <div class="footer"><span></span><span>05 / 11</span></div>
+</div>
+</body>
+</html>

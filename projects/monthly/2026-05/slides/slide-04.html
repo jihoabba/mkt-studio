@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Slide 04 — 한 줄 진단</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 720pt; height: 405pt;
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+    background: #FFFFFF;
+    color: #191F28;
+    overflow: hidden;
+    letter-spacing: -0.01em;
+  }
+  .slide { width: 100%; height: 100%; padding: 56px 64px; display: flex; flex-direction: column; }
+  .label { font-size: 13px; font-weight: 700; color: #3182F6; letter-spacing: 1px; margin-bottom: 20px; }
+  .body { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  h2 { font-size: 34px; font-weight: 800; line-height: 1.4; color: #191F28; letter-spacing: -0.8px; }
+  h2 .strike { text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: #F04452; color: #8B95A1; font-weight: 700; }
+  h2 .blue { color: #3182F6; }
+  .proof { margin-top: 36px; display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center; }
+  .proof-num { font-size: 56px; font-weight: 900; color: #30B562; letter-spacing: -2px; line-height: 1; font-variant-numeric: tabular-nums; }
+  .proof-num .small { font-size: 24px; color: #30B562; font-weight: 800; }
+  .proof-text { font-size: 14px; color: #4E5968; line-height: 1.6; }
+  .proof-text strong { color: #191F28; font-weight: 700; }
+  .proof-tag { display: inline-block; font-size: 11px; font-weight: 700; color: #30B562; background: #E8F7EE; padding: 3px 8px; border-radius: 6px; margin-bottom: 6px; letter-spacing: 0.5px; }
+  .footer { margin-top: 20px; display: flex; justify-content: space-between; font-size: 11px; color: #8B95A1; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="label">02 · 진단 — 한 줄로</div>
+  <div class="body">
+    <h2>
+      <span class="strike">광고 운영의 문제</span>가 아니라,<br>
+      <span class="blue">콘텐츠·상품 사이클 공백</span>이<br>
+      광고에 그대로 나타나는 것
+    </h2>
+    <div class="proof">
+      <div class="proof-num">1,208<span class="small">%</span></div>
+      <div class="proof-text">
+        <span class="proof-tag">✓ 브랜드 자산 유지</span><br>
+        <strong>상시 SA ROAS는 그대로 유지</strong>되고 있음 — 브랜드 검색 수요는 살아있다.<br>
+        문제는 푸시 채널(메타 리타겟팅·DA)의 신선도 고갈입니다.
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>출처: ement YTD 광고 성과 분석 2026</span><span>04 / 11</span></div>
+</div>
+</body>
+</html>

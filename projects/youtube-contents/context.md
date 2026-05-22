@@ -1,3 +1,13 @@
+<!-- ── 문서 메타
+  type:  "project"
+  id:    "youtube-contents"
+  title: "YouTube 콘텐츠 프로젝트 — 팟캐스트 포맷 검토"
+  desc:  "square_b.side 인스타에서 시작된 B급 매체 콘텐츠가 본 계정 + YouTube로 확장. 케파 부담 줄이는 AI 팟캐스트 포맷 검토 진행."
+  file:  "projects/youtube-contents/context.md"
+  date:  "2026-05-14"
+  tags:  ["project", "youtube", "podcast", "b-side", "content-strategy"]
+── -->
+
 # YouTube 콘텐츠 프로젝트 — 배경 컨텍스트
 
 ## 업무 히스토리 (2024년 말 ~)

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Slide 11 — Next Actions</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 720pt; height: 405pt;
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+    background: #FFFFFF;
+    color: #191F28;
+    overflow: hidden;
+    letter-spacing: -0.01em;
+  }
+  .slide { width: 100%; height: 100%; padding: 36px 48px; display: flex; flex-direction: column; }
+  .header { margin-bottom: 22px; }
+  .label { font-size: 12px; font-weight: 700; color: #3182F6; letter-spacing: 1px; margin-bottom: 6px; }
+  h2 { font-size: 24px; font-weight: 800; color: #191F28; letter-spacing: -0.5px; margin: 0; }
+  .sub { font-size: 13px; color: #8B95A1; margin-top: 6px; font-weight: 500; }
+  .body { flex: 1; display: flex; flex-direction: column; }
+  .actions { display: grid; grid-template-columns: 90px 1fr 90px; column-gap: 14px; row-gap: 8px; }
+  .a-owner { font-size: 11px; font-weight: 800; color: #FFFFFF; background: #4E5968; padding: 6px 10px; border-radius: 6px; letter-spacing: 0.3px; align-self: center; text-align: center; }
+  .a-owner.agency { background: #3182F6; }
+  .a-owner.team { background: #8B5CF6; }
+  .a-owner.md { background: #F59E0B; }
+  .a-text { font-size: 13px; color: #191F28; line-height: 1.5; align-self: center; background: #F9FAFB; border: 1px solid #F2F4F6; border-radius: 8px; padding: 10px 14px; }
+  .a-text strong { font-weight: 800; }
+  .a-due { font-size: 11px; color: #4E5968; font-weight: 700; align-self: center; text-align: center; background: #EBF4FF; padding: 6px 10px; border-radius: 6px; letter-spacing: 0.3px; }
+  .closing { margin-top: 18px; padding: 16px 22px; background: #191F28; color: #FFFFFF; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; }
+  .closing-msg { font-size: 15px; font-weight: 800; letter-spacing: -0.3px; }
+  .closing-msg .blue { color: #6AA9FF; }
+  .closing-meta { font-size: 11px; color: #8B95A1; letter-spacing: 0.5px; font-weight: 600; text-align: right; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="slide">
+  <header class="header">
+    <div class="label">NEXT ACTIONS — 미팅 후 진행</div>
+    <h2>액션 아이템 5건</h2>
+    <p class="sub">담당 · 내용 · 데드라인</p>
+  </header>
+  <div class="body">
+    <div class="actions">
+      <span class="a-owner agency">광고대행사</span>
+      <span class="a-text">메타 협력광고 <strong>소재·오디언스·카탈로그 점검</strong> 보고</span>
+      <span class="a-due">2주 내</span>
+
+      <span class="a-owner agency">광고대행사</span>
+      <span class="a-text">PC SA 비중 <strong>15→20%</strong> 단계 확대 테스트 시작</span>
+      <span class="a-due">2주 내</span>
+
+      <span class="a-owner agency">광고대행사</span>
+      <span class="a-text">29CM 협력광고 <strong>IP 2개 (BT21·조구만)</strong> 소규모 테스트 견적</span>
+      <span class="a-due">이번 달</span>
+
+      <span class="a-owner team">마케팅팀</span>
+      <span class="a-text"><strong>"이달의 발굴템"</strong> 포맷 6월 1주차 1편 파일럿</span>
+      <span class="a-due">6월 1주</span>
+
+      <span class="a-owner md">MD · 기획</span>
+      <span class="a-text"><strong>6~8월 신상 출시 캘린더</strong> 공유 요청 (광고 계획 동기화)</span>
+      <span class="a-due">이번 주</span>
+    </div>
+    <div class="closing">
+      <span class="closing-msg">광고가 끌어오는 게 아니라, <span class="blue">상품·콘텐츠가 살리는 구조</span> 복원</span>
+      <span class="closing-meta">2026.05 먼슬리 보고 · 보완 자료<br>LINE FRIENDS SQUARE</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
