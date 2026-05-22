@@ -86,6 +86,12 @@ def main() -> int:
                 continue
             # Auto-fill file path if missing
             meta.setdefault("file", str(path.relative_to(ROOT)))
+            # .md 항목인데 같은 위치에 .html 사본 있으면 .html을 우선 노출
+            # (사내 정적 배포에서 md는 텍스트로 깨지는 이슈 회피)
+            if meta["file"].endswith(".md"):
+                sibling = path.with_suffix(".html")
+                if sibling.exists():
+                    meta["file"] = str(sibling.relative_to(ROOT))
             items.append(meta)
 
     items.sort(key=lambda x: x.get("date", ""), reverse=True)

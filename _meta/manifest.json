@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T11:41:41",
+  "generated_at": "2026-05-22T11:49:00",
   "count": 14,
   "items": [
     {
@@ -7,7 +7,7 @@
       "id": "monthly-2026-05",
       "title": "2026년 5월 먼슬리 — 광고 성과 진단·전략",
       "desc": "ement 대행사 YTD 광고 성과 리포트 + 4월 이후 효율 하락 보완 분석 + 11장 발표 슬라이드. CPC↑·CVR↓ 구조적 진단, C+D+A 대응 조합.",
-      "file": "projects/monthly/2026-05/GUIDE.md",
+      "file": "projects/monthly/2026-05/GUIDE.html",
       "date": "2026-05-22",
       "tags": [
         "project",
@@ -22,7 +22,7 @@
       "id": "2026-05-22-ad-efficiency-diagnosis",
       "title": "4월 이후 광고 소재 효율 하락 — 진단 & 전략 보완",
       "desc": "ement YTD 광고 리포트 보완 자료. CPC↑·CVR↓ 동시 진행의 구조적 원인 진단(콘텐츠·상품 사이클 공백). 4가지 대응 옵션과 추천 조합(C+D+A 일부), 우선순위 로드맵.",
-      "file": "projects/monthly/2026-05/보완_4월-이후-소재-효율-하락-진단과-대응.md",
+      "file": "projects/monthly/2026-05/보완_4월-이후-소재-효율-하락-진단과-대응.html",
       "date": "2026-05-22",
       "tags": [
         "report",
@@ -69,7 +69,7 @@
       "id": "2026-05-14-team-share",
       "title": "마케팅 팀 공유 미팅",
       "desc": "마케팅 먼슬리·IP 동향·에스파 꼴레 프리오더·꼴레 브랜드 정책·리빈느 PB 등 공유",
-      "file": "팀미팅/2026-05-14-team-share.html",
+      "file": "meeting-notes/2026-05-14-team-share.html",
       "date": "2026-05-14",
       "tags": [
         "meeting",
@@ -87,7 +87,7 @@
       "id": "2026-05-14-retro-handheld-giveaway",
       "title": "레트로 게임기 굿즈 아이디어 (이벤트 경품)",
       "desc": "다마고치 양산 어려움 → 시중 에뮬레이터 핸드헬드 + 자체 8bit ROM 발상. GB Studio 활용, Miyoo/Anbernic 검토. 진행 결정 안 함.",
-      "file": "ideas/2026-05-14-retro-handheld-giveaway.md",
+      "file": "ideas/2026-05-14-retro-handheld-giveaway.html",
       "date": "2026-05-14",
       "tags": [
         "idea",
@@ -131,7 +131,7 @@
       "id": "youtube-contents",
       "title": "YouTube 콘텐츠 프로젝트 — 팟캐스트 포맷 검토",
       "desc": "square_b.side 인스타에서 시작된 B급 매체 콘텐츠가 본 계정 + YouTube로 확장. 케파 부담 줄이는 AI 팟캐스트 포맷 검토 진행.",
-      "file": "projects/youtube-contents/context.md",
+      "file": "projects/youtube-contents/context.html",
       "date": "2026-05-14",
       "tags": [
         "project",
@@ -193,7 +193,7 @@
       "id": "settlement-check",
       "title": "광고비 정산 체크 도구",
       "desc": "검수확인서.xlsx + 정산 RAW.xlsx 파싱 → 매체별 비용 합산·오차 검증 → 발주서 PDF 변환 → _체크시트.html 자동 생성. AppleScript 기반 macOS 전용.",
-      "file": "tools/settlement-check/GUIDE.md",
+      "file": "tools/settlement-check/GUIDE.html",
       "date": "2026-04-15",
       "tags": [
         "tool",
