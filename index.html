@@ -61,19 +61,23 @@ body { min-height: 100vh; letter-spacing: -0.01em; }
 }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-.hero { padding: 56px 32px 24px; max-width: 1200px; margin: 0 auto; }
-.hero-eyebrow { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
-.hero h1 { font-size: 40px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.1; }
-.hero h1 .accent { color: var(--accent); }
-.hero-sub { font-size: 16px; color: var(--text-secondary); margin-top: 12px; font-weight: 500; max-width: 640px; line-height: 1.5; }
-.hero-meta {
-  display: flex; gap: 16px; flex-wrap: wrap;
-  margin-top: 24px; padding: 14px 18px;
-  background: var(--surface); border: 1px solid var(--divider); border-radius: 12px;
-  font-size: 12px; color: var(--text-secondary);
+.hero { padding: 64px 32px 8px; max-width: 1200px; margin: 0 auto; }
+.hero h1 {
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1;
 }
-.hero-meta .item { display: flex; align-items: center; gap: 6px; }
+.hero h1 .accent { color: var(--accent); }
+.hero-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  margin-top: 18px;
+  font-size: 12px; color: var(--text-muted);
+  font-weight: 500;
+}
+.hero-meta .item { display: inline-flex; align-items: center; gap: 5px; }
 .hero-meta .item strong { color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
+.hero-meta .dot { width: 3px; height: 3px; background: var(--divider-strong); border-radius: 50%; }
 
 .toolbar {
   max-width: 1200px; margin: 0 auto;
@@ -209,9 +213,7 @@ body { min-height: 100vh; letter-spacing: -0.01em; }
 </header>
 
 <section class="hero">
-  <div class="hero-eyebrow">MARKETING WORK HUB</div>
-  <h1>마케팅 업무 산출물<br>한 곳에서 보기 · <span class="accent">검색 · 추적</span></h1>
-  <p class="hero-sub">회의록 · 보고서 · 아이디어 · 도구 · 프로토타입 · 프로젝트가 모두 모이는 사내 마케팅 허브. 신규 산출물 추가 시 메타 블록만 넣으면 자동 인덱싱됩니다.</p>
+  <h1>yeom's <span class="accent">marketing work hub</span></h1>
   <div class="hero-meta" id="metaBar"></div>
 </section>
 
@@ -294,17 +296,23 @@ function renderMetaBar(data) {
   const byType = {};
   allItems.forEach(i => { byType[i.type] = (byType[i.type] || 0) + 1; });
 
-  const totalItem = el('div', { cls: 'item' });
+  const parts = [];
+  const totalItem = el('span', { cls: 'item' });
   totalItem.appendChild(el('strong', { text: String(data.count) }));
-  totalItem.appendChild(document.createTextNode('건 산출물'));
-  bar.appendChild(totalItem);
+  totalItem.appendChild(document.createTextNode(' 건'));
+  parts.push(totalItem);
 
   TYPE_ORDER.forEach(t => {
     if (!byType[t]) return;
-    const item = el('div', { cls: 'item' });
+    const item = el('span', { cls: 'item' });
     item.appendChild(document.createTextNode(TYPE_LABELS[t] + ' '));
     item.appendChild(el('strong', { text: String(byType[t]) }));
-    bar.appendChild(item);
+    parts.push(item);
+  });
+
+  parts.forEach((p, i) => {
+    if (i > 0) bar.appendChild(el('span', { cls: 'dot' }));
+    bar.appendChild(p);
   });
 }
 
