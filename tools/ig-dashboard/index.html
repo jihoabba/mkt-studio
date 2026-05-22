@@ -407,7 +407,7 @@
   <section class="config" id="configCard" style="display:none;">
     <div class="config-title">⚙ 데이터 소스 (Google Sheets 웹 게시 CSV URL)</div>
     <div class="config-desc">
-      Sheets의 <b>웹 게시 → CSV</b> URL 두 개를 입력하세요. 브라우저 localStorage에 저장돼서 다음 방문에도 유지됩니다.
+      <b>사내 표준 시트</b>가 기본으로 연결돼 있습니다. 다른 시트를 보고 싶을 때만 URL을 덮어쓰세요. <b>초기화</b>를 누르면 기본값으로 복귀합니다.
     </div>
 
     <div class="file-row">
@@ -534,6 +534,12 @@
 
 <script>
 /* ============================================
+   Hardcoded data sources (사내 운영용 고정 URL)
+   ============================================ */
+const DEFAULT_CONTENT_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8Scx8b8cCv4mhL_6Xslwu17hIq3J4BstEw2SxPQg6pY3H70dTuf_gVAh07HU9xDzD9DjBagf4v67M/pub?gid=1275250485&single=true&output=csv';
+const DEFAULT_FOLLOWER_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8Scx8b8cCv4mhL_6Xslwu17hIq3J4BstEw2SxPQg6pY3H70dTuf_gVAh07HU9xDzD9DjBagf4v67M/pub?gid=790666469&single=true&output=csv';
+
+/* ============================================
    State
    ============================================ */
 const STORAGE = {
@@ -564,23 +570,20 @@ const $ = (id) => document.getElementById(id);
    Boot
    ============================================ */
 window.addEventListener('DOMContentLoaded', () => {
-  const cu = localStorage.getItem(STORAGE.contentUrl) || '';
-  const fu = localStorage.getItem(STORAGE.followerUrl) || '';
+  // 하드코딩된 기본 URL이 항상 우선 (사내 표준 시트). 사용자가 ⚙ 설정에서 덮어쓰면 localStorage에 저장됨.
+  const cu = localStorage.getItem(STORAGE.contentUrl) || DEFAULT_CONTENT_URL;
+  const fu = localStorage.getItem(STORAGE.followerUrl) || DEFAULT_FOLLOWER_URL;
   $('contentUrl').value = cu;
   $('followerUrl').value = fu;
 
-  if (cu && fu) {
-    loadAll();
-  } else {
-    $('configCard').style.display = 'block';
-    $('emptyState').style.display = 'block';
-  }
+  // 기본 URL 있으니까 무조건 로드
+  loadAll();
 
   $('loadBtn').addEventListener('click', saveAndLoad);
   $('clearBtn').addEventListener('click', clearConfig);
   $('reloadBtn').addEventListener('click', () => {
-    const c = localStorage.getItem(STORAGE.contentUrl);
-    const f = localStorage.getItem(STORAGE.followerUrl);
+    const c = localStorage.getItem(STORAGE.contentUrl) || DEFAULT_CONTENT_URL;
+    const f = localStorage.getItem(STORAGE.followerUrl) || DEFAULT_FOLLOWER_URL;
     if (c && f) loadAll();
   });
   $('configBtn').addEventListener('click', () => {
@@ -613,20 +616,17 @@ function saveAndLoad() {
 }
 
 function clearConfig() {
+  // 사용자 커스텀 URL을 지우고 기본값(하드코딩)으로 복귀
   localStorage.removeItem(STORAGE.contentUrl);
   localStorage.removeItem(STORAGE.followerUrl);
-  $('contentUrl').value = '';
-  $('followerUrl').value = '';
-  state.contentRows = [];
-  state.followerRows = [];
-  state.followerAccounts = [];
-  $('mainContent').style.display = 'none';
-  $('emptyState').style.display = 'block';
+  $('contentUrl').value = DEFAULT_CONTENT_URL;
+  $('followerUrl').value = DEFAULT_FOLLOWER_URL;
+  loadAll();
 }
 
 async function loadAll() {
-  const contentUrl = localStorage.getItem(STORAGE.contentUrl);
-  const followerUrl = localStorage.getItem(STORAGE.followerUrl);
+  const contentUrl = localStorage.getItem(STORAGE.contentUrl) || DEFAULT_CONTENT_URL;
+  const followerUrl = localStorage.getItem(STORAGE.followerUrl) || DEFAULT_FOLLOWER_URL;
   if (!contentUrl || !followerUrl) return;
   hideError();
   try {
