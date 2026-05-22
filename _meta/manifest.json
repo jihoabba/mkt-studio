@@ -1,21 +1,21 @@
 {
-  "generated_at": "2026-05-22T13:44:44",
+  "generated_at": "2026-05-22T15:59:50",
   "count": 14,
   "items": [
     {
       "type": "tool",
-      "id": "mkt-dashboard",
-      "title": "마케팅 통합 대시보드",
-      "desc": "광고 성과(광고비·매출·ROAS·CPC·CTR·CVR·CPA) + 인스타 성과(콘텐츠 노출·인게이지·팔로워) 통합 뷰. 기간·스토어·매체·IP 필터, 전기 대비 자동 비교.",
-      "file": "tools/mkt-dashboard.html",
+      "id": "media-dashboard",
+      "title": "LINEFRIENDS SQUARE MEDIA DASHBOARD",
+      "desc": "PAID MEDIA(광고 성과: ROAS·매출·CPC·CTR·CVR·CPA) + OWNED MEDIA(콘텐츠 노출·참여·팔로워) 통합 대시보드. 사이드바 토글로 전환.",
+      "file": "tools/media-dashboard.html",
       "date": "2026-05-22",
       "tags": [
         "tool",
         "dashboard",
-        "ad-performance",
-        "instagram",
-        "integrated",
-        "roas"
+        "paid-media",
+        "owned-media",
+        "roas",
+        "instagram"
       ]
     },
     {
