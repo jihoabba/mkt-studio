@@ -159,6 +159,24 @@ body.theme-da{--bg:#fffaf5;--blue:#f97316;--blue-light:#fff7ed;--blue-pale:#fed7
 const PAID_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSj2Av7YPQL4lu2S2B50gZoDWKu1peFqPRQoaLDJr2ydtcPEgB_QYVOQtFOM-2Jpyl0Ws_XF2sd2MhU/pub?gid=1434908615&single=true&output=csv';
 let OFFLINE_DATA = null;
 
+// localStorage 캐시 (6시간 TTL)
+const CACHE_KEY = 'mktDash.paidCache.v1';
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+function loadCachedOfflineData(){
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (!obj || !obj.ts || !obj.data) return null;
+    if (Date.now() - obj.ts > CACHE_TTL_MS) return null;
+    return obj.data;
+  } catch { return null; }
+}
+function saveCachedOfflineData(data){
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch {}
+}
+function clearCachedOfflineData(){ try { localStorage.removeItem(CACHE_KEY); } catch {} }
+
 function _computeKpi(trendRows, months) {
   const rows = months && months.length
     ? trendRows.filter(r => months.includes(r['월']))
@@ -267,7 +285,7 @@ window.fetch = function(url) {
   </div>
   <div class="side-footer">
     <div class="side-footer-time">Live · Google Sheets</div>
-    <button class="side-footer-btn" onclick="location.reload()">새로고침</button>
+    <button class="side-footer-btn" onclick="clearCachedOfflineData();location.reload()">새로고침 (캐시 비우기)</button>
   </div>
 </aside>
 
@@ -924,11 +942,40 @@ async function buildOfflineDataFromCsv() {
 
 async function init(){
   try {
-    OFFLINE_DATA = await buildOfflineDataFromCsv();
-    // SUMMARY가 기본 탭이므로 OWNED 데이터도 백그라운드로 로딩
+    // 1) PAID 캐시 즉시 활용 (있으면)
+    const cached = loadCachedOfflineData();
+    if (cached) {
+      OFFLINE_DATA = cached;
+      console.log('[mkt-dashboard] PAID 캐시 사용 (즉시 렌더)');
+    } else {
+      OFFLINE_DATA = await buildOfflineDataFromCsv();
+      saveCachedOfflineData(OFFLINE_DATA);
+    }
+
+    // 2) OWNED 백그라운드 로딩 + SUMMARY 자동 재렌더
     loadOwned().then(()=>{
-      if (document.getElementById('tab-summary').classList.contains('active')) renderSummary();
+      if (document.getElementById('tab-summary').classList.contains('active')) {
+        safeRenderSummary();
+      }
     });
+
+    // 3) 캐시 사용한 경우 백그라운드로 최신 데이터 fetch (UI 블록 X)
+    if (cached) {
+      buildOfflineDataFromCsv().then(fresh => {
+        OFFLINE_DATA = fresh;
+        saveCachedOfflineData(fresh);
+        // PAID 탭이 활성이면 다시 그리기
+        if (document.getElementById('tab-paid').classList.contains('active')) {
+          applyFilter().then(()=>{renderKPI();renderMonthlyTbl();renderCharts();renderCmp();renderTabs();renderBk();});
+        }
+        // SUMMARY 활성이면 다시 그리기
+        if (document.getElementById('tab-summary').classList.contains('active') && OWNED.loaded) {
+          safeRenderSummary();
+        }
+        console.log('[mkt-dashboard] 백그라운드 새로 받은 데이터로 갱신');
+      }).catch(e => console.warn('백그라운드 갱신 실패', e));
+    }
+
     await loadBase();
     const _yrs=[...new Set(allMonths.map(m=>m.split('년')[0]))].sort();
     const _latestYr=_yrs[_yrs.length-1];
@@ -940,6 +987,8 @@ async function init(){
     updateCmpLabel('A');updateCmpLabel('B');
     renderKPI();renderMonthlyTbl();renderCharts();renderCmp();renderTabs();renderBk();
     document.getElementById('loadingOverlay').style.display='none';
+    // 초기 진입 = SUMMARY 탭. OWNED 안 끝났으면 "로딩 대기" 표시. 끝났으면 즉시 렌더.
+    safeRenderSummary();
   } catch(e) {
     const ov=document.getElementById('loadingOverlay');
     ov.style.display='flex';
@@ -1055,7 +1104,7 @@ function subMselApply(scope){
   document.getElementById(scope+'MselDrop').style.display='none';
   updateSubMselLabel(scope);
   if (scope==='owned') renderOwned();
-  else if (scope==='summary') renderSummary();
+  else if (scope==='summary') safeRenderSummary();
 }
 function updateSubMselLabel(scope){
   const s = SUB_MSEL[scope];
@@ -1108,7 +1157,7 @@ function switchMedia(which) {
   if (which==='owned' && !OWNED.loaded) loadOwned();
   if (which==='summary') {
     if (!OWNED.loaded) loadOwned().then(renderSummary);
-    else renderSummary();
+    else safeRenderSummary();
   }
 }
 
@@ -1464,15 +1513,48 @@ function buildSummaryMonthly() {
 }
 
 function renderSummary() {
-  if (!OFFLINE_DATA || !OWNED.loaded) return;
+  if (!OFFLINE_DATA || !OWNED.loaded) {
+    // 로딩 상태 표시 — 무엇이 대기 중인지 명확히
+    const loadingEl = document.getElementById('summaryLoading');
+    loadingEl.style.display = 'block';
+    document.getElementById('summaryBody').style.display = 'none';
+    const w = [];
+    if (!OFFLINE_DATA) w.push('PAID');
+    if (!OWNED.loaded) w.push('OWNED');
+    loadingEl.querySelectorAll('div')[1].textContent = w.join(' + ') + ' 데이터 로딩 대기 중…';
+    return;
+  }
 
   document.getElementById('summaryLoading').style.display = 'none';
   document.getElementById('summaryBody').style.display = 'block';
 
   const data = buildSummaryMonthly();
+
+  if (!data.allMonths || data.allMonths.length === 0) {
+    document.getElementById('summaryBody').style.display = 'none';
+    const loadingEl = document.getElementById('summaryLoading');
+    loadingEl.style.display = 'block';
+    loadingEl.querySelectorAll('div')[0].textContent = '데이터가 비어있습니다';
+    loadingEl.querySelectorAll('div')[1].textContent = '필터 조건을 풀거나 새로고침을 시도해보세요';
+    return;
+  }
+
   renderSummaryKPIs(data);
   renderSummaryTrendChart(data);
   renderSummaryTable(data);
+}
+
+// 에러 캐치 래퍼 — SUMMARY 렌더 중 예외가 일어나도 화면에 표시
+function safeRenderSummary(){
+  try { renderSummary(); }
+  catch(e) {
+    console.error('[renderSummary error]', e);
+    const loadingEl = document.getElementById('summaryLoading');
+    loadingEl.style.display = 'block';
+    document.getElementById('summaryBody').style.display = 'none';
+    loadingEl.querySelectorAll('div')[0].textContent = 'SUMMARY 렌더 실패';
+    loadingEl.querySelectorAll('div')[1].textContent = e.message;
+  }
 }
 
 function renderSummaryKPIs(data) {
