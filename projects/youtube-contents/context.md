@@ -1,8 +1,8 @@
 <!-- ── 문서 메타
-  type:  "project"
+  type:  "idea"
   id:    "youtube-contents"
-  title: "YouTube 콘텐츠 프로젝트 — 팟캐스트 포맷 검토"
-  desc:  "square_b.side 인스타에서 시작된 B급 매체 콘텐츠가 본 계정 + YouTube로 확장. 케파 부담 줄이는 AI 팟캐스트 포맷 검토 진행."
+  title: "YouTube 콘텐츠 — 팟캐스트 포맷 아이디어"
+  desc:  "square_b.side 인스타에서 시작된 B급 매체 콘텐츠가 본 계정 + YouTube로 확장. 케파 부담 줄이는 AI 팟캐스트 포맷 검토 (아이디어 단계, 진행 결정 전)."
   file:  "projects/youtube-contents/context.md"
   date:  "2026-05-14"
   tags:  ["project", "youtube", "podcast", "b-side", "content-strategy"]

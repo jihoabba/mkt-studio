@@ -183,24 +183,27 @@ def render_md_file(md_path: Path) -> Path:
     return out_path
 
 
-def main() -> int:
-    if not MANIFEST.exists():
-        print("✗ manifest.json 없음. scripts/build-manifest.py 먼저 실행", file=sys.stderr)
-        return 1
+SCAN_DIRS = ["reports", "meeting-notes", "ideas", "tools", "prototypes", "projects"]
 
-    data = json.loads(MANIFEST.read_text(encoding="utf-8"))
+
+def main() -> int:
     count = 0
-    for item in data.get("items", []):
-        file_path = item.get("file", "")
-        if not file_path.endswith(".md"):
+    for dirname in SCAN_DIRS:
+        d = ROOT / dirname
+        if not d.exists():
             continue
-        md_path = ROOT / file_path
-        if not md_path.exists():
-            print(f"  - SKIP (없음): {file_path}")
-            continue
-        out = render_md_file(md_path)
-        print(f"  ✓ {file_path} → {out.relative_to(ROOT)}")
-        count += 1
+        for md_path in sorted(d.rglob("*.md")):
+            # 메타 블록이 있는 MD만 (RAG 대상)
+            try:
+                text = md_path.read_text(encoding="utf-8")
+            except Exception:
+                continue
+            if not META_RE.search(text):
+                continue
+            out = render_md_file(md_path)
+            rel = md_path.relative_to(ROOT)
+            print(f"  ✓ {rel} → {out.relative_to(ROOT)}")
+            count += 1
 
     print(f"\n{count} 파일 변환 완료")
     return 0

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T16:17:30",
+  "generated_at": "2026-05-26T10:04:24",
   "count": 14,
   "items": [
     {
@@ -19,10 +19,10 @@
       ]
     },
     {
-      "type": "project",
+      "type": "report",
       "id": "monthly-2026-05",
-      "title": "2026년 5월 먼슬리 — 광고 성과 진단·전략",
-      "desc": "ement 대행사 YTD 광고 성과 리포트 + 4월 이후 효율 하락 보완 분석 + 11장 발표 슬라이드. CPC↑·CVR↓ 구조적 진단, C+D+A 대응 조합.",
+      "title": "2026년 5월 먼슬리 리포트 — 광고 성과 진단·전략",
+      "desc": "ement 대행사 YTD 광고 성과 리포트 + 4월 이후 효율 하락 보완 분석 + 11장 발표 슬라이드. CPC↑·CVR↓ 구조적 진단, C+D+A 대응 조합. (내용 정리 중)",
       "file": "projects/monthly/2026-05/GUIDE.html",
       "date": "2026-05-22",
       "tags": [
@@ -128,10 +128,10 @@
       ]
     },
     {
-      "type": "project",
+      "type": "idea",
       "id": "youtube-contents",
-      "title": "YouTube 콘텐츠 프로젝트 — 팟캐스트 포맷 검토",
-      "desc": "square_b.side 인스타에서 시작된 B급 매체 콘텐츠가 본 계정 + YouTube로 확장. 케파 부담 줄이는 AI 팟캐스트 포맷 검토 진행.",
+      "title": "YouTube 콘텐츠 — 팟캐스트 포맷 아이디어",
+      "desc": "square_b.side 인스타에서 시작된 B급 매체 콘텐츠가 본 계정 + YouTube로 확장. 케파 부담 줄이는 AI 팟캐스트 포맷 검토 (아이디어 단계, 진행 결정 전).",
       "file": "projects/youtube-contents/context.html",
       "date": "2026-05-14",
       "tags": [
