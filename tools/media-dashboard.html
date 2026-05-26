@@ -1493,7 +1493,7 @@ function buildSummaryMonthly() {
   });
 
   // 4) 합치기 — 두 소스의 모든 월
-  const allMonths = Array.from(new Set([
+  const mergedMonths = Array.from(new Set([
     ...Object.keys(paidByMonth),
     ...Object.keys(ownedByMonth),
     ...Object.keys(followerByMonth),
@@ -1502,14 +1502,14 @@ function buildSummaryMonthly() {
   // 팔로워 변화량 (전월 대비)
   const followerDelta = {};
   let prevFollower = null;
-  allMonths.forEach(m => {
+  mergedMonths.forEach(m => {
     if (followerByMonth[m] != null) {
       followerDelta[m] = prevFollower != null ? followerByMonth[m] - prevFollower : null;
       prevFollower = followerByMonth[m];
     }
   });
 
-  return { allMonths, paidByMonth, ownedByMonth, followerByMonth, followerDelta };
+  return { allMonths: mergedMonths, paidByMonth, ownedByMonth, followerByMonth, followerDelta };
 }
 
 function renderSummary() {
