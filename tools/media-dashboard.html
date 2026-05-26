@@ -878,9 +878,15 @@ async function buildOfflineDataFromCsv() {
   };
   const toMonth = (d)=>{ const yr=String(d.getFullYear()).slice(2); return yr+'년 '+String(d.getMonth()+1).padStart(2,'0')+'월'; };
 
+  // ✅ 최근 12개월 필터링 로직 추가
+  const now = new Date();
+  const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 12, 1);
+
   const valid = rows.map(r=>{
     const d = parseD(r['기간'] || r['일자']);
     if(!d) return null;
+    // 최근 12개월 이내 데이터만 허용
+    if(d < twelveMonthsAgo) return null;
     return {
       date: d, month: toMonth(d),
       store: (r['스토어']||'').trim(),
@@ -1230,6 +1236,11 @@ async function loadOwned() {
       fetch(IG_CONTENT_URL).then(r=>r.text()),
       fetch(IG_FOLLOWER_URL).then(r=>r.text()),
     ]);
+
+    // ✅ 최근 12개월 필터링 로직 추가
+    const now = new Date();
+    const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 12, 1);
+
     OWNED.contentRows = ownedParseCSV(ct).map(r => ({
       date: ownedParseDate(r['일시']),
       type: (r['종류']||'').trim(),
@@ -1244,7 +1255,7 @@ async function loadOwned() {
       saves: ownedNum(r['저장']),
       engRate: ownedEngRate(r['참여율']),
       url: (r['url']||'').trim(),
-    })).filter(r=>r.date!=null);
+    })).filter(r=>r.date!=null && r.date >= twelveMonthsAgo);  // ✅ 최근 12개월만
 
     OWNED.followerRows = ownedParseCSV(ft).map(r => {
       const out = { date: ownedParseDate(r['일자']), values: {} };
@@ -1253,7 +1264,7 @@ async function loadOwned() {
         out.values[k.replace(/\n/g,' ').trim()] = ownedNum(r[k]);
       }
       return out;
-    }).filter(r=>r.date!=null);
+    }).filter(r=>r.date!=null && r.date >= twelveMonthsAgo);  // ✅ 최근 12개월만
 
     const accountsWithData = {};
     OWNED.followerRows.forEach(r=>{
