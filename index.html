@@ -3,253 +3,523 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>mkt-studio — LINE FRIENDS SQUARE 마케팅 허브</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<title>mkt-studio — Finder</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #f5f5f7;
-  --surface: #ffffff;
+  --bg: #ebebeb;
+  --window-bg: #ffffff;
+  --sidebar-bg: rgba(246,246,246,0.95);
+  --titlebar: #e9e9e9;
+  --titlebar-dark: #ddd;
   --text: #1d1d1f;
-  --text-secondary: rgba(0,0,0,0.55);
-  --text-muted: rgba(0,0,0,0.4);
-  --accent: #0071e3;
-  --green: #1d8348;
-  --orange: #b95000;
-  --purple: #7048c1;
-  --red: #c0392b;
+  --text-secondary: #595959;
+  --text-muted: #8a8a8a;
+  --accent: #007aff;
+  --accent-bg: rgba(0,122,255,0.12);
+  --selected-bg: #007aff;
+  --selected-text: #ffffff;
   --divider: rgba(0,0,0,0.08);
   --divider-strong: rgba(0,0,0,0.14);
-  --shadow: 0 2px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
-  --shadow-hover: 0 10px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
-  --radius: 16px;
-  --green-bg: rgba(29,131,72,0.08);
-  --orange-bg: rgba(185,80,0,0.08);
-  --blue-bg: rgba(0,113,227,0.07);
-  --purple-bg: rgba(112,72,193,0.08);
-  --red-bg: rgba(192,57,43,0.08);
+  --row-hover: rgba(0,0,0,0.04);
 }
-html { background: var(--bg); font-family: 'Pretendard Variable', Pretendard, -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif; color: var(--text); -webkit-font-smoothing: antialiased; }
-body { min-height: 100vh; letter-spacing: -0.01em; }
+html, body {
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", sans-serif;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  font-size: 13px;
+  line-height: 1.4;
+  height: 100vh;
+  overflow: hidden;
+}
 
-.header {
-  background: rgba(245,245,247,0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--divider);
-  position: sticky; top: 0; z-index: 100;
-  padding: 0 32px;
-  height: 56px;
-  display: flex; align-items: center; justify-content: space-between;
+.window {
+  height: 100vh;
+  background: var(--window-bg);
+  display: grid;
+  grid-template-rows: 44px 1fr 24px;
+  overflow: hidden;
 }
-.header-left { display: flex; align-items: center; gap: 12px; }
-.header-logo { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); }
-.header-sep { width: 1px; height: 14px; background: var(--divider-strong); }
-.header-title { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
-.header-right { display: flex; align-items: center; gap: 8px; }
-.badge-live {
-  display: flex; align-items: center; gap: 5px;
-  padding: 4px 10px;
-  background: var(--green-bg);
-  border-radius: 100px;
-  font-size: 11px; font-weight: 600; color: var(--green); letter-spacing: 0.04em;
-}
-.badge-live::before {
-  content: ''; width: 6px; height: 6px;
-  border-radius: 50%; background: var(--green);
-  animation: pulse 2s ease-in-out infinite;
-}
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-.hero { padding: 64px 32px 8px; max-width: 1200px; margin: 0 auto; }
-.hero h1 {
-  font-size: 44px;
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 1;
-}
-.hero h1 .accent { color: var(--accent); }
-.hero-meta {
-  display: flex; gap: 14px; flex-wrap: wrap;
-  margin-top: 18px;
-  font-size: 12px; color: var(--text-muted);
-  font-weight: 500;
-}
-.hero-meta .item { display: inline-flex; align-items: center; gap: 5px; }
-.hero-meta .item strong { color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
-.hero-meta .dot { width: 3px; height: 3px; background: var(--divider-strong); border-radius: 50%; }
-
-.toolbar {
-  max-width: 1200px; margin: 0 auto;
-  padding: 24px 32px 16px;
-  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
-}
-.search {
-  flex: 1; min-width: 240px;
+/* ── Title bar (traffic lights + title) ─────────── */
+.titlebar {
+  background: linear-gradient(to bottom, var(--titlebar), var(--titlebar-dark));
+  border-bottom: 1px solid var(--divider-strong);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
   position: relative;
+  -webkit-user-select: none;
+  user-select: none;
 }
-.search input {
+.traffic-lights {
+  display: flex;
+  gap: 8px;
+}
+.light {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 0.5px solid rgba(0,0,0,0.15);
+}
+.light.red { background: #ff5f57; }
+.light.yellow { background: #febc2e; }
+.light.green { background: #28c840; }
+.toolbar-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: 16px;
+}
+.tb-btn {
+  width: 28px; height: 24px;
+  border: none;
+  background: transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: background 0.1s;
+}
+.tb-btn:hover { background: rgba(0,0,0,0.06); }
+.tb-btn:active { background: rgba(0,0,0,0.1); }
+.tb-btn svg { width: 14px; height: 14px; }
+.view-toggle {
+  display: inline-flex;
+  background: rgba(0,0,0,0.05);
+  border-radius: 6px;
+  padding: 2px;
+  margin-left: 4px;
+}
+.view-toggle .tb-btn { width: 24px; height: 20px; border-radius: 4px; }
+.view-toggle .tb-btn.active { background: white; color: var(--text); box-shadow: 0 0 0 0.5px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.05); }
+.window-title {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: -0.01em;
+  pointer-events: none;
+}
+.title-icon { font-size: 12px; margin-right: 4px; }
+.toolbar-spacer { flex: 1; }
+.search-wrap {
+  position: relative;
+  width: 200px;
+}
+.search-input {
   width: 100%;
-  height: 40px;
-  padding: 0 16px 0 38px;
-  border: 1px solid var(--divider-strong);
-  border-radius: 10px;
-  background: var(--surface);
+  height: 24px;
+  padding: 0 8px 0 26px;
+  border: 0.5px solid rgba(0,0,0,0.2);
+  border-radius: 5px;
+  background: rgba(255,255,255,0.8);
   font-family: inherit;
-  font-size: 14px;
+  font-size: 12px;
   color: var(--text);
   outline: none;
-  transition: 0.15s;
+  transition: 0.1s;
 }
-.search input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--blue-bg); }
-.search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.search-input:focus { background: white; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,122,255,0.2); }
+.search-input::placeholder { color: var(--text-muted); }
+.search-wrap svg {
+  position: absolute;
+  left: 8px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  width: 12px; height: 12px;
+}
 
-.filters {
-  display: inline-flex; gap: 4px;
-  background: var(--surface);
-  border: 1px solid var(--divider);
-  border-radius: 100px;
-  padding: 3px;
-  flex-wrap: wrap;
-}
-.filter-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-family: inherit;
-  font-size: 13px; font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 100px;
-  cursor: pointer;
-  transition: 0.15s;
-}
-.filter-btn:hover { color: var(--text); }
-.filter-btn.active { background: var(--text); color: white; }
-.filter-count { margin-left: 4px; opacity: 0.6; font-size: 11px; font-variant-numeric: tabular-nums; }
-
-.grid {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 16px 32px 64px;
+/* ── Body (sidebar + main) ─────────── */
+.body {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
+  grid-template-columns: 200px 1fr;
+  overflow: hidden;
 }
-.card {
-  background: var(--surface);
-  border: 1px solid var(--divider);
-  border-radius: var(--radius);
-  padding: 18px 20px 16px;
+.sidebar {
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--divider-strong);
+  overflow-y: auto;
+  padding: 12px 0 12px 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.sb-section {
+  margin-bottom: 16px;
+}
+.sb-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 14px;
+}
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px 5px 14px;
+  margin: 0 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.08s;
+}
+.sb-item:hover { background: rgba(0,0,0,0.05); }
+.sb-item.active {
+  background: var(--selected-bg);
+  color: var(--selected-text);
+}
+.sb-icon {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.sb-label-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sb-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.sb-item.active .sb-count { color: rgba(255,255,255,0.85); }
+
+/* ── Main content ─────────── */
+.main {
+  overflow-y: auto;
+  background: white;
+}
+
+/* List view (default) */
+.list-header {
+  position: sticky;
+  top: 0;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  display: grid;
+  grid-template-columns: minmax(280px, 2fr) 100px 90px 120px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 0;
+  border-bottom: 1px solid var(--divider);
+  z-index: 5;
+}
+.list-header > div {
+  padding: 7px 12px;
+  border-right: 1px solid var(--divider);
+  cursor: pointer;
+  user-select: none;
+  letter-spacing: -0.01em;
+}
+.list-header > div:hover { background: rgba(0,0,0,0.03); }
+.list-header > div.sorted { color: var(--text); }
+.list-header > div:last-child { border-right: none; }
+
+.list-row {
+  display: grid;
+  grid-template-columns: minmax(280px, 2fr) 100px 90px 120px;
+  align-items: center;
+  font-size: 12.5px;
+  color: var(--text);
+  cursor: pointer;
+  text-decoration: none;
+  border-bottom: 1px solid var(--divider);
+}
+.list-row:hover { background: var(--row-hover); }
+.list-row.selected {
+  background: var(--selected-bg);
+  color: var(--selected-text);
+}
+.list-row > div {
+  padding: 6px 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.list-row .name-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.list-row .file-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.list-row .name-title {
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+.list-row .col-muted { color: var(--text-muted); font-size: 11.5px; }
+.list-row.selected .col-muted { color: rgba(255,255,255,0.85); }
+
+/* Icon (grid) view */
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  padding: 20px;
+}
+.icon-tile {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  padding: 12px 8px;
+  border-radius: 8px;
   cursor: pointer;
   text-decoration: none;
   color: inherit;
-  transition: 0.2s;
+  text-align: center;
+  transition: background 0.1s;
 }
-.card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--divider-strong); }
-.card-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.card-type {
-  font-size: 10px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.08em;
-  padding: 3px 8px; border-radius: 5px;
+.icon-tile:hover { background: rgba(0,0,0,0.04); }
+.icon-tile.selected { background: var(--selected-bg); color: var(--selected-text); }
+.icon-tile-icon {
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 8px;
 }
-.type-report { background: var(--blue-bg); color: var(--accent); }
-.type-meeting { background: var(--purple-bg); color: var(--purple); }
-.type-idea { background: var(--orange-bg); color: var(--orange); }
-.type-tool { background: var(--green-bg); color: var(--green); }
-.type-prototype { background: var(--red-bg); color: var(--red); }
-.type-project { background: rgba(0,0,0,0.06); color: var(--text); }
-.card-date { font-size: 11px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
-.card-title { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.3; }
-.card-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.55; flex: 1; }
-.card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; padding-top: 10px; border-top: 1px dashed var(--divider); }
-.tag {
-  font-size: 10px;
+.icon-tile-name {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: keep-all;
+}
+
+/* Empty / placeholder */
+.empty {
+  padding: 80px 24px;
+  text-align: center;
   color: var(--text-muted);
-  background: var(--bg);
-  padding: 2px 7px;
-  border-radius: 4px;
-  font-weight: 600;
+  font-size: 13px;
+}
+.empty strong {
+  display: block;
+  color: var(--text);
+  font-size: 15px;
+  margin-bottom: 6px;
 }
 
-.empty { padding: 80px 32px; text-align: center; color: var(--text-muted); grid-column: 1 / -1; }
-.empty strong { display: block; font-size: 16px; color: var(--text); margin-bottom: 6px; }
+/* ── Status bar ─────────── */
+.statusbar {
+  background: linear-gradient(to bottom, var(--titlebar), var(--titlebar-dark));
+  border-top: 1px solid var(--divider-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: -0.01em;
+  -webkit-user-select: none;
+  user-select: none;
+}
 
-.footer {
+/* Detail pane (slide-in when selected) — optional ESC to close */
+.detail-pane {
+  position: fixed;
+  top: 44px;
+  right: 0;
+  bottom: 24px;
+  width: 320px;
+  background: white;
+  border-left: 1px solid var(--divider-strong);
+  padding: 20px 24px;
+  transform: translateX(100%);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow-y: auto;
+  z-index: 20;
+}
+.detail-pane.open { transform: translateX(0); }
+.detail-icon-big {
+  font-size: 80px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.detail-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.detail-type {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.detail-section {
   border-top: 1px solid var(--divider);
-  padding: 24px 32px;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 14px 0;
+}
+.detail-section h4 {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+.detail-row {
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  color: var(--text-muted);
+  padding: 3px 0;
 }
-.footer a { color: var(--accent); text-decoration: none; }
-.footer a:hover { text-decoration: underline; }
+.detail-row .k { color: var(--text-muted); }
+.detail-row .v { color: var(--text); font-weight: 500; }
+.detail-desc {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+.detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.detail-tag {
+  font-size: 10px;
+  background: rgba(0,0,0,0.06);
+  color: var(--text-secondary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.detail-open-btn {
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+  padding: 10px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+}
+.detail-open-btn:hover { background: #0066d6; }
+.detail-close {
+  position: absolute;
+  top: 10px; right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: var(--text-muted);
+  cursor: pointer;
+  width: 24px; height: 24px;
+  border-radius: 4px;
+}
+.detail-close:hover { background: rgba(0,0,0,0.06); color: var(--text); }
 
 @media (max-width: 720px) {
-  .hero { padding: 32px 20px 16px; }
-  .hero h1 { font-size: 28px; }
-  .toolbar { padding: 16px 20px 12px; flex-direction: column; align-items: stretch; }
-  .grid { padding: 12px 20px 48px; grid-template-columns: 1fr; }
-  .header { padding: 0 20px; }
+  .body { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .window-title { font-size: 12px; }
+  .detail-pane { width: 100%; }
+  .search-wrap { width: 140px; }
+  .list-header { grid-template-columns: 1fr 70px 80px; }
+  .list-header > div:nth-child(3) { display: none; }
+  .list-row { grid-template-columns: 1fr 70px 80px; }
+  .list-row > div:nth-child(3) { display: none; }
 }
 </style>
 </head>
 <body>
 
-<header class="header">
-  <div class="header-left">
-    <span class="header-logo">LINE FRIENDS</span>
-    <span class="header-sep"></span>
-    <span class="header-title">mkt-studio</span>
-  </div>
-  <div class="header-right">
-    <span class="badge-live">SYNCED</span>
-  </div>
-</header>
+<div class="window">
 
-<section class="hero">
-  <h1>yeom's <span class="accent">marketing work hub</span></h1>
-  <div class="hero-meta" id="metaBar"></div>
-</section>
+  <!-- Title bar -->
+  <header class="titlebar">
+    <div class="traffic-lights">
+      <span class="light red"></span>
+      <span class="light yellow"></span>
+      <span class="light green"></span>
+    </div>
+    <div class="toolbar-actions">
+      <button class="tb-btn" id="prevBtn" title="뒤로" disabled style="opacity:0.4">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="10,4 6,8 10,12"/></svg>
+      </button>
+      <button class="tb-btn" id="nextBtn" title="앞으로" disabled style="opacity:0.4">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,4 10,8 6,12"/></svg>
+      </button>
+      <div class="view-toggle">
+        <button class="tb-btn" id="viewIcon" title="아이콘 보기">
+          <svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+        </button>
+        <button class="tb-btn active" id="viewList" title="리스트 보기">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="4" x2="13" y2="4"/><line x1="3" y1="8" x2="13" y2="8"/><line x1="3" y1="12" x2="13" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="window-title">
+      <span class="title-icon">📁</span>
+      <span>yeom's marketing work hub</span>
+    </div>
+    <div class="toolbar-spacer"></div>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="검색">
+    </div>
+  </header>
 
-<section class="toolbar">
-  <div class="search">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="searchInput" placeholder="제목 · 설명 · 태그 검색…">
+  <!-- Body -->
+  <div class="body">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main" id="main"></main>
   </div>
-  <div class="filters" id="filterBar"></div>
-</section>
 
-<main class="grid" id="grid"></main>
+  <!-- Status bar -->
+  <footer class="statusbar" id="statusbar">14개 항목</footer>
 
-<footer class="footer">
-  <div>
-    <strong style="color:var(--text);">mkt-studio</strong>
-    <span> · </span>
-    <a href="https://github.com/jihoabba/mkt-studio" target="_blank" rel="noopener">GitHub</a>
-  </div>
-  <div id="updatedAt"></div>
-</footer>
+</div>
+
+<!-- Detail pane (slides in when item selected) -->
+<aside class="detail-pane" id="detailPane">
+  <button class="detail-close" id="detailClose">×</button>
+  <div id="detailContent"></div>
+</aside>
 
 <script>
-const TYPE_LABELS = {
-  report: '리포트',
-  meeting: '회의록',
-  idea: '아이디어',
-  tool: '도구',
-  prototype: '프로토타입',
-  project: '프로젝트',
+const TYPE_META = {
+  report:    { label:'리포트',     icon:'📊' },
+  meeting:   { label:'회의록',     icon:'📋' },
+  idea:      { label:'아이디어',   icon:'💡' },
+  tool:      { label:'도구',       icon:'🛠' },
+  prototype: { label:'프로토타입', icon:'🎮' },
+  project:   { label:'프로젝트',   icon:'📁' },
 };
-const TYPE_ORDER = ['report', 'meeting', 'idea', 'tool', 'prototype', 'project'];
+const TYPE_ORDER = ['report','meeting','idea','tool','prototype','project'];
 
 let allItems = [];
 let activeType = 'all';
 let searchText = '';
+let viewMode = 'list';
+let selectedId = null;
+let sortKey = 'date';
+let sortDesc = true;
+let manifestMeta = null;
 
 function el(tag, opts, ...children) {
   const node = document.createElement(tag);
@@ -267,7 +537,7 @@ function el(tag, opts, ...children) {
   }
   return node;
 }
-function clearNode(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+function clearNode(n){while(n.firstChild)n.removeChild(n.firstChild);}
 
 async function loadManifest() {
   try {
@@ -275,73 +545,69 @@ async function loadManifest() {
     if (!res.ok) throw new Error('manifest 로드 실패');
     const data = await res.json();
     allItems = data.items || [];
-    const updated = document.getElementById('updatedAt');
-    updated.textContent = '최근 업데이트: ' + (data.generated_at || '—');
-    renderMetaBar(data);
-    renderFilters();
-    render();
+    manifestMeta = data;
+    renderSidebar();
+    renderMain();
+    updateStatusbar();
   } catch (e) {
-    const grid = document.getElementById('grid');
-    clearNode(grid);
+    const main = document.getElementById('main');
+    clearNode(main);
     const empty = el('div', { cls: 'empty' });
     empty.appendChild(el('strong', { text: '매니페스트 로드 실패' }));
     empty.appendChild(document.createTextNode('scripts/build-manifest.py 를 실행한 후 다시 시도하세요.'));
-    grid.appendChild(empty);
+    main.appendChild(empty);
   }
 }
 
-function renderMetaBar(data) {
-  const bar = document.getElementById('metaBar');
-  clearNode(bar);
+function renderSidebar() {
+  const sb = document.getElementById('sidebar');
+  clearNode(sb);
+
   const byType = {};
   allItems.forEach(i => { byType[i.type] = (byType[i.type] || 0) + 1; });
 
-  const parts = [];
-  const totalItem = el('span', { cls: 'item' });
-  totalItem.appendChild(el('strong', { text: String(data.count) }));
-  totalItem.appendChild(document.createTextNode(' 건'));
-  parts.push(totalItem);
+  // FAVORITES
+  const fav = el('div', { cls: 'sb-section' });
+  fav.appendChild(el('div', { cls: 'sb-label', text: '즐겨찾기' }));
+  const recents = allItems.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0, 3);
+  recents.forEach(item => {
+    const meta = TYPE_META[item.type] || { label:item.type, icon:'📄' };
+    const it = el('div', { cls: 'sb-item' });
+    it.appendChild(el('span', { cls: 'sb-icon', text: meta.icon }));
+    it.appendChild(el('span', { cls: 'sb-label-text', text: item.title || item.id }));
+    it.addEventListener('click', () => {
+      selectItem(item);
+    });
+    fav.appendChild(it);
+  });
+  sb.appendChild(fav);
+
+  // TAGS / Categories
+  const cats = el('div', { cls: 'sb-section' });
+  cats.appendChild(el('div', { cls: 'sb-label', text: '태그' }));
+
+  const allItem = el('div', { cls: 'sb-item' + (activeType==='all' ? ' active' : '') });
+  allItem.appendChild(el('span', { cls: 'sb-icon', text: '📂' }));
+  allItem.appendChild(el('span', { cls: 'sb-label-text', text: '전체' }));
+  allItem.appendChild(el('span', { cls: 'sb-count', text: String(allItems.length) }));
+  allItem.addEventListener('click', () => { activeType = 'all'; renderSidebar(); renderMain(); updateStatusbar(); });
+  cats.appendChild(allItem);
 
   TYPE_ORDER.forEach(t => {
     if (!byType[t]) return;
-    const item = el('span', { cls: 'item' });
-    item.appendChild(document.createTextNode(TYPE_LABELS[t] + ' '));
-    item.appendChild(el('strong', { text: String(byType[t]) }));
-    parts.push(item);
+    const meta = TYPE_META[t];
+    const it = el('div', { cls: 'sb-item' + (activeType===t ? ' active' : '') });
+    it.appendChild(el('span', { cls: 'sb-icon', text: meta.icon }));
+    it.appendChild(el('span', { cls: 'sb-label-text', text: meta.label }));
+    it.appendChild(el('span', { cls: 'sb-count', text: String(byType[t]) }));
+    it.addEventListener('click', () => { activeType = t; renderSidebar(); renderMain(); updateStatusbar(); });
+    cats.appendChild(it);
   });
-
-  parts.forEach((p, i) => {
-    if (i > 0) bar.appendChild(el('span', { cls: 'dot' }));
-    bar.appendChild(p);
-  });
+  sb.appendChild(cats);
 }
 
-function renderFilters() {
-  const bar = document.getElementById('filterBar');
-  clearNode(bar);
-  const byType = {};
-  allItems.forEach(i => { byType[i.type] = (byType[i.type] || 0) + 1; });
-  const buttons = [{ key: 'all', label: '전체', count: allItems.length }];
-  TYPE_ORDER.forEach(t => {
-    if (byType[t]) buttons.push({ key: t, label: TYPE_LABELS[t], count: byType[t] });
-  });
-  buttons.forEach(b => {
-    const btn = el('button', {
-      cls: 'filter-btn' + (activeType === b.key ? ' active' : ''),
-      attrs: { 'data-type': b.key },
-      on: { click: () => { activeType = b.key; renderFilters(); render(); } }
-    });
-    btn.appendChild(document.createTextNode(b.label));
-    btn.appendChild(el('span', { cls: 'filter-count', text: String(b.count) }));
-    bar.appendChild(btn);
-  });
-}
-
-function render() {
-  const grid = document.getElementById('grid');
-  clearNode(grid);
-
-  const filtered = allItems.filter(item => {
+function getFiltered() {
+  let rows = allItems.filter(item => {
     if (activeType !== 'all' && item.type !== activeType) return false;
     if (searchText) {
       const q = searchText.toLowerCase();
@@ -350,44 +616,216 @@ function render() {
     }
     return true;
   });
+  rows.sort((a, b) => {
+    let av = a[sortKey] || '', bv = b[sortKey] || '';
+    if (sortKey === 'type') {
+      av = TYPE_META[av]?.label || av;
+      bv = TYPE_META[bv]?.label || bv;
+    }
+    if (av < bv) return sortDesc ? 1 : -1;
+    if (av > bv) return sortDesc ? -1 : 1;
+    return 0;
+  });
+  return rows;
+}
 
-  if (filtered.length === 0) {
+function renderMain() {
+  const main = document.getElementById('main');
+  clearNode(main);
+  const rows = getFiltered();
+  if (rows.length === 0) {
     const empty = el('div', { cls: 'empty' });
-    empty.appendChild(el('strong', { text: '검색 결과 없음' }));
-    empty.appendChild(document.createTextNode('다른 키워드를 시도해보세요.'));
-    grid.appendChild(empty);
+    empty.appendChild(el('strong', { text: '항목 없음' }));
+    empty.appendChild(document.createTextNode('필터·검색 조건을 바꿔보세요.'));
+    main.appendChild(empty);
     return;
   }
+  if (viewMode === 'icon') renderIconView(main, rows);
+  else renderListView(main, rows);
+}
 
-  filtered.forEach(item => {
-    const card = el('a', {
-      cls: 'card',
-      attrs: { href: item.file || '#', target: '_blank', rel: 'noopener' }
+function renderListView(main, rows) {
+  // Header
+  const header = el('div', { cls: 'list-header' });
+  const cols = [
+    { k: 'title', label: '이름' },
+    { k: 'date', label: '수정일' },
+    { k: 'type', label: '종류' },
+    { k: 'id', label: 'ID' },
+  ];
+  cols.forEach(c => {
+    const div = el('div', {
+      cls: sortKey === c.k ? 'sorted' : '',
+      on: { click: () => {
+        if (sortKey === c.k) sortDesc = !sortDesc;
+        else { sortKey = c.k; sortDesc = c.k === 'date'; }
+        renderMain();
+      }}
     });
-    const head = el('div', { cls: 'card-head' });
-    head.appendChild(el('span', {
-      cls: 'card-type type-' + (item.type || 'project'),
-      text: TYPE_LABELS[item.type] || item.type
-    }));
-    head.appendChild(el('span', { cls: 'card-date', text: item.date || '' }));
-    card.appendChild(head);
-    card.appendChild(el('div', { cls: 'card-title', text: item.title || item.id || 'Untitled' }));
-    card.appendChild(el('div', { cls: 'card-desc', text: item.desc || '' }));
-
-    if (item.tags && item.tags.length > 0) {
-      const tagsWrap = el('div', { cls: 'card-tags' });
-      item.tags.slice(0, 5).forEach(t => {
-        tagsWrap.appendChild(el('span', { cls: 'tag', text: t }));
-      });
-      card.appendChild(tagsWrap);
+    div.appendChild(document.createTextNode(c.label));
+    if (sortKey === c.k) {
+      div.appendChild(document.createTextNode('  ' + (sortDesc ? '↓' : '↑')));
     }
-    grid.appendChild(card);
+    header.appendChild(div);
+  });
+  main.appendChild(header);
+
+  rows.forEach(item => {
+    const meta = TYPE_META[item.type] || { label: item.type, icon: '📄' };
+    const row = el('a', {
+      cls: 'list-row' + (selectedId === item.id ? ' selected' : ''),
+      attrs: { href: item.file || '#', target: '_blank', rel: 'noopener' },
+      on: {
+        click: (e) => {
+          // 단일 클릭: 선택 + 디테일 보여주기, 더블 클릭: 새 탭 열기
+          if (e.detail === 1) {
+            e.preventDefault();
+            selectItem(item);
+          }
+        }
+      }
+    });
+    const nameCell = el('div', { cls: 'name-cell' });
+    nameCell.appendChild(el('span', { cls: 'file-icon', text: meta.icon }));
+    nameCell.appendChild(el('span', { cls: 'name-title', text: item.title || item.id || '제목 없음' }));
+    row.appendChild(nameCell);
+    row.appendChild(el('div', { cls: 'col-muted', text: item.date || '—' }));
+    row.appendChild(el('div', { cls: 'col-muted', text: meta.label }));
+    row.appendChild(el('div', { cls: 'col-muted', text: item.id || '—' }));
+    main.appendChild(row);
   });
 }
 
+function renderIconView(main, rows) {
+  const grid = el('div', { cls: 'icon-grid' });
+  rows.forEach(item => {
+    const meta = TYPE_META[item.type] || { label: item.type, icon: '📄' };
+    const tile = el('a', {
+      cls: 'icon-tile' + (selectedId === item.id ? ' selected' : ''),
+      attrs: { href: item.file || '#', target: '_blank', rel: 'noopener' },
+      on: {
+        click: (e) => {
+          if (e.detail === 1) {
+            e.preventDefault();
+            selectItem(item);
+          }
+        }
+      }
+    });
+    tile.appendChild(el('div', { cls: 'icon-tile-icon', text: meta.icon }));
+    tile.appendChild(el('div', { cls: 'icon-tile-name', text: item.title || item.id || '제목 없음' }));
+    grid.appendChild(tile);
+  });
+  main.appendChild(grid);
+}
+
+function selectItem(item) {
+  selectedId = item.id;
+  renderMain();
+  renderDetail(item);
+  updateStatusbar();
+}
+
+function renderDetail(item) {
+  const pane = document.getElementById('detailPane');
+  const content = document.getElementById('detailContent');
+  clearNode(content);
+
+  const meta = TYPE_META[item.type] || { label: item.type, icon: '📄' };
+
+  content.appendChild(el('div', { cls: 'detail-icon-big', text: meta.icon }));
+  content.appendChild(el('div', { cls: 'detail-title', text: item.title || item.id || '제목 없음' }));
+  content.appendChild(el('div', { cls: 'detail-type', text: meta.label }));
+
+  // 일반 정보
+  const info = el('div', { cls: 'detail-section' });
+  info.appendChild(el('h4', { text: '정보' }));
+  const rows = [
+    { k: '종류', v: meta.label },
+    { k: '수정일', v: item.date || '—' },
+    { k: 'ID', v: item.id || '—' },
+    { k: '경로', v: item.file || '—' },
+  ];
+  rows.forEach(r => {
+    const row = el('div', { cls: 'detail-row' });
+    row.appendChild(el('span', { cls: 'k', text: r.k }));
+    row.appendChild(el('span', { cls: 'v', text: r.v, style: 'max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;' }));
+    info.appendChild(row);
+  });
+  content.appendChild(info);
+
+  // 설명
+  if (item.desc) {
+    const desc = el('div', { cls: 'detail-section' });
+    desc.appendChild(el('h4', { text: '설명' }));
+    desc.appendChild(el('div', { cls: 'detail-desc', text: item.desc }));
+    content.appendChild(desc);
+  }
+
+  // 태그
+  if (item.tags && item.tags.length) {
+    const tagSec = el('div', { cls: 'detail-section' });
+    tagSec.appendChild(el('h4', { text: '태그' }));
+    const tagWrap = el('div', { cls: 'detail-tags' });
+    item.tags.forEach(t => tagWrap.appendChild(el('span', { cls: 'detail-tag', text: t })));
+    tagSec.appendChild(tagWrap);
+    content.appendChild(tagSec);
+  }
+
+  // 열기 버튼
+  if (item.file) {
+    const btn = el('a', {
+      cls: 'detail-open-btn',
+      attrs: { href: item.file, target: '_blank', rel: 'noopener' },
+      text: '열기 ↗',
+    });
+    content.appendChild(btn);
+  }
+
+  pane.classList.add('open');
+}
+
+document.getElementById('detailClose').addEventListener('click', () => {
+  document.getElementById('detailPane').classList.remove('open');
+  selectedId = null;
+  renderMain();
+  updateStatusbar();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.getElementById('detailPane').classList.remove('open');
+    selectedId = null;
+    renderMain();
+    updateStatusbar();
+  }
+});
+
+function updateStatusbar() {
+  const rows = getFiltered();
+  const sb = document.getElementById('statusbar');
+  const sel = selectedId ? '  ·  1개 선택됨' : '';
+  const updated = manifestMeta?.generated_at ? '  ·  업데이트 ' + manifestMeta.generated_at.slice(0,10) : '';
+  sb.textContent = rows.length + '개 항목' + sel + updated;
+}
+
+document.getElementById('viewIcon').addEventListener('click', () => {
+  viewMode = 'icon';
+  document.getElementById('viewIcon').classList.add('active');
+  document.getElementById('viewList').classList.remove('active');
+  renderMain();
+});
+document.getElementById('viewList').addEventListener('click', () => {
+  viewMode = 'list';
+  document.getElementById('viewList').classList.add('active');
+  document.getElementById('viewIcon').classList.remove('active');
+  renderMain();
+});
+
 document.getElementById('searchInput').addEventListener('input', (e) => {
   searchText = e.target.value.trim();
-  render();
+  renderMain();
+  updateStatusbar();
 });
 
 loadManifest();
