@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4월 이후 광고 효율 하락 — 진단과 대응 (2026.05)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+  background: #2a2a2a;
+  color: #fff;
+  overflow-x: hidden;
+  letter-spacing: -0.01em;
+}
+
+/* Viewer UI */
+.viewer-header {
+  background: #1a1a1a;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  transition: 0.3s;
+}
+.viewer-title { font-size: 14px; font-weight: 700; }
+.viewer-meta { font-size: 12px; color: rgba(255,255,255,0.6); }
+.viewer-controls {
+  background: #1a1a1a;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  gap: 12px;
+  transition: 0.3s;
+}
+button {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  transition: 0.15s;
+}
+button:hover:not(:disabled) { background: rgba(255,255,255,0.18); }
+button:disabled { opacity: 0.35; cursor: not-allowed; }
+.progress { display: flex; gap: 4px; }
+.dot {
+  width: 8px; height: 8px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.dot.active { background: #ff7849; transform: scale(1.3); }
+.dot:hover { background: rgba(255,255,255,0.5); }
+.counter {
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  font-weight: 600;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* Slide Container */
+.slide-container {
+  position: fixed;
+  top: 49px;
+  bottom: 53px;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  transition: 0.3s;
+}
+.slide-frame {
+  width: min(96vw, calc(96vh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+.slide-inner {
+  width: 720pt;
+  height: 405pt;
+  transform-origin: top left;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.slide-hint {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  background: rgba(0,0,0,0.5);
+  padding: 4px 10px;
+  border-radius: 100px;
+  backdrop-filter: blur(8px);
+  z-index: 10;
+}
+
+/* Fullscreen */
+body.fullscreen .viewer-header,
+body.fullscreen .viewer-controls {
+  opacity: 0;
+  pointer-events: none;
+}
+body.fullscreen .slide-container {
+  top: 0;
+  bottom: 0;
+  padding: 0;
+}
+body.fullscreen .slide-frame {
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+}
+body.fullscreen .slide-hint {
+  display: block;
+}
+
+/* Slide Content (common) */
+.slide {
+  width: 720pt;
+  height: 405pt;
+  display: none;
+}
+.slide.active { display: block; }
+
+/* Slide 01 - Cover */
+.slide-01 {
+  background: #191F28;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+}
+.slide-01 .inner { max-width: 880px; width: 100%; text-align: center; }
+.slide-01 .label { font-size: 12px; font-weight: 700; color: #3182F6; letter-spacing: 2px; margin-bottom: 18px; }
+.slide-01 h1 { font-size: 52px; font-weight: 900; line-height: 1.18; letter-spacing: -1.5px; }
+.slide-01 h1 .blue { color: #3182F6; }
+.slide-01 .sub { font-size: 20px; color: #D1D6DB; margin-top: 22px; font-weight: 500; letter-spacing: -0.5px; }
+.slide-01 .meta { position: absolute; bottom: 28px; left: 48px; right: 48px; display: flex; justify-content: space-between; font-size: 11px; color: #8B95A1; letter-spacing: 1px; font-weight: 600; }
+
+/* Slide 02-11 - Content */
+.slide-content { background: #FFFFFF; color: #191F28; padding: 36px 48px; display: flex; flex-direction: column; width: 720pt; height: 405pt; }
+.header { margin-bottom: 18px; }
+.label { font-size: 12px; font-weight: 700; color: #3182F6; letter-spacing: 1px; margin-bottom: 6px; }
+h2 { font-size: 22px; font-weight: 800; color: #191F28; letter-spacing: -0.5px; margin: 0; }
+.sub { font-size: 13px; color: #8B95A1; margin-top: 6px; font-weight: 500; }
+.footer { margin-top: auto; display: flex; justify-content: space-between; font-size: 11px; color: #8B95A1; font-weight: 600; padding-top: 12px; }
+
+/* Slide 02 - Contents */
+.slide-02 .grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-content: start; }
+.slide-02 .item { background: #F9FAFB; border: 1px solid #F2F4F6; border-radius: 14px; padding: 20px 24px; display: flex; align-items: center; gap: 18px; }
+.slide-02 .item-num { font-size: 28px; font-weight: 900; color: #3182F6; font-variant-numeric: tabular-nums; line-height: 1; }
+.slide-02 .item-text { font-size: 15px; font-weight: 700; color: #191F28; line-height: 1.4; }
+
+/* Slide 03 - Statistics */
+.slide-03 .grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.slide-03 .card { background: #F9FAFB; border: 1px solid #F2F4F6; border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; gap: 10px; }
+.metric-label { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.metric-tag { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 100px; letter-spacing: 0.5px; }
+.metric-tag.up { background: #FFF6F6; color: #F04452; }
+.metric-tag.down { background: #FFF6F6; color: #F04452; }
+.metric-name { font-size: 13px; font-weight: 700; color: #4E5968; }
+.metric-row { display: flex; align-items: baseline; gap: 8px; font-variant-numeric: tabular-nums; }
+.m-num { font-size: 36px; font-weight: 900; color: #191F28; letter-spacing: -1.2px; line-height: 1; }
+.m-arrow { font-size: 20px; color: #D1D6DB; font-weight: 700; }
+.m-unit { font-size: 16px; color: #4E5968; font-weight: 700; margin-left: 2px; }
+.month-row { font-size: 11px; color: #8B95A1; font-weight: 600; letter-spacing: 0.3px; }
+.insight { background: #191F28; color: #FFFFFF; border-radius: 12px; padding: 16px 22px; display: flex; align-items: center; gap: 18px; }
+.insight-quote { font-size: 17px; font-weight: 800; line-height: 1.35; }
+.insight-quote .blue { color: #6AA9FF; }
+.insight-sep { width: 1px; height: 36px; background: rgba(255,255,255,0.2); flex-shrink: 0; }
+.insight-desc { font-size: 12px; line-height: 1.55; color: #D1D6DB; }
+
+/* Slide 04 - Quote */
+.slide-04 { padding: 48px 60px; }
+.slide-04 .body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 28px; }
+.slide-04 h2 { font-size: 32px; font-weight: 900; line-height: 1.45; letter-spacing: -1px; color: #191F28; }
+.strike { text-decoration: line-through; color: #D1D6DB; font-weight: 600; }
+.blue { color: #3182F6; }
+.proof { display: flex; align-items: center; gap: 24px; background: #F9FAFB; border: 2px solid #3182F6; border-radius: 16px; padding: 20px 26px; }
+.proof-num { font-size: 52px; font-weight: 900; color: #3182F6; font-variant-numeric: tabular-nums; line-height: 1; }
+.proof-num .small { font-size: 32px; }
+.proof-text { font-size: 13px; line-height: 1.65; color: #4E5968; }
+.proof-tag { display: inline-block; font-size: 11px; font-weight: 800; color: #30B562; background: #F4FBF6; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px; letter-spacing: 0.5px; }
+.proof-text strong { color: #191F28; font-weight: 800; }
+
+/* Slide 05 - Flow */
+.flow { flex: 1; display: grid; grid-template-columns: 1fr 16px 1fr 16px 1fr 16px 1fr; align-items: stretch; gap: 0; }
+.step { background: #F9FAFB; border: 1px solid #F2F4F6; border-radius: 14px; padding: 16px 14px; display: flex; flex-direction: column; gap: 8px; }
+.step-num { display: inline-block; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; background: #EBF4FF; color: #3182F6; letter-spacing: 0.5px; align-self: flex-start; }
+.step-title { font-size: 14px; font-weight: 800; color: #191F28; line-height: 1.35; }
+.step-desc { font-size: 11px; color: #4E5968; line-height: 1.55; margin-top: auto; }
+.step.last { background: #191F28; border-color: #191F28; }
+.step.last .step-num { background: rgba(106,169,255,0.15); color: #6AA9FF; }
+.step.last .step-title { color: #FFFFFF; }
+.step.last .step-desc { color: #D1D6DB; }
+.arrow { display: flex; align-items: center; justify-content: center; font-size: 16px; color: #3182F6; font-weight: 700; }
+.insight-box { margin-top: 16px; background: #FFF8E6; border-left: 4px solid #F59E0B; border-radius: 0 12px 12px 0; padding: 12px 18px; font-size: 13px; color: #92560A; line-height: 1.55; font-weight: 600; }
+.insight-box strong { color: #5A370A; font-weight: 800; }
+
+/* Slide 06 - Comparison */
+.slide-06 .grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card { background: #F9FAFB; border: 1px solid #F2F4F6; border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; gap: 10px; }
+.card.good { background: #F4FBF6; border-color: #D7F0DF; }
+.card.bad { background: #FFF6F6; border-color: #FFDDDD; }
+.card-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 100px; align-self: flex-start; letter-spacing: 0.5px; }
+.card.good .card-tag { background: #30B562; color: #FFFFFF; }
+.card.bad .card-tag { background: #F04452; color: #FFFFFF; }
+.card-title { font-size: 15px; font-weight: 800; color: #191F28; line-height: 1.4; }
+.card-title .muted { color: #8B95A1; font-weight: 500; font-size: 13px; }
+.big-stat { display: flex; align-items: baseline; gap: 6px; font-variant-numeric: tabular-nums; }
+.big-stat .n { font-size: 36px; font-weight: 900; color: #191F28; letter-spacing: -1.2px; line-height: 1; }
+.big-stat .u { font-size: 14px; color: #4E5968; font-weight: 700; margin-left: 2px; }
+.stat-desc { font-size: 12px; color: #4E5968; line-height: 1.55; }
+.stat-desc strong { color: #191F28; font-weight: 700; }
+.funnel { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.f-pill { font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: #FFFFFF; border: 1px solid #F2F4F6; color: #4E5968; font-variant-numeric: tabular-nums; }
+.f-pill.weak { background: #FFE5E5; border-color: #FFCCCC; color: #C9333F; }
+.f-arrow { font-size: 11px; color: #8B95A1; }
+.compare { margin-top: auto; padding-top: 10px; border-top: 1px solid #E5E8EB; font-size: 11px; color: #4E5968; line-height: 1.55; }
+.compare strong { color: #191F28; font-weight: 700; }
+
+/* Slide 07 - Divider */
+.slide-07 { background: #191F28; color: #FFFFFF; display: flex; align-items: center; justify-content: center; padding: 48px; }
+.divider-inner { text-align: center; }
+.divider-label { font-size: 13px; font-weight: 800; color: #6AA9FF; letter-spacing: 2px; margin-bottom: 18px; }
+.divider-title { font-size: 48px; font-weight: 900; line-height: 1.25; letter-spacing: -1.5px; }
+.divider-sub { font-size: 18px; color: #8B95A1; margin-top: 14px; font-weight: 500; }
+
+/* Slide 08 - Options Grid */
+.slide-08 .grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; }
+.opt { background: #F9FAFB; border: 1px solid #F2F4F6; border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.opt.rec { background: #EBF4FF; border: 2px solid #3182F6; }
+.opt-head { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+.opt-key { font-size: 11px; font-weight: 800; width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: #4E5968; color: #FFFFFF; }
+.opt.rec .opt-key { background: #3182F6; }
+.opt-tag { font-size: 10px; font-weight: 800; color: #8B95A1; letter-spacing: 0.5px; }
+.opt.rec .opt-tag { color: #3182F6; }
+.opt-star { margin-left: auto; font-size: 13px; color: #3182F6; }
+.opt-title { font-size: 14px; font-weight: 800; color: #191F28; line-height: 1.35; }
+.opt-desc { font-size: 11px; color: #4E5968; line-height: 1.55; }
+.pc { margin-top: auto; padding-top: 8px; border-top: 1px solid #ECEFF2; display: grid; grid-template-columns: 14px 1fr; column-gap: 6px; row-gap: 3px; font-size: 10px; line-height: 1.4; }
+.opt.rec .pc { border-top-color: rgba(49,130,246,0.2); }
+.pc .mark.pro { color: #30B562; font-weight: 800; }
+.pc .mark.con { color: #F04452; font-weight: 800; }
+.pc-text { color: #4E5968; }
+
+/* Slide 09 - Timeline */
+.timeline { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; flex: 1; }
+.phase { background: #F9FAFB; border: 1px solid #F2F4F6; border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.phase-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 8px; border-bottom: 1px solid #ECEFF2; }
+.phase-name { font-size: 13px; font-weight: 800; color: #191F28; }
+.phase-time { font-size: 10px; color: #3182F6; font-weight: 800; letter-spacing: 0.6px; background: #EBF4FF; padding: 2px 7px; border-radius: 4px; }
+ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+li { font-size: 11.5px; line-height: 1.5; color: #191F28; display: grid; grid-template-columns: 18px 1fr; column-gap: 6px; align-items: start; }
+.tag { font-size: 9px; font-weight: 800; color: #FFFFFF; background: #3182F6; padding: 2px 5px; border-radius: 3px; text-align: center; letter-spacing: 0.3px; line-height: 1.4; }
+.tag.b { background: #8B5CF6; }
+.tag.c { background: #30B562; }
+.tag.d { background: #F59E0B; }
+.tag.a { background: #F04452; }
+.tag.star { background: #191F28; color: #6AA9FF; }
+li strong { font-weight: 800; }
+.insight-final { background: #191F28; color: #FFFFFF; border-radius: 12px; padding: 12px 18px; display: flex; align-items: center; gap: 14px; font-size: 12px; line-height: 1.5; margin-top: 12px; }
+.insight-tag { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; background: rgba(245,158,11,0.25); color: #F59E0B; letter-spacing: 0.5px; flex-shrink: 0; }
+.insight-text strong { color: #6AA9FF; font-weight: 800; }
+
+/* Slide 10 - 3-up Statement */
+.slide-10 .body { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+.msg-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.msg { background: #F9FAFB; border-left: 4px solid #3182F6; border-radius: 0 12px 12px 0; padding: 16px 20px; display: flex; align-items: flex-start; gap: 16px; }
+.msg-num { font-size: 28px; font-weight: 900; color: #3182F6; font-variant-numeric: tabular-nums; line-height: 1; flex-shrink: 0; }
+.msg-text { font-size: 14px; font-weight: 700; color: #191F28; line-height: 1.55; }
+
+/* Slide 11 - Actions */
+.slide-11 .body { flex: 1; display: flex; flex-direction: column; }
+.action-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.action-list li { background: #F9FAFB; border: 1px solid #F2F4F6; border-radius: 12px; padding: 14px 18px; display: grid; grid-template-columns: auto 1fr; column-gap: 14px; align-items: start; font-size: 13px; line-height: 1.6; color: #191F28; }
+.action-owner { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px; background: #3182F6; color: #FFFFFF; letter-spacing: 0.5px; align-self: flex-start; }
+.action-owner.agency { background: #8B5CF6; }
+.action-owner.team { background: #30B562; }
+.action-owner.md { background: #F59E0B; }
+.action-list li strong { font-weight: 800; }
+.cta { margin-top: auto; background: #191F28; color: #FFFFFF; border-radius: 12px; padding: 16px 24px; text-align: center; font-size: 14px; font-weight: 700; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<header class="viewer-header">
+  <div class="viewer-title">4월 이후 광고 효율 하락 — 진단과 대응</div>
+  <div class="viewer-meta">2026.05 먼슬리 보고 · 보완 자료</div>
+</header>
+
+<div class="slide-container">
+  <div class="slide-frame">
+    <div class="slide-inner" id="slideInner">
+
+      <!-- Slide 01 -->
+      <div class="slide slide-01 active" data-index="1">
+        <div class="inner">
+          <p class="label">— 보완 자료 · 2026.05 MONTHLY</p>
+          <h1>4월 이후 광고 효율 하락,<br><span class="blue">진단</span>과 <span class="blue">대응</span></h1>
+          <p class="sub">광고 운영 문제가 아닌, 구조적 신호</p>
+        </div>
+        <div class="meta">
+          <span>YTD 광고 성과 보고 보완 · ement 리포트 기반</span>
+          <span>LINE FRIENDS SQUARE</span>
+        </div>
+      </div>
+
+      <!-- Slide 02 -->
+      <div class="slide slide-content" data-index="2">
+        <header class="header">
+          <div class="label">CONTENTS</div>
+          <h2>오늘 다룰 5가지</h2>
+        </header>
+        <div class="grid slide-02">
+          <div class="item"><div class="item-num">01</div><div class="item-text">현황 — 표면 신호</div></div>
+          <div class="item"><div class="item-num">02</div><div class="item-text">진단 — 광고 문제가 아니다</div></div>
+          <div class="item"><div class="item-num">03</div><div class="item-text">구조적 원인 — 4단계 흐름</div></div>
+          <div class="item"><div class="item-num">04</div><div class="item-text">대응 전략 — 4가지 옵션</div></div>
+          <div class="item"><div class="item-num">05</div><div class="item-text">추천 조합과 액션</div></div>
+        </div>
+        <div class="footer"><span>4월 이후 광고 효율 하락 — 진단과 대응</span><span>02 / 11</span></div>
+      </div>
+
+      <!-- Slide 03 -->
+      <div class="slide slide-content slide-03" data-index="3">
+        <header class="header">
+          <div class="label">01 · 현황 — 표면 신호</div>
+          <h2>CPC 상승, CVR 하락 — 동시 진행</h2>
+          <p class="sub">두 지표가 같이 악화 = "더 비싼 클릭이 덜 산다"</p>
+        </header>
+        <div class="grid">
+          <div class="card">
+            <div class="metric-label">
+              <span class="metric-tag up">↑ +37.9%</span>
+              <span class="metric-name">CPC · 클릭당 비용</span>
+            </div>
+            <div class="metric-row">
+              <span class="m-num">272</span>
+              <span class="m-arrow">→</span>
+              <span class="m-num">327</span>
+              <span class="m-arrow">→</span>
+              <span class="m-num">375</span>
+              <span class="m-unit">원</span>
+            </div>
+            <div class="month-row">1월 · 4월 · 5월(17일까지)</div>
+            <p style="font-size:12px; color:#4E5968; line-height:1.5; margin-top:6px;">광고비가 더 비싸지고 있음 — 메타 알고리즘이 효율 낮은 풀에 비싼 입찰을 강요</p>
+          </div>
+          <div class="card">
+            <div class="metric-label">
+              <span class="metric-tag down">↓ -38.0%</span>
+              <span class="metric-name">CVR · 전환율</span>
+            </div>
+            <div class="metric-row">
+              <span class="m-num">3.34</span>
+              <span class="m-arrow">→</span>
+              <span class="m-num">2.83</span>
+              <span class="m-arrow">→</span>
+              <span class="m-num">2.07</span>
+              <span class="m-unit">%</span>
+            </div>
+            <div class="month-row">1월 · 4월 · 5월(17일까지)</div>
+            <p style="font-size:12px; color:#4E5968; line-height:1.5; margin-top:6px;">클릭한 사람이 덜 사고 있음 — 메타 리타겟팅이 두 스토어 모두 동반 하락</p>
+          </div>
+        </div>
+        <div class="insight">
+          <span class="insight-quote">"더 비싼 클릭이 <span class="blue">덜 산다</span>"</span>
+          <div class="insight-sep"></div>
+          <span class="insight-desc">메타 리타겟팅 효율이 <strong>스스·스퀘어</strong> 두 스토어에서 동반 하락 중</span>
+        </div>
+        <div class="footer"><span>출처: ement YTD 광고 성과 분석 2026</span><span>03 / 11</span></div>
+      </div>
+
+      <!-- Slide 04 -->
+      <div class="slide slide-content slide-04" data-index="4">
+        <div class="label">02 · 진단 — 한 줄로</div>
+        <div class="body">
+          <h2>
+            <span class="strike">광고 운영의 문제</span>가 아니라,<br>
+            <span class="blue">콘텐츠·상품 사이클 공백</span>이<br>
+            광고에 그대로 나타나는 것
+          </h2>
+          <div class="proof">
+            <div class="proof-num">1,208<span class="small">%</span></div>
+            <div class="proof-text">
+              <span class="proof-tag">✓ 브랜드 자산 유지</span><br>
+              <strong>상시 SA ROAS는 그대로 유지</strong>되고 있음 — 브랜드 검색 수요는 살아있다.<br>
+              문제는 푸시 채널(메타 리타겟팅·DA)의 신선도 고갈입니다.
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span></span><span>04 / 11</span></div>
+      </div>
+
+      <!-- Slide 05 -->
+      <div class="slide slide-content" data-index="5">
+        <header class="header">
+          <div class="label">03 · 구조적 원인</div>
+          <h2>4단계 흐름 — 신제품 공백이 광고 효율 하락으로 이어진다</h2>
+          <p class="sub">광고 문제가 아니라 콘텐츠·상품 사이클 공백의 결과</p>
+        </header>
+        <div class="flow">
+          <div class="step">
+            <span class="step-num">STEP 01</span>
+            <div class="step-title">신제품·티징 부재</div>
+            <p class="step-desc">새 콘텐츠 부재로<br>신규 트래픽 유입 감소</p>
+          </div>
+          <div class="arrow">→</div>
+          <div class="step">
+            <span class="step-num">STEP 02</span>
+            <div class="step-title">리타겟팅 풀 노후화</div>
+            <p class="step-desc">살 사람은 이미 샀고<br>안 살 사람은 안 삼</p>
+          </div>
+          <div class="arrow">→</div>
+          <div class="step">
+            <span class="step-num">STEP 03</span>
+            <div class="step-title">동일 소재 반복</div>
+            <p class="step-desc">광고 피로도 ↑<br>호기심·전환 의도 ↓</p>
+          </div>
+          <div class="arrow">→</div>
+          <div class="step last">
+            <span class="step-num">STEP 04</span>
+            <div class="step-title">CPC ↑ · CVR ↓</div>
+            <p class="step-desc">알고리즘이<br>비싼 입찰을 강요</p>
+          </div>
+        </div>
+        <div class="insight-box">⚠ <strong>월 고정비 3,600만원 (검색 1,700 + 리타겟팅 1,700) · 신규 여력 400~500만원</strong> — 신제품·프로모션 공백 시 신규 확보 여력이 사라지는 구조</div>
+        <div class="footer"><span></span><span>05 / 11</span></div>
+      </div>
+
+      <!-- Slide 06 -->
+      <div class="slide slide-content slide-06" data-index="6">
+        <header class="header">
+          <div class="label">03 · 보조 증거 — 데이터로 검증</div>
+          <h2>검색(SA)은 멀쩡, 푸시(메타·DA)만 하락</h2>
+          <p class="sub">진단 적중 — 광고 운영 문제가 아니라 푸시 채널 신선도 고갈</p>
+        </header>
+        <div class="grid">
+          <div class="card good">
+            <span class="card-tag">✓ 브랜드 자산 · 멀쩡</span>
+            <div class="card-title">상시 SA <span class="muted">/ 검색 수요 기반</span></div>
+            <div class="big-stat"><span class="n">1,208</span><span class="u">% ROAS</span></div>
+            <p class="stat-desc">광고비 <strong>40.7%</strong> → 매출 <strong>67.6%</strong> · 구매 <strong>62%</strong> 견인</p>
+            <p class="compare">브랜드 검색 수요는 그대로 유지 — 광고가 끌어오는 게 아니라 <strong>유저가 찾아오는 구조</strong>가 살아있음</p>
+          </div>
+          <div class="card bad">
+            <span class="card-tag">⚠ 푸시 채널 · 신선도 고갈</span>
+            <div class="card-title">메타 리타겟팅 <span class="muted">/ 클릭→구매 전환 약함</span></div>
+            <div class="funnel">
+              <span class="f-pill">광고비 17%</span>
+              <span class="f-arrow">›</span>
+              <span class="f-pill">클릭 21% <strong style="color:#3182F6;">1위</strong></span>
+              <span class="f-arrow">›</span>
+              <span class="f-pill weak">구매 5.8%</span>
+              <span class="f-arrow">›</span>
+              <span class="f-pill weak">매출 4.0%</span>
+            </div>
+            <p class="stat-desc" style="margin-top:4px;">클릭은 잘 받는데 <strong>전환은 안 됨</strong></p>
+            <p class="compare">같은 메타 안의 <strong>어드밴티지(ROAS 555%)</strong>와 명확한 격차 — 26년 YTD 신제품·프로모션 부재로 신규 풀 확보 실패</p>
+          </div>
+        </div>
+        <div class="footer"><span>출처: ement YTD 광고 성과 분석 2026</span><span>06 / 11</span></div>
+      </div>
+
+      <!-- Slide 07 -->
+      <div class="slide slide-07" data-index="7">
+        <div class="divider-inner">
+          <div class="divider-label">— SECTION 02</div>
+          <div class="divider-title">대응 전략</div>
+          <div class="divider-sub">4가지 옵션 검토 → 추천 조합</div>
+        </div>
+      </div>
+
+      <!-- Slide 08 -->
+      <div class="slide slide-content slide-08" data-index="8" style="padding:32px 48px;">
+        <header class="header">
+          <div class="label">04 · 대응 전략 — 옵션 매트릭스</div>
+          <h2>4가지 옵션 — 수비형 / 공격형 / 콘텐츠형 / 분산형</h2>
+          <p class="sub">★ 표시는 추천 옵션 (즉시 실행 가능 + 데이터 근거 있음)</p>
+        </header>
+        <div class="grid">
+          <div class="opt">
+            <div class="opt-head"><span class="opt-key">A</span><span class="opt-tag">수비형 · 하반기 집중</span></div>
+            <div class="opt-title">광고비 세이브 → 하반기 PB·빅 프로모션 집중</div>
+            <div class="opt-desc">상반기 시간 끌며 비효율 최소화, 하반기 커머셜 이벤트에 예산 집중</div>
+            <div class="pc">
+              <span class="mark pro">+</span><span class="pc-text">즉시 ROAS 회복, 하반기 빅 웨이브 여력 확보</span>
+              <span class="mark con">−</span><span class="pc-text">상반기 볼륨 축소 → 신규 풀 더 마름 (일시적)</span>
+            </div>
+          </div>
+          <div class="opt">
+            <div class="opt-head"><span class="opt-key">B</span><span class="opt-tag">공격형</span></div>
+            <div class="opt-title">신규 시장·타겟 발굴</div>
+            <div class="opt-desc">룩어라이크 확장, 신규 지역·연령대 테스트, 인플루언서 협업</div>
+            <div class="pc">
+              <span class="mark pro">+</span><span class="pc-text">리타겟팅 풀 자체를 키움 — 근본 처방</span>
+              <span class="mark con">−</span><span class="pc-text">초기 ROAS 낮을 수 있음, 검증 기간 필요</span>
+            </div>
+          </div>
+          <div class="opt rec">
+            <div class="opt-head"><span class="opt-key">C</span><span class="opt-tag">콘텐츠형 · 시간 끌기</span><span class="opt-star">★</span></div>
+            <div class="opt-title">소재 최신성 확보 — 시즌 반영 자동화</div>
+            <div class="opt-desc">대행사 나노바나나 자동화 소재 제작 (월 2~3주 단위 전단지형)</div>
+            <div class="pc">
+              <span class="mark pro">+</span><span class="pc-text">신제품 없이 광고 신선도 유지, 노력 대비 효과 미지수</span>
+              <span class="mark con">−</span><span class="pc-text">구조적 해결 아님 — 하반기까지 버티는 전술</span>
+            </div>
+          </div>
+          <div class="opt rec">
+            <div class="opt-head"><span class="opt-key">D</span><span class="opt-tag">분산형 · 추천</span><span class="opt-star">★</span></div>
+            <div class="opt-title">채널 다각화 — PC 확대·29CM 협력광고</div>
+            <div class="opt-desc">PC 인벤토리 (ROAS 3,236%) 확대, 29CM·올웨이즈 등 신규 채널</div>
+            <div class="pc">
+              <span class="mark pro">+</span><span class="pc-text">ZOA × 29CM ROAS 849%로 이미 검증된 방향</span>
+              <span class="mark con">−</span><span class="pc-text">채널별 학습 기간 필요</span>
+            </div>
+          </div>
+        </div>
+        <div class="footer" style="margin-top:10px;"><span></span><span>08 / 11</span></div>
+      </div>
+
+      <!-- Slide 09 -->
+      <div class="slide slide-content" data-index="9" style="padding:32px 48px;">
+        <header class="header">
+          <div class="label">04 · 추천 조합 — 단기 · 중기 · 장기</div>
+          <h2>추천: <span class="blue">C + D + A 일부</span> 조합으로 분리 실행</h2>
+          <p class="sub">즉시 가능한 콘텐츠/PC부터, 중기로 채널 다각화, 장기로 구조 개편</p>
+        </header>
+        <div class="body" style="flex:1; display:flex; flex-direction:column;">
+          <div class="timeline">
+            <article class="phase">
+              <header class="phase-head"><span class="phase-name">즉시 ~ 1개월</span><span class="phase-time">SHORT</span></header>
+              <ul>
+                <li><span class="tag c">C</span><span>나노바나나 소재 자동화 (월 2~3주 시즌 반영)</span></li>
+                <li><span class="tag a">A</span><span>메타 협력광고 신제품 타이밍 전환</span></li>
+                <li><span class="tag d">D</span><span>카카오 선물하기 랜딩 협력광고 테스트</span></li>
+              </ul>
+            </article>
+            <article class="phase">
+              <header class="phase-head"><span class="phase-name">상반기 버티기</span><span class="phase-time">MID</span></header>
+              <ul>
+                <li><span class="tag a">A</span><span>광고비 <strong>최소 유지</strong> (월 3,600 고정비 중심)</span></li>
+                <li><span class="tag c">C</span><span>소재 신선도로 시간 끌기 (효과 미지수)</span></li>
+                <li><span class="tag star">★</span><span><strong>하반기 여력 확보</strong> — PB·빅 프로모션 대기</span></li>
+              </ul>
+            </article>
+            <article class="phase">
+              <header class="phase-head"><span class="phase-name">하반기 빅 웨이브</span><span class="phase-time">LONG</span></header>
+              <ul>
+                <li><span class="tag star">★</span><span><strong>PB 상품 런칭</strong> — 신규 고객 확보 모멘텀</span></li>
+                <li><span class="tag star">★</span><span><strong>빅 프로모션</strong> 집중 투자 (상반기 세이브분)</span></li>
+                <li><span class="tag star">★</span><span>MD·기획팀 협업 — <strong>커머셜 이벤트</strong> 확보</span></li>
+              </ul>
+            </article>
+          </div>
+          <div class="insight-final">
+            <span class="insight-tag">핵심</span>
+            <div class="insight-text"><strong>상반기는 구조적 해결 불가</strong> — 신제품·프로모션 부재로 마케팅 단독 돌파 어려움. 소재 신선도로 시간 끌며 하반기 커머셜 이벤트 집중 전략.</div>
+          </div>
+        </div>
+        <div class="footer" style="margin-top:6px;"><span></span><span>09 / 11</span></div>
+      </div>
+
+      <!-- Slide 10 -->
+      <div class="slide slide-content slide-10" data-index="10" style="padding:36px 48px;">
+        <header class="header">
+          <div class="label">— 핵심 메시지</div>
+          <h2>오늘 결론 3가지</h2>
+        </header>
+        <div class="body">
+          <div class="msg-grid">
+            <div class="msg">
+              <div class="msg-num">01</div>
+              <div class="msg-text">광고 효율 하락은 광고 운영 문제가 아니라 <strong>콘텐츠·상품 공백 문제</strong>입니다.</div>
+            </div>
+            <div class="msg">
+              <div class="msg-num">02</div>
+              <div class="msg-text">단기 = 콘텐츠 신선도 / 중기 = 채널 다각화 / 장기 = <strong>신상 사이클 개편</strong></div>
+            </div>
+            <div class="msg">
+              <div class="msg-num">03</div>
+              <div class="msg-text">광고비 무작정 컷팅은 악순환 — <strong>풀을 다시 채우면서 효율화 병행</strong>해야 합니다.</div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span></span><span>10 / 11</span></div>
+      </div>
+
+      <!-- Slide 11 -->
+      <div class="slide slide-content slide-11" data-index="11" style="padding:36px 48px;">
+        <header class="header">
+          <div class="label">— NEXT ACTIONS</div>
+          <h2>미팅 후 진행 사항</h2>
+        </header>
+        <div class="body">
+          <ul class="action-list">
+            <li><span class="action-owner agency">광고 대행사</span><span>메타 협력광고 소재·오디언스·카탈로그 점검 <strong>(2주 내)</strong></span></li>
+            <li><span class="action-owner agency">광고 대행사</span><span>PC SA 비중 <strong>15→20%</strong> 단계 확대 테스트</span></li>
+            <li><span class="action-owner agency">광고 대행사</span><span>29CM 협력광고 IP 2개 (BT21·조구만) 소규모 견적</span></li>
+            <li><span class="action-owner team">마케팅 팀</span><span>"이달의 발굴템" 포맷 <strong>6월 1주차 1편</strong> 파일럿</span></li>
+            <li><span class="action-owner md">MD·기획</span><span><strong>6~8월 신상 출시 캘린더</strong> 공유 요청</span></li>
+          </ul>
+          <div class="cta">이 덱 공유 주소 → <strong>mkt-studio/report/2605_mkt_monthly.html</strong></div>
+        </div>
+        <div class="footer"><span></span><span>11 / 11</span></div>
+      </div>
+
+    </div>
+    <div class="slide-hint">← → 또는 Space 키로 이동 · F 전체화면</div>
+  </div>
+</div>
+
+<div class="viewer-controls">
+  <button id="prevBtn">← 이전</button>
+  <div class="progress" id="progress"></div>
+  <span class="counter" id="counter">1 / 11</span>
+  <button id="nextBtn">다음 →</button>
+  <button id="fullscreenBtn" style="margin-left:8px;">⛶ 전체화면</button>
+</div>
+
+<script>
+const TOTAL = 11;
+let current = 1;
+
+const slideInner = document.getElementById('slideInner');
+const counter = document.getElementById('counter');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const progress = document.getElementById('progress');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+function update() {
+  document.querySelectorAll('.slide').forEach((s, i) => {
+    s.classList.toggle('active', i + 1 === current);
+  });
+  counter.textContent = current + ' / ' + TOTAL;
+  prevBtn.disabled = current === 1;
+  nextBtn.disabled = current === TOTAL;
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('active', i + 1 === current);
+  });
+}
+
+function scale() {
+  const frame = document.querySelector('.slide-frame');
+  const wrap = frame.getBoundingClientRect();
+  const SLIDE_W = 960;
+  const SLIDE_H = 540;
+  const sx = wrap.width / SLIDE_W;
+  const sy = wrap.height / SLIDE_H;
+  const s = Math.min(sx, sy);
+  slideInner.style.transform = `scale(${s})`;
+  slideInner.style.width = SLIDE_W + 'px';
+  slideInner.style.height = SLIDE_H + 'px';
+
+  // Center alignment
+  const scaledW = SLIDE_W * s;
+  const scaledH = SLIDE_H * s;
+  const offsetX = (wrap.width - scaledW) / 2;
+  const offsetY = (wrap.height - scaledH) / 2;
+  slideInner.style.left = offsetX + 'px';
+  slideInner.style.top = offsetY + 'px';
+}
+
+for (let i = 1; i <= TOTAL; i++) {
+  const dot = document.createElement('div');
+  dot.className = 'dot';
+  dot.addEventListener('click', () => { current = i; update(); });
+  progress.appendChild(dot);
+}
+
+prevBtn.addEventListener('click', () => { if (current > 1) { current--; update(); } });
+nextBtn.addEventListener('click', () => { if (current < TOTAL) { current++; update(); } });
+
+function toggleFullscreen() {
+  document.body.classList.toggle('fullscreen');
+  fullscreenBtn.textContent = document.body.classList.contains('fullscreen') ? '⛶ 나가기' : '⛶ 전체화면';
+  scale();
+}
+
+fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); if (current < TOTAL) { current++; update(); } }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); if (current > 1) { current--; update(); } }
+  if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleFullscreen(); }
+  if (e.key === 'Escape') { document.body.classList.remove('fullscreen'); fullscreenBtn.textContent = '⛶ 전체화면'; scale(); }
+});
+
+window.addEventListener('resize', scale);
+window.addEventListener('load', () => { update(); scale(); });
+
+update();
+scale();
+</script>
+
+</body>
+</html>

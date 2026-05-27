@@ -88,6 +88,25 @@
     min-width: 60px;
     text-align: center;
   }
+  .fullscreen-btn {
+    margin-left: 8px;
+    padding: 8px 12px;
+  }
+  body.fullscreen .controls,
+  body.fullscreen header {
+    display: none;
+  }
+  body.fullscreen .stage {
+    padding: 0;
+  }
+  body.fullscreen .frame-wrap {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+  body.fullscreen .hint {
+    display: block;
+  }
   .hint {
     position: absolute;
     bottom: 12px; right: 16px;
@@ -119,6 +138,7 @@
   <div class="progress" id="progress"></div>
   <span class="counter" id="counter">1 / 11</span>
   <button id="nextBtn">다음 →</button>
+  <button id="fullscreenBtn" class="fullscreen-btn">⛶ 전체화면</button>
 </div>
 
 <script>
@@ -131,6 +151,7 @@ const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 const progress = document.getElementById('progress');
 const frameWrap = document.getElementById('frameWrap');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
 
 function pad(n) { return String(n).padStart(2, '0'); }
 
@@ -167,9 +188,19 @@ for (let i = 1; i <= TOTAL; i++) {
 prevBtn.addEventListener('click', () => { if (current > 1) { current--; update(); } });
 nextBtn.addEventListener('click', () => { if (current < TOTAL) { current++; update(); } });
 
+function toggleFullscreen() {
+  document.body.classList.toggle('fullscreen');
+  fullscreenBtn.textContent = document.body.classList.contains('fullscreen') ? '⛶ 나가기' : '⛶ 전체화면';
+  scale();
+}
+
+fullscreenBtn.addEventListener('click', toggleFullscreen);
+
 document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); if (current < TOTAL) { current++; update(); } }
   if (e.key === 'ArrowLeft') { e.preventDefault(); if (current > 1) { current--; update(); } }
+  if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleFullscreen(); }
+  if (e.key === 'Escape') { document.body.classList.remove('fullscreen'); fullscreenBtn.textContent = '⛶ 전체화면'; scale(); }
 });
 
 window.addEventListener('resize', scale);
